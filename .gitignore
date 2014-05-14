@@ -1,0 +1,22 @@
+# Unneeded files
+logs/*
+*.log
+!.gitkeep
+tmp
+.DS_Store
+
+# Local node modules
+node_modules/
+
+# Swp files
+*.swp
+*~
+
+# Test output
+test_out/
+
+# Sublime
+*sublime*
+
+# Vagrant
+.vagrant/
