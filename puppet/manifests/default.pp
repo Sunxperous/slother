@@ -35,7 +35,7 @@ class { 'install_npm_packages':
 # after installing global npm modules.
 exec { 'npm install --no-bin-link':
   cwd => '/vagrant',
-  path => '/usr/local/node/node-current/bin',
+  path => '/usr/local/node/node-default/bin',
   require => Class['install_npm_packages'],
 }
 
