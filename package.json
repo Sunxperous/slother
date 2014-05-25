@@ -1,10 +1,14 @@
 {
-  "name": "",
-  "description": "",
-  "author": "",
-  "version": "",
-  "repository": "",
+  "name": "Slother",
+  "description": "Slother for Orbital 2014",
+  "author": "Sloth",
+  "version": "0.0.0",
+  "repository": "https://github.com/Sunxperous/slother",
 
   "devDependencies": {
+  },
+
+  "dependencies": {
+    "express": "3.x"
   }
 }
