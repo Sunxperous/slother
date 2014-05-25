@@ -16,7 +16,7 @@ node_modules/
 test_out/
 
 # Sublime
-*sublime*
+*sublime-workspace
 
 # Vagrant
 .vagrant/
