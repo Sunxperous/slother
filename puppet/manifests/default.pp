@@ -24,6 +24,12 @@ class { 'install_nodejs': }
 # Installs global npm modules: 
 # after installing node.js.
 class install_npm_packages {
+  package { 'browser-sync':
+    provider => 'npm',
+  }
+  package { 'supervisor':
+    provider => 'npm',
+  }
 }
 class { 'install_npm_packages':
   require => [
