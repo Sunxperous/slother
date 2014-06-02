@@ -26,6 +26,7 @@ class { 'install_nodejs': }
 class install_npm_packages {
   package { 'browser-sync':
     provider => 'npm',
+    ensure => '0.9.1'
   }
   package { 'supervisor':
     provider => 'npm',
