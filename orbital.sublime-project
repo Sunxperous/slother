@@ -3,7 +3,15 @@
   [
     {
       "path": "/",
-      "name": "/"
+      "name": "/",
+      "file_exclude_patterns": [
+        "*.swp",
+      ],
+      "folder_exclude_patterns": [
+        ".vagrant",
+        "node_modules",
+        "puppet/modules"
+      ]
     }
   ]    
 }

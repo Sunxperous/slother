@@ -50,3 +50,8 @@ exec { 'npm install --no-bin-link':
 package { 'git':
   ensure => installed,
 }
+
+# Installs Vim.
+package { 'vim':
+  ensure => installed,
+}
