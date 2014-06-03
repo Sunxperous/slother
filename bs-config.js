@@ -143,7 +143,7 @@ module.exports = {
      |--------------------------------------------------------------------------
      | https://github.com/shakyShane/browser-sync/wiki/options#wiki-host
      */
-    host: null,
+    host: 'localhost',
 
     /*
      |--------------------------------------------------------------------------
