@@ -1,0 +1,18 @@
+table {
+  margin: auto auto;
+}
+td {
+  border: 1px solid #666;
+  padding: 4px;
+}
+td.slot {
+  text-align: left;
+  overflow: hidden;
+  font-size: 12px;
+}
+td.empty {
+  max-width: 10px;
+}
+td.stuff {
+  min-width: 30px;
+}

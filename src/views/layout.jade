@@ -1,6 +1,9 @@
 doctype html
-html(lang="en")
+html(lang='en')
   head
     title= title
+    //- Express will find /main.css in /public.
+    link(rel='stylesheet', href='/bootstrap/bootstrap.css')
+    link(rel='stylesheet', href='/main.css')
   body
     block content

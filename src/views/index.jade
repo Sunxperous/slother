@@ -1,4 +1,20 @@
 extends layout
 
 block content
-  h1= title+'!'
+  - var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  table
+    thead
+      tr
+        td Time
+        - for (var i = 0; i < 24; i++)
+          td.slot= i
+    tbody
+    - for (var daysI = 0; daysI < 7; daysI++)
+      tr
+        td= days[daysI]
+        - for (var i = 0; i < 24; i++)
+          if (i > 10) && (i < 21)
+            td.slot.stuff
+          else
+            td.slot.empty
+
