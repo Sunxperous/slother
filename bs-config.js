@@ -19,7 +19,8 @@ module.exports = {
      | https://github.com/shakyShane/browser-sync/wiki/options#wiki-files
      */
     files: [
-        'src/views/*.jade'
+        'src/views/*.jade',
+        'src/public/*.css'
     ],
 
     /*
@@ -47,8 +48,8 @@ module.exports = {
     proxy: 'localhost:8000',
 
     ports: {
-        min: 8100,
-        max: 8200
+        min: 8010,
+        max: 8020
     },
 
     /*
@@ -142,7 +143,7 @@ module.exports = {
      |--------------------------------------------------------------------------
      | https://github.com/shakyShane/browser-sync/wiki/options#wiki-host
      */
-    host: '192.168.16.16',
+    host: null,
 
     /*
      |--------------------------------------------------------------------------
