@@ -3,7 +3,9 @@ html(lang='en')
   head
     title= title
     //- Express will find /main.css in /public.
-    link(rel='stylesheet', href='/bootstrap/bootstrap.css')
-    link(rel='stylesheet', href='/main.css')
+    script(src= '/vendor/jquery-2.1.1.min.js')
+    script(src= '/js/moduleExtract.js')
+    link(rel='stylesheet', href='/vendor/bootstrap.css')
+    link(rel='stylesheet', href='/css/main.css')
   body
     block content

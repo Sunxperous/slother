@@ -1,19 +1,29 @@
 extends layout
 
 block content
-  - var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  - var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
   table
     thead
       tr
-        td Time
+        td.day
         - for (var i = 0; i < 24; i++)
-          td.slot= i
+          if (i < 5)
+            td.slot.ungodly
+          else if (i > 10) && (i < 21)
+            td.slot.stuff
+              div= i
+          else
+            td.slot.empty
+              div= i
+            
     tbody
     - for (var daysI = 0; daysI < 7; daysI++)
       tr
-        td= days[daysI]
+        td.day= days[daysI]
         - for (var i = 0; i < 24; i++)
-          if (i > 10) && (i < 21)
+          if (i < 5)
+            td.slot.ungodly
+          else if (i > 10) && (i < 21)
             td.slot.stuff
           else
             td.slot.empty
