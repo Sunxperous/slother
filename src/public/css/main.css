@@ -1,14 +1,35 @@
+body {
+  padding: 10px 5%;
+}
 table {
   margin: auto auto;
+  width: 100%;
+}
+thead td {
+  border: 0;
 }
 td {
   border: 1px solid #666;
   padding: 4px;
 }
-td.slot {
+td div {
   text-align: left;
-  overflow: hidden;
+  font-size: 10px;
+}
+td.weekWrapper {
+  width: 20px;
+}
+div.week {
+  transform: rotate(-0.25turn);
+  vertical-align: middle;
   font-size: 12px;
+  white-space: pre;
+  display: inline-block;
+}
+td.ungodly {
+  display: none;
+}
+td.slot {
 }
 td.empty {
   max-width: 10px;

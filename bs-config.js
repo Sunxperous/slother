@@ -20,7 +20,8 @@ module.exports = {
      */
     files: [
         'src/views/*.jade',
-        'src/public/*.css'
+        'src/public/css/*.css',
+        'src/public/js/*.js'
     ],
 
     /*
