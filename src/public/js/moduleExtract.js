@@ -21,7 +21,7 @@ function extract(addr) {
   mod.sort();
   console.log(mod); //For checking
   var tempMod = mod.pop().split("=");
-  while(true) {
+  while(tempMod !== undefined) {
     
     var tempOb = {
       codeNo: tempMod[0],
@@ -32,12 +32,11 @@ function extract(addr) {
         tempOb[noToLessonType(tempMod[1])].
           push(tempMod[1].substring(1));  
         tempMod = mod.pop();
-        if(tempMod== undefined) { break; }
+        if(tempMod == undefined) { break; }
         else 
           tempMod = tempMod.split("="); 
     }
     modDetailInfo[tempOb.codeNo] = tempOb;
-    if(tempMod== undefined) { break; }
   }
   console.log(modDetailInfo);
 
@@ -47,7 +46,6 @@ function extract(addr) {
       tempModCode = "FE5218",
       modBriefInfo = {};
   for(var x in modDetailInfo) {
-    var y = 0;
     tempURL = tempURL.replace(tempModCode,x); 
     tempModCode = x;
     $.getJSON(tempURL,function(data) {
@@ -67,20 +65,29 @@ function extract(addr) {
         data.ModuleCode;
 
       //Next,timetable.
-      for(y in data.Timetable) {
-        if(data.Timetable[y].LessonType == "LECTURE" && 
-            data.Timetable[y].ClassNo == modDetailInfo[data.ModuleCode].lect )
-          modBriefInfo[data.ModuleCode].Lecture.push(data.Timetable[y]);
-        else if(data.Timetable[y].LessonType == "LABORATORY" && 
-            data.Timetable[y].ClassNo == modDetailInfo[data.ModuleCode].lab )
-          modBriefInfo[data.ModuleCode].Laboratory.push(data.Timetable[y]);
-        else if(data.Timetable[y].LessonType == "SECTIONAL TEACHING" && 
-            data.Timetable[y].ClassNo == modDetailInfo[data.ModuleCode].sect )
-          modBriefInfo[data.ModuleCode].Sectional.push(data.Timetable[y]);
-        else if(data.Timetable[y].LessonType == "TUTORIAL" && 
-            data.Timetable[y].ClassNo == modDetailInfo[data.ModuleCode].tut )
-          modBriefInfo[data.ModuleCode].Tutorial.push(data.Timetable[y]);
-      }
+      for(var y in data.Timetable) {
+        var timetable = data.Timetable[y],
+            lessonType = checkLessonTaken(timetable,
+                      modDetailInfo[data.ModuleCode]);
+        if(lessonType == false)
+          continue;
+        else{
+          switch(lessonType){
+            case "lect": modBriefInfo[data.ModuleCode].
+                    Lecture.push(timetable);
+                  break;
+            case "lab": modBriefInfo[data.ModuleCode].
+                    Laboratory.push(timetable);
+                  break;
+            case "tut": modBriefInfo[data.ModuleCode].
+                    Tutorial.push(timetable);
+                  break;
+            case "sect": modBriefInfo[data.ModuleCode].
+                    Sectional.push(timetable);
+                  break;
+          }
+        }
+     }
     });
   }
   return modBriefInfo;
@@ -98,16 +105,34 @@ function noToLessonType(lesson) {
 }
 
 
-// //Return boolean whether lesson is in user timetable
-// function checkLessonNo(timetable, lessonNo) {
-//   for(var x in lessonNo) {
-//     switch(timetable.LessonType) {
-//       case "LECTURE": 
-//       case "LABORATORY": 
-//       case "TUTORIAL":
-//       case "SECTIONAL TEACHING": 
-//         return (timetable.ClassNo == lessonNo);
-//       default: return false;
-//     }
-//   }
-// }
+//Return boolean whether lesson is in user timetable
+//Input:  timetable class from nusmods
+//        lessonNo class grouped by lect,lab,tut,sect
+function checkLessonTaken(timetable, lessonNo) {
+  //console.log(lessonNo)
+  switch(timetable.LessonType) {
+      case "LECTURE": 
+        for(var x in lessonNo.lect)
+          return (timetable.ClassNo == 
+            lessonNo.lect[x])?"lect":false;
+      case "LABORATORY": 
+        for(var x in lessonNo.lab)
+          return (timetable.ClassNo == 
+            lessonNo.lab[x])?"lab":false;
+      
+      case "TUTORIAL": 
+        for(var x in lessonNo.tut)
+          return (timetable.ClassNo == 
+            lessonNo.tut[x])?"tut":false;
+      
+      case "SECTIONAL TEACHING": 
+        for(var x in lessonNo.sect)
+          return (timetable.ClassNo == 
+            lessonNo.sect[x])?"sect":false;
+      
+      default: 
+        console.log("Non-defined lesson-type")
+        return false;
+        //For error checking
+  }
+}
