@@ -1,35 +1,41 @@
 extends layout
 
-block content
-  //div= mock['MA1101R']
-  - var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-  table
-    thead
-      tr
-        td.week
-        td.day
-        - for (var i = 0; i < 24; i++)
-          if (i < 5)
-            td.slot.ungodly
-          else if (i > 10) && (i < 21)
-            td.slot.stuff
-              div= i
-          else
-            td.slot.empty
-              div= i
-            
-    tbody
-    - for (var daysI = 0; daysI < 7; daysI++)
-      tr
-        if (daysI == 0)
-          td(rowspan="7").weekWrapper
-            div.week Week 1
-        td.day= days[daysI]
-        - for (var i = 0; i < 24; i++)
-          if (i < 5)
-            td.slot.ungodly
-          else if (i > 10) && (i < 21)
-            td.slot.stuff
-          else
-            td.slot.empty
+block script
+  script(src='/js/timetable.js')
 
+block content
+  - var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+  div.tableWrapper
+    table
+      thead
+        tr
+          th.day
+            div.dayText Week 1
+          - for (var i = 0; i < 24; i++)
+            if (i < 5)
+              th.slot.ungodly
+                div= i + ':00'
+            else if (i > 10) && (i < 21)
+              th.slot.stuff
+                div= i + ':00'
+            else
+              th.slot.empty
+                div= i + ':00'
+              
+      tbody
+        div
+        - for (var daysI = 0; daysI < 7; daysI++)
+          tr
+            td.day
+              div.dayText= days[daysI]
+            - for (var i = 0; i < 24; i++)
+              if (i < 5)
+                td.slot.ungodly
+              else if (i > 10) && (i < 21)
+                td.slot.stuff
+                  if (i == 11) && (daysI == 4)
+                    div Hello
+                    div Goodbye
+                    div Hello Again
+              else
+                td.slot.empty

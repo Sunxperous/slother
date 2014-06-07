@@ -1,39 +1,50 @@
 body {
-  padding: 10px 5%;
+  padding: 10px 0;
+}
+div.tableWrapper {
+  margin-left: 104px;
+  overflow-x: scroll;
+  margin-right: 24px;
+  text-align: left;
 }
 table {
-  margin: auto auto;
-  width: 100%;
 }
-thead td {
+thead th {
   border: 0;
 }
-td {
-  border: 1px solid #666;
+td, th {
+  border: 1px solid #999;
   padding: 4px;
+  min-width: 60px;
+  height: 30px;
 }
-td div {
+th div {
   text-align: left;
   font-size: 10px;
 }
-td.weekWrapper {
-  width: 20px;
+.day {
+  vertical-align: top;
+  background-color: #fff;
+  border: 0;
+  max-width: 0;
+  min-width: 0;
 }
-div.week {
-  transform: rotate(-0.25turn);
-  vertical-align: middle;
-  font-size: 12px;
-  white-space: pre;
-  display: inline-block;
+.dayText {
+  position: fixed;
+  width: 100px;
+  left: 0;
+  text-align: right;
+  margin-top: 1px;
+  border: 0;
+  border-bottom: 1px solid #999;
+  border-right: 1px solid #999;
+  padding-right: 10px;
 }
-td.ungodly {
-  display: none;
+.ungodly {
 }
-td.slot {
+.slot {
 }
-td.empty {
-  max-width: 10px;
+.empty {
 }
-td.stuff {
-  min-width: 30px;
+.stuff {
 }

@@ -2,9 +2,13 @@ doctype html
 html(lang='en')
   head
     title= title
-    //- Express will find /main.css in /public.
-    script(src= '/vendor/jquery-2.1.1.min.js')
-    script(src= '/js/moduleExtract.js')
+    script(src='/vendor/jquery-2.1.1.min.js')
+
+    //- Test environment during BrowserSync.
+    if (true) 
+      script(src='/vendor/socket.io.js')
+
+    block script
     link(rel='stylesheet', href='/vendor/bootstrap.css')
     link(rel='stylesheet', href='/css/main.css')
   body
