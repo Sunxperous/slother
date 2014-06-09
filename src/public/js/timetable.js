@@ -156,28 +156,54 @@ var insertAndShowEvent = function(event) {
   var venue = event.Venue;
   var start = parseInt(event.StartTime);
   var end = parseInt(event.EndTime);
-  var day;
+  var day = event.DayText.substr(0, 3);
 
-  switch (event.DayText) {
-    case 'WEDNESDAY':
-      day = 'WED';
-  };
+  var color = '#c99'; // Temporary.
+  var CELL_WIDTH = 60; // Cell width.
 
   var generateDiv = function(name, start, end) {
-    var CELL_WIDTH = 60; // Cell width.
     var div = $('<div>');
-    var duration = (end - start) / 100 * CELL_WIDTH; // Temporary.
+    var duration = calculateDurationWidth(start, end); // Temporary.
     div.width(duration);
-    div.css('background-color', '#c00'); // Temporary.
+    div.css('background-color', color);
+    div.addClass('event');
     div.text(name);
     return div;
   };
 
+  // Assumes start and end are timings in the following format: HHMM
+  var calculateDurationWidth = function(start, end) {
+    var startHour = start / 100;
+    var startMin = start % 100;
+    var endHour = end / 100;
+    var endMin = end % 100;
+
+    var startInMinutes = startHour * 60 + startMin;
+    var endInMinutes = endHour * 60 + endMin;
+    // Assumes start > end for now.
+
+    return (endInMinutes - startInMinutes) / 60 * CELL_WIDTH;
+  }
+
   var div = generateDiv(name, start, end);
-  $('tr.' + day).children('td.12').append(div);
-  $('tr.' + day).children('td.12').append(div.clone());
-  $('tr.' + day).children('td.12').append(div.clone());
-  $('tr.' + day).children('td.12').append(div.clone());
+  $('tr.' + day).children('td.' + start / 100).append(div);
 };
 
-insertAndShowEvent(mock['CS2100'].Lecture[0]);
+// Looping through the mock data... temporary.
+var moduleList = Object.getOwnPropertyNames(mock); // Retrieves module codes.
+var lessonTypes = ['Lecture', 'Tutorial', 'Sectional', 'Laboratory'];
+
+var moduleI;
+for (moduleI in moduleList) { // For each module...
+  var module = mock[moduleList[moduleI]]; // Module object.
+
+  var lessonI;
+  for (lessonI in lessonTypes) { // For each lesson type...
+    var lesson = module[lessonTypes[lessonI]]; // Lesson object.
+
+    var i;
+    for (i in lesson) { // For multiple of the same lesson type...
+      insertAndShowEvent(lesson[i]);
+    }
+  }
+}
