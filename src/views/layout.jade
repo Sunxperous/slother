@@ -8,8 +8,9 @@ html(lang='en')
     if (true) 
       script(src='/vendor/socket.io.js')
 
-    block script
+    block headScripts
     link(rel='stylesheet', href='/vendor/bootstrap.css')
     link(rel='stylesheet', href='/css/main.css')
   body
     block content
+    block footScripts

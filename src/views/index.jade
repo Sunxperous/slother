@@ -1,7 +1,6 @@
 extends layout
 
-block script
-  script(src='/js/timetable.js')
+block headScript
 
 block content
   - var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
@@ -25,17 +24,11 @@ block content
       tbody
         div
         - for (var daysI = 0; daysI < 7; daysI++)
-          tr
+          tr(class= days[daysI])
             td.day
               div.dayText= days[daysI]
             - for (var i = 0; i < 24; i++)
-              if (i < 5)
-                td.slot.ungodly
-              else if (i > 10) && (i < 21)
-                td.slot.stuff
-                  if (i == 11) && (daysI == 4)
-                    div Hello
-                    div Goodbye
-                    div Hello Again
-              else
-                td.slot.empty
+              td.slot(class= i)
+
+block footScripts
+  script(src='/js/timetable.js')
