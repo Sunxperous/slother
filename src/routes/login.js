@@ -2,7 +2,9 @@ var express = require('express');
 var passport = require('passport');
 var mongoose = require('mongoose');
 var LocalStrategy = require('passport-local').Strategy;
+var OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 var router = express.Router();
+var config = require('../config');
 
 router.get('/', function(req, res) {
   res.render('login');

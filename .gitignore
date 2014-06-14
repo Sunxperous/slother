@@ -20,3 +20,6 @@ test_out/
 
 # Vagrant
 .vagrant/
+
+# Config
+config.js

@@ -5,6 +5,7 @@ var express = require('express');
   var mongoose = require('mongoose');
   var path = require('path');
   var http = require('http');
+var config = require('./config');
 
 // Mongoose and Express.
 mongoose.connect('mongodb://localhost/test');
