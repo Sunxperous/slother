@@ -4,17 +4,16 @@
   "author": "Sloth",
   "version": "0.0.0",
   "repository": "https://github.com/Sunxperous/slother",
-
-  "devDependencies": {
-  },
-
+  "devDependencies": {},
   "dependencies": {
-    "express": "4.3.1",
     "body-parser": "1.3.1",
-    "mongoose": "3.8.11",
+    "connect": "^2.19.6",
+    "express": "4.3.1",
     "jade": "1.3.1",
+    "mongoose": "3.8.11",
     "passport": "0.2.0",
     "passport-local": "1.0.0",
-    "passport-oauth": "1.0.0"
+    "passport-oauth": "1.0.0",
+    "passport-openid": "0.3.1"
   }
 }

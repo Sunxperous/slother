@@ -3,9 +3,13 @@ extends layout
 block headScript
 
 block content
-  form(method='post', action='/login')
+  form(method='post', action='/login/default')
     input(type='text', placeholder='username', name='username')
     input(type='password', placeholder='password', name='password')
     input(type='submit')
+
+  form(method='get', action='/login/ivle')
+    input(type='hidden', name='openid_identifier', value='https://openid.nus.edu.sg')
+    input(type='submit' value='Login with NUS OpenID')
 
 block footScripts
