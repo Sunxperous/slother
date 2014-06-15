@@ -1,11 +1,12 @@
 // Requires. Indentation signifies "dependence".
-var connect = require('connect');
-  var express = require('express');
-    var passport = require('passport');
-      var bodyParser = require('body-parser');
-    var mongoose = require('mongoose');
-  var path = require('path');
-  var http = require('http');
+var express = require('express');
+  var session = require('express-session');
+  var cookieParser = require('cookie-parser');
+  var passport = require('passport');
+    var bodyParser = require('body-parser');
+  var mongoose = require('mongoose');
+var path = require('path');
+var http = require('http');
 var config = require('./config');
 
 // Mongoose and Express.
@@ -20,9 +21,18 @@ app.set('port', 8000);
 var routes = require('./routes/index');
 var login = require('./routes/login');
 
+// Passport serialization, e.g. id to user.
+// Something like that I think.
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
 // Middleware.
-app.use(connect.cookieParser());
-app.use(connect.session({ secret: 'keyboard neko', cookie: { secure: true }}));
+app.use(cookieParser());
+app.use(session({ secret: 'keyboard neko' }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser());
