@@ -2,208 +2,276 @@
 
 /*
 http://nusmods.com/2013-2014/sem2/v1/#HY2242=21&SSA1201=21&HY2242=8W1&CS1010=61&CS2100=813&CS2100=21&SSA1201=8E1&HY2242=21&CS2100=21&CS2100=114&CS1010=82&GEK1008=21&GEK1008=8D18
-{ "CS1010" : { "ExamDate" : "2014-04-30T17:00+0800",
-      "Laboratory" : [  ],
-      "Lecture" : [  ],
-      "ModuleCode" : "CS1010",
-      "ModuleTitle" : "Programming Methodology",
-      "Sectional" : [ { "ClassNo" : "1",
-            "DayText" : "TUESDAY",
-            "EndTime" : "1300",
-            "LessonType" : "SECTIONAL TEACHING",
-            "StartTime" : "1000",
-            "Venue" : "i3-0345",
-            "WeekText" : "EVERY WEEK"
-          } ],
-      "Tutorial" : [ { "ClassNo" : "2",
-            "DayText" : "FRIDAY",
-            "EndTime" : "1400",
-            "LessonType" : "TUTORIAL",
-            "StartTime" : "1200",
-            "Venue" : "COM1-B108",
-            "WeekText" : "EVERY WEEK"
-          } ]
+[
+  {
+    "summary": "SSA1201 (LECT)",
+    "description": "Singapore Society - ClassNo: 1",
+    "location": "LT11",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
     },
-  "CS2100" : { "ExamDate" : "2014-04-29T09:00+0800",
-      "Laboratory" : [ { "ClassNo" : "14",
-            "DayText" : "THURSDAY",
-            "EndTime" : "1700",
-            "LessonType" : "LABORATORY",
-            "StartTime" : "1600",
-            "Venue" : "COM1-0114",
-            "WeekText" : "EVERY WEEK"
-          } ],
-      "Lecture" : [ { "ClassNo" : "1",
-            "DayText" : "WEDNESDAY",
-            "EndTime" : "1400",
-            "LessonType" : "LECTURE",
-            "StartTime" : "1200",
-            "Venue" : "i3-Aud",
-            "WeekText" : "EVERY WEEK"
-          },
-          { "ClassNo" : "1",
-            "DayText" : "THURSDAY",
-            "EndTime" : "1500",
-            "LessonType" : "LECTURE",
-            "StartTime" : "1400",
-            "Venue" : "i3-Aud",
-            "WeekText" : "EVERY WEEK"
-          }
-        ],
-      "ModuleCode" : "CS2100",
-      "ModuleTitle" : "Computer Organisation",
-      "Sectional" : [  ],
-      "Tutorial" : [ { "ClassNo" : "13",
-            "DayText" : "TUESDAY",
-            "EndTime" : "1400",
-            "LessonType" : "TUTORIAL",
-            "StartTime" : "1300",
-            "Venue" : "COM1-0208",
-            "WeekText" : "EVERY WEEK"
-          } ]
+    "exclude": [
+      "2014-02-24T08:00:00.000Z"
+    ],
+    "dateStart": "2014-01-13T08:00:00.000Z",
+    "dateEnd": "2014-01-13T10:00:00.000Z"
+  },
+  {
+    "summary": "SSA1201 (TUT)",
+    "description": "Singapore Society - ClassNo: E1",
+    "location": "AS1-0204",
+    "rrule": {
+      "freq": "EVEN&nbsp;WEEK",
+      "count": 14
     },
-  "GEK1008" : { "ExamDate" : "2014-04-28T13:00+0800",
-      "Laboratory" : [  ],
-      "Lecture" : [ { "ClassNo" : "1",
-            "DayText" : "FRIDAY",
-            "EndTime" : "1600",
-            "LessonType" : "LECTURE",
-            "StartTime" : "1400",
-            "Venue" : "UT-AUD1",
-            "WeekText" : "EVERY WEEK"
-          } ],
-      "ModuleCode" : "GEK1008",
-      "ModuleTitle" : "Southeast Asia: A Changing Region",
-      "Sectional" : [  ],
-      "Tutorial" : [ { "ClassNo" : "D18",
-            "DayText" : "FRIDAY",
-            "EndTime" : "1800",
-            "LessonType" : "TUTORIAL",
-            "StartTime" : "1600",
-            "Venue" : "ERC-SR11",
-            "WeekText" : "ODD WEEK"
-          } ]
+    "exclude": [
+      "2014-03-12T08:00:00.000Z"
+    ],
+    "dateStart": "2014-01-29T08:00:00.000Z",
+    "dateEnd": "2014-01-29T10:00:00.000Z"
+  },
+  {
+    "summary": "SSA1201 (EXAM)",
+    "description": "Singapore Society",
+    "rrule": {
+      "freq": "ONCE"
     },
-  "HY2242" : { "ExamDate" : "2014-05-07T09:00+0800",
-      "Laboratory" : [  ],
-      "Lecture" : [ { "ClassNo" : "1",
-            "DayText" : "MONDAY",
-            "EndTime" : "1200",
-            "LessonType" : "LECTURE",
-            "StartTime" : "1000",
-            "Venue" : "AS4-0206",
-            "WeekText" : "EVERY WEEK"
-          },
-          { "ClassNo" : "1",
-            "DayText" : "THURSDAY",
-            "EndTime" : "1400",
-            "LessonType" : "LECTURE",
-            "StartTime" : "1200",
-            "Venue" : "AS4-0206",
-            "WeekText" : "EVERY WEEK"
-          }
-        ],
-      "ModuleCode" : "HY2242",
-      "ModuleTitle" : "Singapore's Military History",
-      "Sectional" : [  ],
-      "Tutorial" : [ { "ClassNo" : "W1",
-            "DayText" : "MONDAY",
-            "EndTime" : "1200",
-            "LessonType" : "TUTORIAL",
-            "StartTime" : "1000",
-            "Venue" : "AS1-0204",
-            "WeekText" : "EVERY WEEK"
-          } ]
+    "dateStart": "2014-04-30T01:00:00.000Z",
+    "dateEnd": "2014-04-30T04:00:00.000Z"
+  },
+  {
+    "summary": "HY2242 (LECT)",
+    "description": "Singapore's Military History - ClassNo: 1",
+    "location": "AS4-0206",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
     },
-  "SSA1201" : { "ExamDate" : "2014-04-30T09:00+0800",
-      "Laboratory" : [  ],
-      "Lecture" : [ { "ClassNo" : "1",
-            "DayText" : "MONDAY",
-            "EndTime" : "1800",
-            "LessonType" : "LECTURE",
-            "StartTime" : "1600",
-            "Venue" : "LT11",
-            "WeekText" : "EVERY WEEK"
-          } ],
-      "ModuleCode" : "SSA1201",
-      "ModuleTitle" : "Singapore Society",
-      "Sectional" : [  ],
-      "Tutorial" : [ { "ClassNo" : "E1",
-            "DayText" : "WEDNESDAY",
-            "EndTime" : "1800",
-            "LessonType" : "TUTORIAL",
-            "StartTime" : "1600",
-            "Venue" : "AS1-0204",
-            "WeekText" : "EVEN WEEK"
-          } ]
-    }
-}
+    "exclude": [
+      "2014-02-24T02:00:00.000Z"
+    ],
+    "dateStart": "2014-01-13T02:00:00.000Z",
+    "dateEnd": "2014-01-13T04:00:00.000Z"
+  },
+  {
+    "summary": "HY2242 (LECT)",
+    "description": "Singapore's Military History - ClassNo: 1",
+    "location": "AS4-0206",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
+    },
+    "exclude": [
+      "2014-02-27T04:00:00.000Z"
+    ],
+    "dateStart": "2014-01-16T04:00:00.000Z",
+    "dateEnd": "2014-01-16T06:00:00.000Z"
+  },
+  {
+    "summary": "HY2242 (TUT)",
+    "description": "Singapore's Military History - ClassNo: W1",
+    "location": "AS1-0204",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
+    },
+    "exclude": [
+      "2014-03-10T02:00:00.000Z"
+    ],
+    "dateStart": "2014-01-27T02:00:00.000Z",
+    "dateEnd": "2014-01-27T04:00:00.000Z"
+  },
+  {
+    "summary": "HY2242 (EXAM)",
+    "description": "Singapore's Military History",
+    "rrule": {
+      "freq": "ONCE"
+    },
+    "dateStart": "2014-05-07T01:00:00.000Z",
+    "dateEnd": "2014-05-07T04:00:00.000Z"
+  },
+  {
+    "summary": "GEK1008 (LECT)",
+    "description": "Southeast Asia: A Changing Region - ClassNo: 1",
+    "location": "UT-AUD1",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
+    },
+    "exclude": [
+      "2014-02-28T06:00:00.000Z"
+    ],
+    "dateStart": "2014-01-17T06:00:00.000Z",
+    "dateEnd": "2014-01-17T08:00:00.000Z"
+  },
+  {
+    "summary": "GEK1008 (TUT)",
+    "description": "Southeast Asia: A Changing Region - ClassNo: D18",
+    "location": "ERC-SR11",
+    "rrule": {
+      "freq": "ODD&nbsp;WEEK",
+      "count": 14
+    },
+    "exclude": [
+      "2014-03-14T08:00:00.000Z"
+    ],
+    "dateStart": "2014-01-31T08:00:00.000Z",
+    "dateEnd": "2014-01-31T10:00:00.000Z"
+  },
+  {
+    "summary": "GEK1008 (EXAM)",
+    "description": "Southeast Asia: A Changing Region",
+    "rrule": {
+      "freq": "ONCE"
+    },
+    "dateStart": "2014-04-28T05:00:00.000Z",
+    "dateEnd": "2014-04-28T08:00:00.000Z"
+  },
+  {
+    "summary": "CS2100 (LAB)",
+    "description": "Computer Organisation - ClassNo: 14",
+    "location": "COM1-0114",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
+    },
+    "exclude": [
+      "2014-03-13T08:00:00.000Z"
+    ],
+    "dateStart": "2014-01-30T08:00:00.000Z",
+    "dateEnd": "2014-01-30T09:00:00.000Z"
+  },
+  {
+    "summary": "CS2100 (LECT)",
+    "description": "Computer Organisation - ClassNo: 1",
+    "location": "i3-Aud",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
+    },
+    "exclude": [
+      "2014-02-26T04:00:00.000Z"
+    ],
+    "dateStart": "2014-01-15T04:00:00.000Z",
+    "dateEnd": "2014-01-15T06:00:00.000Z"
+  },
+  {
+    "summary": "CS2100 (LECT)",
+    "description": "Computer Organisation - ClassNo: 1",
+    "location": "i3-Aud",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
+    },
+    "exclude": [
+      "2014-02-27T06:00:00.000Z"
+    ],
+    "dateStart": "2014-01-16T06:00:00.000Z",
+    "dateEnd": "2014-01-16T07:00:00.000Z"
+  },
+  {
+    "summary": "CS2100 (TUT)",
+    "description": "Computer Organisation - ClassNo: 13",
+    "location": "COM1-0208",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
+    },
+    "exclude": [
+      "2014-03-11T05:00:00.000Z"
+    ],
+    "dateStart": "2014-01-28T05:00:00.000Z",
+    "dateEnd": "2014-01-28T06:00:00.000Z"
+  },
+  {
+    "summary": "CS2100 (EXAM)",
+    "description": "Computer Organisation",
+    "rrule": {
+      "freq": "ONCE"
+    },
+    "dateStart": "2014-04-29T01:00:00.000Z",
+    "dateEnd": "2014-04-29T04:00:00.000Z"
+  },
+  {
+    "summary": "CS1010 (SEC)",
+    "description": "Programming Methodology - ClassNo: 1",
+    "location": "i3-0345",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
+    },
+    "exclude": [
+      "2014-02-25T02:00:00.000Z"
+    ],
+    "dateStart": "2014-01-14T02:00:00.000Z",
+    "dateEnd": "2014-01-14T05:00:00.000Z"
+  },
+  {
+    "summary": "CS1010 (TUT)",
+    "description": "Programming Methodology - ClassNo: 2",
+    "location": "COM1-B108",
+    "rrule": {
+      "freq": "EVERY&nbsp;WEEK",
+      "count": 14
+    },
+    "exclude": [
+      "2014-03-14T04:00:00.000Z"
+    ],
+    "dateStart": "2014-01-31T04:00:00.000Z",
+    "dateEnd": "2014-01-31T06:00:00.000Z"
+  },
+  {
+    "summary": "CS1010 (EXAM)",
+    "description": "Programming Methodology",
+    "rrule": {
+      "freq": "ONCE"
+    },
+    "dateStart": "2014-04-30T09:00:00.000Z",
+    "dateEnd": "2014-04-30T12:00:00.000Z"
+  }
+]
 */
 
-var mock = JSON.parse('{"SSA1201":{"Lecture":[{"ClassNo":"1","LessonType":"LECTURE","WeekText":"EVERY&nbsp;WEEK","DayText":"MONDAY","StartTime":"1600","EndTime":"1800","Venue":"LT11"}],"Tutorial":[{"ClassNo":"E1","LessonType":"TUTORIAL","WeekText":"EVEN&nbsp;WEEK","DayText":"WEDNESDAY","StartTime":"1600","EndTime":"1800","Venue":"AS1-0204"}],"Sectional":[],"Laboratory":[],"ExamDate":"2014-04-30T09:00+0800","ModuleTitle":"Singapore Society","ModuleCode":"SSA1201"},"HY2242":{"Lecture":[{"ClassNo":"1","LessonType":"LECTURE","WeekText":"EVERY&nbsp;WEEK","DayText":"MONDAY","StartTime":"1000","EndTime":"1200","Venue":"AS4-0206"},{"ClassNo":"1","LessonType":"LECTURE","WeekText":"EVERY&nbsp;WEEK","DayText":"THURSDAY","StartTime":"1200","EndTime":"1400","Venue":"AS4-0206"}],"Tutorial":[{"ClassNo":"W1","LessonType":"TUTORIAL","WeekText":"EVERY&nbsp;WEEK","DayText":"MONDAY","StartTime":"1000","EndTime":"1200","Venue":"AS1-0204"}],"Sectional":[],"Laboratory":[],"ExamDate":"2014-05-07T09:00+0800","ModuleTitle":"Singapore\'s Military History","ModuleCode":"HY2242"},"GEK1008":{"Lecture":[{"ClassNo":"1","LessonType":"LECTURE","WeekText":"EVERY&nbsp;WEEK","DayText":"FRIDAY","StartTime":"1400","EndTime":"1600","Venue":"UT-AUD1"}],"Tutorial":[{"ClassNo":"D18","LessonType":"TUTORIAL","WeekText":"ODD&nbsp;WEEK","DayText":"FRIDAY","StartTime":"1600","EndTime":"1800","Venue":"ERC-SR11"}],"Sectional":[],"Laboratory":[],"ExamDate":"2014-04-28T13:00+0800","ModuleTitle":"Southeast Asia: A Changing Region","ModuleCode":"GEK1008"},"CS2100":{"Lecture":[{"ClassNo":"1","LessonType":"LECTURE","WeekText":"EVERY&nbsp;WEEK","DayText":"WEDNESDAY","StartTime":"1200","EndTime":"1400","Venue":"i3-Aud"},{"ClassNo":"1","LessonType":"LECTURE","WeekText":"EVERY&nbsp;WEEK","DayText":"THURSDAY","StartTime":"1400","EndTime":"1500","Venue":"i3-Aud"}],"Tutorial":[{"ClassNo":"13","LessonType":"TUTORIAL","WeekText":"EVERY&nbsp;WEEK","DayText":"TUESDAY","StartTime":"1300","EndTime":"1400","Venue":"COM1-0208"}],"Sectional":[],"Laboratory":[{"ClassNo":"14","LessonType":"LABORATORY","WeekText":"EVERY&nbsp;WEEK","DayText":"THURSDAY","StartTime":"1600","EndTime":"1700","Venue":"COM1-0114"}],"ExamDate":"2014-04-29T09:00+0800","ModuleTitle":"Computer Organisation","ModuleCode":"CS2100"},"CS1010":{"Lecture":[],"Tutorial":[{"ClassNo":"2","LessonType":"TUTORIAL","WeekText":"EVERY&nbsp;WEEK","DayText":"FRIDAY","StartTime":"1200","EndTime":"1400","Venue":"COM1-B108"}],"Sectional":[{"ClassNo":"1","LessonType":"SECTIONAL TEACHING","WeekText":"EVERY&nbsp;WEEK","DayText":"TUESDAY","StartTime":"1000","EndTime":"1300","Venue":"i3-0345"}],"Laboratory":[],"ExamDate":"2014-04-30T17:00+0800","ModuleTitle":"Programming Methodology","ModuleCode":"CS1010"}}');
+var mock = JSON.parse('[{"summary":"SSA1201 (LECT)","description":"Singapore Society - ClassNo: 1","location":"LT11","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-02-24T08:00:00.000Z"],"dateStart":"2014-01-13T08:00:00.000Z","dateEnd":"2014-01-13T10:00:00.000Z"},{"summary":"SSA1201 (TUT)","description":"Singapore Society - ClassNo: E1","location":"AS1-0204","rrule":{"freq":"EVEN&nbsp;WEEK","count":14},"exclude":["2014-03-12T08:00:00.000Z"],"dateStart":"2014-01-29T08:00:00.000Z","dateEnd":"2014-01-29T10:00:00.000Z"},{"summary":"SSA1201 (EXAM)","description":"Singapore Society","rrule":{"freq":"ONCE"},"dateStart":"2014-04-30T01:00:00.000Z","dateEnd":"2014-04-30T04:00:00.000Z"},{"summary":"HY2242 (LECT)","description":"Singapore\'s Military History - ClassNo: 1","location":"AS4-0206","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-02-24T02:00:00.000Z"],"dateStart":"2014-01-13T02:00:00.000Z","dateEnd":"2014-01-13T04:00:00.000Z"},{"summary":"HY2242 (LECT)","description":"Singapore\'s Military History - ClassNo: 1","location":"AS4-0206","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-02-27T04:00:00.000Z"],"dateStart":"2014-01-16T04:00:00.000Z","dateEnd":"2014-01-16T06:00:00.000Z"},{"summary":"HY2242 (TUT)","description":"Singapore\'s Military History - ClassNo: W1","location":"AS1-0204","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-03-10T02:00:00.000Z"],"dateStart":"2014-01-27T02:00:00.000Z","dateEnd":"2014-01-27T04:00:00.000Z"},{"summary":"HY2242 (EXAM)","description":"Singapore\'s Military History","rrule":{"freq":"ONCE"},"dateStart":"2014-05-07T01:00:00.000Z","dateEnd":"2014-05-07T04:00:00.000Z"},{"summary":"GEK1008 (LECT)","description":"Southeast Asia: A Changing Region - ClassNo: 1","location":"UT-AUD1","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-02-28T06:00:00.000Z"],"dateStart":"2014-01-17T06:00:00.000Z","dateEnd":"2014-01-17T08:00:00.000Z"},{"summary":"GEK1008 (TUT)","description":"Southeast Asia: A Changing Region - ClassNo: D18","location":"ERC-SR11","rrule":{"freq":"ODD&nbsp;WEEK","count":14},"exclude":["2014-03-14T08:00:00.000Z"],"dateStart":"2014-01-31T08:00:00.000Z","dateEnd":"2014-01-31T10:00:00.000Z"},{"summary":"GEK1008 (EXAM)","description":"Southeast Asia: A Changing Region","rrule":{"freq":"ONCE"},"dateStart":"2014-04-28T05:00:00.000Z","dateEnd":"2014-04-28T08:00:00.000Z"},{"summary":"CS2100 (LAB)","description":"Computer Organisation - ClassNo: 14","location":"COM1-0114","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-03-13T08:00:00.000Z"],"dateStart":"2014-01-30T08:00:00.000Z","dateEnd":"2014-01-30T09:00:00.000Z"},{"summary":"CS2100 (LECT)","description":"Computer Organisation - ClassNo: 1","location":"i3-Aud","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-02-26T04:00:00.000Z"],"dateStart":"2014-01-15T04:00:00.000Z","dateEnd":"2014-01-15T06:00:00.000Z"},{"summary":"CS2100 (LECT)","description":"Computer Organisation - ClassNo: 1","location":"i3-Aud","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-02-27T06:00:00.000Z"],"dateStart":"2014-01-16T06:00:00.000Z","dateEnd":"2014-01-16T07:00:00.000Z"},{"summary":"CS2100 (TUT)","description":"Computer Organisation - ClassNo: 13","location":"COM1-0208","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-03-11T05:00:00.000Z"],"dateStart":"2014-01-28T05:00:00.000Z","dateEnd":"2014-01-28T06:00:00.000Z"},{"summary":"CS2100 (EXAM)","description":"Computer Organisation","rrule":{"freq":"ONCE"},"dateStart":"2014-04-29T01:00:00.000Z","dateEnd":"2014-04-29T04:00:00.000Z"},{"summary":"CS1010 (SEC)","description":"Programming Methodology - ClassNo: 1","location":"i3-0345","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-02-25T02:00:00.000Z"],"dateStart":"2014-01-14T02:00:00.000Z","dateEnd":"2014-01-14T05:00:00.000Z"},{"summary":"CS1010 (TUT)","description":"Programming Methodology - ClassNo: 2","location":"COM1-B108","rrule":{"freq":"EVERY&nbsp;WEEK","count":14},"exclude":["2014-03-14T04:00:00.000Z"],"dateStart":"2014-01-31T04:00:00.000Z","dateEnd":"2014-01-31T06:00:00.000Z"},{"summary":"CS1010 (EXAM)","description":"Programming Methodology","rrule":{"freq":"ONCE"},"dateStart":"2014-04-30T09:00:00.000Z","dateEnd":"2014-04-30T12:00:00.000Z"}]');
 
-var timetable = function() {
 
-};
+var now = moment();
 
-// Adds an event to be shown on the timetable.
-// event object contains:
+var sundayOfWeek = now.subtract(now.day(), 'days');
+console.log(sundayOfWeek.toDate());
+
+var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+// Adds an item to be shown on the timetable.
+// item object contains:
 //   > day, name, venue, start time, end time
 //     > name value should be concatenation of moduleCode/moduleTitle,
 //       lesson type and class no.
-var insertAndShowEvent = function(event) {
-  var name = event.LessonType + ' ' + event.ClassNo;
-  var venue = event.Venue;
-  var start = parseInt(event.StartTime);
-  var end = parseInt(event.EndTime);
-  var day = event.DayText.substr(0, 3);
+var insertAndShowEvent = function(item) {
+  var day = moment(item.dateStart).day();
 
   var color = '#c99'; // Temporary.
   var CELL_WIDTH = 60; // Cell width.
 
   var generateDiv = function(name, start, end) {
     var div = $('<div>');
-    var duration = calculateDurationWidth(start, end); // Temporary.
-    div.width(duration);
+    var duration = end.diff(start, 'h') * CELL_WIDTH;
+    var trimRightEdge = 2;
+    div.width(duration - trimRightEdge);
     div.css('background-color', color);
-    div.addClass('event');
+    div.addClass('item');
     div.text(name);
     return div;
   };
 
-  // Assumes start and end are timings in the following format: HHMM
-  var calculateDurationWidth = function(start, end) {
-    var startHour = start / 100;
-    var startMin = start % 100;
-    var endHour = end / 100;
-    var endMin = end % 100;
-
-    var startInMinutes = startHour * 60 + startMin;
-    var endInMinutes = endHour * 60 + endMin;
-    // Assumes start > end for now.
-
-    return (endInMinutes - startInMinutes) / 60 * CELL_WIDTH;
-  }
-
-  var div = generateDiv(name, start, end);
-  $('tr.' + day).children('td.' + start / 100).append(div);
+  var div = generateDiv(item.summary, moment(item.dateStart), moment(item.dateEnd));
+  $('tr.' + days[day]).children('td.' + moment(item.dateStart).hour()).append(div);
 };
 
 // Looping through the mock data... temporary.
-var moduleList = Object.getOwnPropertyNames(mock); // Retrieves module codes.
-var lessonTypes = ['Lecture', 'Tutorial', 'Sectional', 'Laboratory'];
 
-var moduleI;
-for (moduleI in moduleList) { // For each module...
-  var module = mock[moduleList[moduleI]]; // Module object.
-
-  var lessonI;
-  for (lessonI in lessonTypes) { // For each lesson type...
-    var lesson = module[lessonTypes[lessonI]]; // Lesson object.
-
-    var i;
-    for (i in lesson) { // For multiple of the same lesson type...
-      insertAndShowEvent(lesson[i]);
-    }
-  }
-}
+mock.forEach(function(item, index) {
+  console.log(item.summary);
+  insertAndShowEvent(item);
+});
