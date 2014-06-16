@@ -46,7 +46,7 @@ th div {
   border-right: 1px solid #999;
   padding-right: 10px;
 }
-.event {
+.item {
   position: relative;
   z-index: 50;
   padding: 0 2px;

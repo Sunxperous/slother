@@ -237,41 +237,65 @@ var mock = JSON.parse('[{"summary":"SSA1201 (LECT)","description":"Singapore Soc
 
 
 var now = moment();
+now = moment("2014-01-13").add(16, 'weeks'); // For testing purpose, set to 1st week of 2013-14Sem2.
 
 var sundayOfWeek = now.subtract(now.day(), 'days');
-console.log(sundayOfWeek.toDate());
+var saturdayOfWeek = moment(sundayOfWeek).add(6, 'days');
 
 var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 // Adds an item to be shown on the timetable.
-// item object contains:
-//   > day, name, venue, start time, end time
-//     > name value should be concatenation of moduleCode/moduleTitle,
-//       lesson type and class no.
 var insertAndShowEvent = function(item) {
-  var day = moment(item.dateStart).day();
+  var dateStart = item.dateStart;
+  var dateEnd = item.dateEnd;
+  var day = moment(dateStart).day();
 
   var color = '#c99'; // Temporary.
   var CELL_WIDTH = 60; // Cell width.
+  var RIGHT_DIV_TRIM = 2; // Pixels to trim at the right of each item div.
 
   var generateDiv = function(name, start, end) {
     var div = $('<div>');
     var duration = end.diff(start, 'h') * CELL_WIDTH;
-    var trimRightEdge = 2;
-    div.width(duration - trimRightEdge);
+    div.width(duration - RIGHT_DIV_TRIM);
     div.css('background-color', color);
     div.addClass('item');
     div.text(name);
     return div;
   };
 
-  var div = generateDiv(item.summary, moment(item.dateStart), moment(item.dateEnd));
-  $('tr.' + days[day]).children('td.' + moment(item.dateStart).hour()).append(div);
+  var div = generateDiv(item.summary, moment(dateStart), moment(dateEnd));
+  $('tr.' + days[day]).children('td.' + moment(dateStart).hour()).append(div);
+};
+
+var duringDisplayedWeek = function(item) {
+  var date = moment(item.dateStart);
+  if (date.isAfter(sundayOfWeek) && date.isBefore(saturdayOfWeek)) {
+    return true; // First date is during, return true.
+  }
+  else if (item.rrule.freq != 'ONCE') { // Repeating event...
+    item.rrule.count--; // Already tested first event date.
+    while (item.rrule.count > 0) {
+      if (item.rrule.freq === 'EVERY&nbsp;WEEK') {
+        date.add(1, 'week');
+      }
+
+      if (date.isAfter(sundayOfWeek) && date.isBefore(saturdayOfWeek)) {
+        return true; // Currently checked date is during, return true.
+      }
+
+      item.rrule.count--;
+    }
+  }
+  return false;
 };
 
 // Looping through the mock data... temporary.
-
 mock.forEach(function(item, index) {
-  console.log(item.summary);
-  insertAndShowEvent(item);
+  if (duringDisplayedWeek(item)) {
+    insertAndShowEvent(item);
+  }
 });
+
+// Scrolls immediately to 7:00am.
+$('.tableWrapper').scrollLeft(420);
