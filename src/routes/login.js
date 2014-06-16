@@ -14,17 +14,6 @@ router.get('/', function(req, res) {
   res.render('login');
 })
 
-
-
-// The two following methods are relevant to sessions, which
-//   are not implemented yet, I think.
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
-passport.deserializeUser(function(obj, done) {
-  done(null, obj);
-});
-
 // http://mongoosejs.com/docs/index.html
 //
 // Insert a mock user in MongoDB:
@@ -77,8 +66,10 @@ router.post('/default',
 
 
 // http://passportjs.org/guide/openid/
-passport.use('ivle', new OpenIDStrategy({
-    returnURL: 'http://localhost:8000/login/ivle/callback',
+// login via NUS only via localhost:8000,
+// then continue development on original port.
+passport.use('nus', new OpenIDStrategy({
+    returnURL: 'http://localhost:8000/login/nus/callback',
     realm: 'http://localhost:8000/',
   },
   function(identifier, done) { // Only calls this function if successfully, I assume.
@@ -97,15 +88,34 @@ passport.use('ivle', new OpenIDStrategy({
   }
 ));
 
-// Ivle login.
-router.get('/ivle', passport.authenticate('ivle'));
-router.get('/ivle/callback', passport.authenticate('ivle', {
+// Nus login.
+router.get('/nus', passport.authenticate('nus'));
+router.get('/nus/callback', passport.authenticate('nus', {
     successRedirect: '/',
     failureRedirect: '/login'
   })
 );
 
 
+// Default registration.
+router.get('/register', function(req, res) {
+  res.render('register');
+});
 
+router.post('/register', function(req, res) {
+  // Assuming valid, non-existing user...
+  User.create({
+    username: req.body.username,
+    password: req.body.password
+  }, function(err, user) {
+    if (err) { res.redirect('/register'); }
+    if (user) {
+      req.login(user, function(err_login) {
+        if (err) { res.redirect('/register'); }        
+        return res.redirect('/');
+      });
+    }
+  });
+});
 
 module.exports = router;

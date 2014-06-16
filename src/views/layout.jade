@@ -13,5 +13,10 @@ html(lang='en')
     link(rel='stylesheet', href='/vendor/bootstrap.css')
     link(rel='stylesheet', href='/css/main.css')
   body
+    if (message)
+      h3= message
+    if (user)
+      //- Probably render another view block for logged in users.
+      h1= user.username
     block content
     block footScripts

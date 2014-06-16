@@ -36,6 +36,10 @@ app.use(session({ secret: 'keyboard neko' }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser());
+app.use(function(req, res, next) {
+  app.locals.user = req.user; // Exposes user to all views.
+  next();
+});
 app.use(express.static(__dirname + '/public'));
 app.use('/login', login);
 app.use('/', routes);
