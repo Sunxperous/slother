@@ -11,6 +11,7 @@
 //  Take note of delays from getJSON !!!
 //  Manual enter of semStart date in line 44
 
+
 function extract(addr) {
   var year = addr.substring(19,28),
       sem = addr.substring(32,33),
@@ -38,11 +39,10 @@ function extract(addr) {
     modDetailInfo[tempOb.codeNo] = tempOb;
   }
   console.log(modDetailInfo);
-
-
-  var semStart = new Date(2014,0,13,0,0,0,0);
-  //Manual key in Monday as start day
   
+  var semStart = semesterStart(year,sem);
+  //Manual key calender and Monday as start day
+
   var tempURL = "http://api.nusmods.com/"+year+"/"
                 +sem+'/modules/FE5218.json',
       tempModCode = "FE5218",
@@ -73,7 +73,8 @@ function extract(addr) {
 }
 
 //Return class type string
-//Input: class no. from nusMods eg. MA2213= 8T04
+//Input: class no. from nusMods 
+//        eg. "8T04" of "MA2213=8T04"
 function noToLessonType(lesson) {
   switch(lesson.substring(0,1)) {
   case '1': return "lab";
@@ -113,6 +114,11 @@ function checkLessonTaken(timetable, lessonNo) {
   }
 }
 
+
+//Build an event class for NUS module
+//Output: An ics event class of NUS module lesson
+//Input : Data from NUSAPI, semester of the class, 
+//        classNo of NUSAPI timetable array   
 function buildNUSEvent(data, semStart, classNo) {
   //console.log("semStart = " + semStart + ", data = "+data.ModuleCode);
   var temp = {
@@ -150,17 +156,25 @@ function buildNUSEvent(data, semStart, classNo) {
   temp.dateStart = new Date(semStart.getTime());
   semStart.setHours(parseInt(data.Timetable[classNo].EndTime.substring(0,2)));
   temp.dateEnd = new Date(semStart.getTime());
-  switch(temp.freq){
+  switch(temp.freq) {
     case "ODD WEEK": 
     case "EVEN WEEK": temp.count = 7;
     case "EVERY WEEK": break;
   }
-  console.log("Class of " + temp.summary  + " start at "+ temp.dateStart);
-  temp.exclude.push(new Date(temp.dateStart.getTime() + 3628800000));
+  //console.log("Class of " + temp.summary  + " start at "+ temp.dateStart);
+  if(data.Timetable[classNo].LessonType == "TUTORIAL" || 
+    data.Timetable[classNo].LessonType == "LABORATORY") {
+      temp.exclude.push(new Date(temp.dateStart.getTime() + 2419200000));
+  }
+  else 
+    temp.exclude.push(new Date(temp.dateStart.getTime() + 3628800000));
   return temp;
 }
 
 
+//Build an event class for NUS module
+//Output: An ics event class of NUS module FINAL EXAM
+//Input : Data from NUSAPI, semester of the class,
 function buildNUSExam(data, semStart) {
   var examD = data.ExamDate,
       temp = {
@@ -178,4 +192,36 @@ function buildNUSExam(data, semStart) {
   temp.dateEnd = new Date(temp.dateStart.getTime() + 10800000);
   console.log("Exam of " + temp.summary + " start at "+temp.dateStart)
   return temp;
+}
+
+// Return the semester start date 
+//Output: Smester start date in js date format
+//Input: year (eg. "2013-2014") and 
+//       semester (eg. "1") string 
+function semesterStart(year,sem) {
+  var semStart = new Date();
+  switch(year) {
+
+    case "2013-2014": {
+      //13-01-2014 & 12-08-2013
+      (sem=="1")?semStart.setTime(1376236800000): 
+                 semStart.setTime(1389542400000);
+    } break; 
+    case "2012-2013": {
+      //14-01-2013 & 13-08-2012
+      (sem=="1")?semStart.setTime(1344787200000):
+                 semStart.setTime(1358092800000);
+    } break;
+    case "2011-2012": {
+      //09-01-2012 & 08-08-2011
+      (sem=="1")?semStart.setTime(1312732800000):
+                 semStart.setTime(1326038400000);
+    } break;
+    case "2010-2011": {
+      //10-01-2011 & 09-08-2010
+      (sem=="1")?semStart.setTime(1281283200000):
+                 semStart.setTime(1294588800000);
+    } break;
+  }
+  return semStart;
 }
