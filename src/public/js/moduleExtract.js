@@ -161,7 +161,7 @@ function buildNUSEvent(data, semStart, classNo) {
       temp.exclude.push(new Date(semStart.getTime() + 4838400000)); //week 9
       temp.exclude.push(new Date(semStart.getTime() + 6048000000)); //week 11 
       temp.exclude.push(new Date(semStart.getTime() + 7257600000)); //week 13
-      temp.rrule.freq = "FORTNIGHTLY";
+      
     } break;
     case "EVEN&nbsp;WEEK": {
       temp.exclude.push(new Date(semStart.getTime())); //week 1
@@ -171,13 +171,12 @@ function buildNUSEvent(data, semStart, classNo) {
       temp.exclude.push(new Date(semStart.getTime() + 5443200000)); //week 10       
       temp.exclude.push(new Date(semStart.getTime() + 6652800000)); //week 12
       temp.exclude.push(new Date(semStart.getTime() + 7862400000)); //week 14
-      temp.rrule.freq = "FORTNIGHTLY";
+      
     } break;
-    case "EVERY&nbsp;WEEK": {
-      temp.rrule.freq = "WEEKLY";
-    } break;
+    case "EVERY&nbsp;WEEK": break;
 
   }
+  temp.rrule.freq = "WEEKLY";
   //Recess week
   temp.exclude.push(new Date(semStart.getTime() + 3628800000));
   
