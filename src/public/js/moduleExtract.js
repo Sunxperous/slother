@@ -127,19 +127,19 @@ function buildNUSEvent(data, semStart, classNo) {
                     + data.Timetable[classNo].ClassNo,
         location: data.Timetable[classNo].Venue,
         rrule: {
-          freq: data.Timetable[classNo].WeekText,
+          freq: "dummy",
           count: 14 //default semester week
         },
         exclude: []
          // dateStart, dateEnd, 
   };
-  switch(data.Timetable[classNo].LessonType){
+  switch(data.Timetable[classNo].LessonType) {
     case "LABORATORY": temp.summary = temp.summary +  " (LAB)"; break;
     case "SECTIONAL TEACHING": temp.summary = temp.summary +  " (SEC)"; break;
     case "LECTURE": temp.summary = temp.summary + " (LECT)"; break;
     case "TUTORIAL": temp.summary = temp.summary + " (TUT)"; break;
   }
-  switch(data.Timetable[classNo].DayText){
+  switch(data.Timetable[classNo].DayText) {
     case "SUNDAY" :  semStart.setDate(semStart.getDate()+6); break;
     case "SATURDAY" :  semStart.setDate(semStart.getDate() + 5); break;
     case "FRIDAY" : semStart.setDate(semStart.getDate() + 4); break;
@@ -149,25 +149,50 @@ function buildNUSEvent(data, semStart, classNo) {
     case "MONDAY" : semStart.setDate(semStart.getDate()); break;
   }
   semStart.setHours(parseInt(data.Timetable[classNo].StartTime.substring(0,2)));
+  
+  //console.log(semStart.getTime());
+  //console.log(semStart.toString());
+  //console.log(data.Timetable[classNo].WeekText);
+  switch(data.Timetable[classNo].WeekText) {
+    case "ODD&nbsp;WEEK": {
+      temp.exclude.push(new Date(semStart.getTime() + 604800000)); //week 2
+      temp.exclude.push(new Date(semStart.getTime() + 1814400000)); //week 4
+      temp.exclude.push(new Date(semStart.getTime() + 3024000000)); //week 6
+      temp.exclude.push(new Date(semStart.getTime() + 4838400000)); //week 9
+      temp.exclude.push(new Date(semStart.getTime() + 6048000000)); //week 11 
+      temp.exclude.push(new Date(semStart.getTime() + 7257600000)); //week 13
+      temp.rrule.freq = "FORTNIGHTLY";
+    } break;
+    case "EVEN&nbsp;WEEK": {
+      temp.exclude.push(new Date(semStart.getTime())); //week 1
+      temp.exclude.push(new Date(semStart.getTime() + 1209600000)); //week 3    
+      temp.exclude.push(new Date(semStart.getTime() + 2419200000)); //week 5
+      temp.exclude.push(new Date(semStart.getTime() + 4233600000)); //week 8
+      temp.exclude.push(new Date(semStart.getTime() + 5443200000)); //week 10       
+      temp.exclude.push(new Date(semStart.getTime() + 6652800000)); //week 12
+      temp.exclude.push(new Date(semStart.getTime() + 7862400000)); //week 14
+      temp.rrule.freq = "FORTNIGHTLY";
+    } break;
+    case "EVERY&nbsp;WEEK": {
+      temp.rrule.freq = "WEEKLY";
+    } break;
+
+  }
+  //Recess week
+  temp.exclude.push(new Date(semStart.getTime() + 3628800000));
+  
   if(data.Timetable[classNo].LessonType == "TUTORIAL" || 
     data.Timetable[classNo].LessonType == "LABORATORY") {
-      semStart = new Date(semStart.getTime() + 1209600000);
+      if(data.Timetable[classNo].WeekText !== "EVEN&nbsp;WEEK")
+        temp.exclude.push(new Date(semStart.getTime()));
+      if(data.Timetable[classNo].WeekText !== "ODD&nbsp;WEEK")
+        temp.exclude.push(new Date(semStart.getTime() + 604800000));
   }
   temp.dateStart = new Date(semStart.getTime());
   semStart.setHours(parseInt(data.Timetable[classNo].EndTime.substring(0,2)));
   temp.dateEnd = new Date(semStart.getTime());
-  switch(temp.freq) {
-    case "ODD WEEK": 
-    case "EVEN WEEK": temp.count = 7;
-    case "EVERY WEEK": break;
-  }
+  temp.exclude.sort();
   //console.log("Class of " + temp.summary  + " start at "+ temp.dateStart);
-  if(data.Timetable[classNo].LessonType == "TUTORIAL" || 
-    data.Timetable[classNo].LessonType == "LABORATORY") {
-      temp.exclude.push(new Date(temp.dateStart.getTime() + 2419200000));
-  }
-  else 
-    temp.exclude.push(new Date(temp.dateStart.getTime() + 3628800000));
   return temp;
 }
 
