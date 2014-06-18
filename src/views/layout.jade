@@ -11,13 +11,22 @@ html(lang='en')
       script(src='/vendor/socket.io.js')
 
     block headScripts
-    link(rel='stylesheet', href='/vendor/bootstrap.css')
+    //-link(rel='stylesheet', href='/vendor/bootstrap.css')
     link(rel='stylesheet', href='/css/main.css')
   body
-    if (message)
-      h3= message
-    if (user)
-      //- Probably render another view block for logged in users.
-      h1= user.username
+    #header
+      .left
+        h1 Sloth
+      nav.right
+        if (user)
+          h1= 'Hello ' + user.username
+        else
+          a(href='/login') Login
+          a(href='/login/register') Register
+      .clear
+        if (message)
+          h3= message
+        if (error)
+          h3= error.message
     block content
     block footScripts

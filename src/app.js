@@ -2,6 +2,7 @@
 var express = require('express');
   var session = require('express-session');
   var cookieParser = require('cookie-parser');
+  var flash = require('connect-flash');
   var passport = require('passport');
     var bodyParser = require('body-parser');
   var mongoose = require('mongoose');
@@ -33,6 +34,7 @@ passport.deserializeUser(function(obj, done) {
 // Middleware.
 app.use(cookieParser());
 app.use(session({ secret: 'keyboard neko' }));
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser());

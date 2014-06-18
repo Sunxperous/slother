@@ -11,7 +11,7 @@ var config = require('../config');
 
 // Login page.
 router.get('/', function(req, res) {
-  res.render('login');
+  res.render('login', { message: req.flash('error') });
 })
 
 // http://mongoosejs.com/docs/index.html
@@ -45,10 +45,10 @@ passport.use(new LocalStrategy(
     User.findOne({ username: username }, function(err, user) {
       if (err) { return done(err); }
       if (!user) {
-        return done(null, false, { message: 'No such user.' });
+        return done(null, false, { message: 'Invalid login.' });
       }
       if (!user.validPassword(password)) {
-        return done(null, false, { message: 'Wrong password.' });
+        return done(null, false, { message: 'Invalid login.' });
       }
       return done(null, user);
     });
@@ -59,7 +59,8 @@ passport.use(new LocalStrategy(
 router.post('/default',
   passport.authenticate('local', {
     successRedirect: '/',
-    failureRedirect: '/login'
+    failureRedirect: '/login',
+    failureFlash: true
   })
 );
 
