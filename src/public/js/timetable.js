@@ -237,10 +237,10 @@ var mock = JSON.parse('[{"summary":"SSA1201 (LECT)","description":"Singapore Soc
 
 
 var now = moment();
-now = moment("2014-01-13").add(16, 'weeks'); // For testing purpose, set to 1st week of 2013-14Sem2.
+now = moment("2014-01-13").add(0, 'weeks'); // For testing purpose, set to 1st week of 2013-14Sem2.
 
-var sundayOfWeek = now.subtract(now.day(), 'days');
-var saturdayOfWeek = moment(sundayOfWeek).add(6, 'days');
+var sunOfWeek = now.subtract(now.day(), 'days');
+var satOfWeek = moment(sunOfWeek).add(6, 'days');
 
 var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
@@ -269,8 +269,20 @@ var insertAndShowEvent = function(item) {
 };
 
 var duringDisplayedWeek = function(item) {
-  var date = moment(item.dateStart);
-  if (date.isAfter(sundayOfWeek) && date.isBefore(saturdayOfWeek)) {
+  var date;
+  // Check for excludes first.
+  if (item.exclude && item.exclude.length > 0) {
+    for (var i = 0; i < item.exclude.length; i++) {
+      date = moment(item.exclude[i]);
+      if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
+        return false;
+      }
+    }
+  }
+
+  // Then check for normal dates.
+  date = moment(item.dateStart);
+  if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
     return true; // First date is during, return true.
   }
   else if (item.rrule.freq != 'ONCE') { // Repeating event...
@@ -280,7 +292,7 @@ var duringDisplayedWeek = function(item) {
         date.add(1, 'week');
       }
 
-      if (date.isAfter(sundayOfWeek) && date.isBefore(saturdayOfWeek)) {
+      if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
         return true; // Currently checked date is during, return true.
       }
 
@@ -298,4 +310,4 @@ mock.forEach(function(item, index) {
 });
 
 // Scrolls immediately to 7:00am.
-$('.tableWrapper').scrollLeft(420);
+$('.tableWrapper').scrollLeft(421);
