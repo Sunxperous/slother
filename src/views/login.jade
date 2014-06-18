@@ -3,6 +3,7 @@ extends layout
 block headScript
 
 block content
+  h2 Login
   form#loginDefault.form-horizontal(method='post', action='/login/default')
     div
       label(for='username' class='control-label') Username
@@ -11,10 +12,12 @@ block content
       label(for='password' class='control-label') Password
       input(type='password', placeholder='password', name='password')
     div
-      input(type='submit')
+      input(type='submit' value='Login')
 
   form#loginNus(method='get', action='/login/nus')
     input(type='hidden', name='openid_identifier', value='https://openid.nus.edu.sg')
     input(type='submit' value='Login with NUS OpenID')
+
+  a(href='/register') Register
 
 block footScripts

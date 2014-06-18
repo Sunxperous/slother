@@ -10,7 +10,7 @@ var config = require('../config');
 
 
 // Login page.
-router.get('/', function(req, res) {
+router.get('/login', function(req, res) {
   res.render('login', { message: req.flash('error') });
 })
 
@@ -56,7 +56,7 @@ passport.use(new LocalStrategy(
 ));
 
 // Default login request.
-router.post('/default',
+router.post('/login/default',
   passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/login',
@@ -90,8 +90,8 @@ passport.use('nus', new OpenIDStrategy({
 ));
 
 // Nus login.
-router.get('/nus', passport.authenticate('nus'));
-router.get('/nus/callback', passport.authenticate('nus', {
+router.get('/login/nus', passport.authenticate('nus'));
+router.get('/login/nus/callback', passport.authenticate('nus', {
     successRedirect: '/',
     failureRedirect: '/login'
   })
@@ -117,6 +117,14 @@ router.post('/register', function(req, res) {
       });
     }
   });
+});
+
+
+
+// Logout
+router.get('/logout', function(req, res) {
+  req.logout();
+  res.redirect('/');
 });
 
 module.exports = router;

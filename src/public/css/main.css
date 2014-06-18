@@ -46,13 +46,58 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+a:link, a:active, a:visited, a:hover {
+  text-decoration: none;
+  color: #960;
+}
 /* End reset */
 
-
+/*v layout.jade v*/
 body {
+  font-family: 'Helvetica', 'Arial', sans-serif;
   padding: 10px 0;
   overflow-x: hidden;
+  font-size: 14px;
 }
+h1 {
+  font-size: 30px;
+  font-weight: 600;
+  margin: 8px;
+}
+h2 {
+  font-size: 22px;
+  margin: 12px;
+}
+#header {
+  position: relative;
+  margin: 0 40px 10px 40px;
+}
+#brand {
+  display: inline-block;
+}
+nav {
+  display: inline-block;
+  text-align: right;
+}
+nav * {
+  padding-left: 16px;
+}
+#alert {
+  padding: 0;
+  text-align: center;
+}
+.message {
+  color: #f66;
+  display: block;
+  padding: 4px;
+}
+#content {
+  margin: auto auto;
+  text-align: center;
+}
+/*^ layout.jade ^*/
+
+/*v timetable.jade v*/
 div.tableWrapper {
   margin-left: 115px;
   overflow-x: scroll;
@@ -110,21 +155,4 @@ th div {
   font-size: 12px;
   box-sizing: border-box;
 }
-#header {
-  position: relative;
-}
-#header div,nav {
-  padding: 12px;
-}
-.left {
-  float: left;
-}
-nav.right {
-  float: right;
-}
-nav.right a {
-  padding-left: 8px;
-}
-.clear {
-  clear: both;
-}
+/*^ timetable.jade ^*/

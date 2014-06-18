@@ -43,7 +43,7 @@ app.use(function(req, res, next) {
   next();
 });
 app.use(express.static(__dirname + '/public'));
-app.use('/login', login);
+app.use('/', login);
 app.use('/', routes);
 app.use('/extract',extractMod);
 
