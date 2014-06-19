@@ -1,3 +1,6 @@
+var express = require('express');
+var router = express.Router();
+var http = require('http');
 //  extract module info from nusmods address.
 //  Input         : address of nusmods 
 //  Output        : Array Events info
@@ -10,9 +13,10 @@
 //
 //  Take note of delays from getJSON !!!
 //  Manual enter of semStart date in line 44
-
+console.log("testets");
 
 function extract(addr) {
+
   var year = addr.substring(19,28),
       sem = addr.substring(32,33),
       modDetailInfo = {};
@@ -50,26 +54,43 @@ function extract(addr) {
   for(var x in modDetailInfo) {
     tempURL = tempURL.replace(tempModCode,x); 
     tempModCode = x;
-    $.getJSON(tempURL,function(data) {
-      //Go through and copy each element.
-      //First, handle normal lesson timetable.
-      for(var y in data.Timetable) {
-        var timetable = data.Timetable[y],
-            lessonType = checkLessonTaken(timetable,
-                      modDetailInfo[data.ModuleCode]);
-        if(lessonType == false)
-          continue;
-        else
-          eventInfo.push(buildNUSEvent(data,
-            new Date(semStart.getTime()),y));
+    console.log(tempURL);
+    http.get(tempURL, function(res) {
+      console.log("http gotten");
+      var body = '';
+      res.on('data', function(chunk) {
+        body += chunk;
+      });
+      res.on('end', function() {
+        var modJSON = JSON.parse(body);
+        console.log(modJSON);
+        for(var y in modJSON.Timetable) {
+          //Go through and copy each element.
+          //First, handle normal lesson timetable.
+          var timetable = modJSON.Timetable[y],
+              lessonType = checkLessonTaken(timetable,
+                        modDetailInfo[modJSON.ModuleCode]);
+          if(lessonType == false)
+            continue;
+          else
+            eventInfo.push(buildNUSEvent(modJSON,
+              new Date(semStart.getTime()),y));
         }
-      //Next, exam info
-      eventInfo.push(buildNUSExam(data,
-        new Date(semStart.getTime())));
+        //Next, exam info
+        eventInfo.push(buildNUSExam(modJSON,
+          new Date(semStart.getTime())));
+    
+        console.log(eventInfo);
+      });
+    }).on('error', function(err) {
+      console.log("Got error '"+ err +"' from NUSAPI JSON.");
     });
-    //console.log(eventInfo);
+    
   }
-  return eventInfo;
+  setTimeout(function() {
+    console.log(eventInfo);
+    return eventInfo;
+  }, 5000);
 }
 
 //Return class type string
@@ -251,13 +272,11 @@ function semesterStart(year,sem) {
 }
 
 
+router.get('/', function (req,res) {
+    
+  console.log("showing "+req.query.addr);
+  var body = extract(decodeURIComponent(req.query.addr));
+  res.send(body);
+});
 
-
-
-
-exports.extract = extract;
-exports.noToLessonType = noToLessonType;
-exports.checkLessonTaken = checkLessonTaken;
-exports.buildNUSEvent = buildNUSEvent;
-exports.buildNUSExam = buildNUSExam;
-exports.semesterStart = semesterStart;
+module.exports = router;

@@ -20,7 +20,7 @@ app.set('port', 8000);
 // Routing.
 var routes = require('./routes/index');
 var login = require('./routes/login');
-
+var extractMod = require('./routes/extractMod.js');
 // Passport serialization, e.g. id to user.
 // Something like that I think.
 passport.serializeUser(function(user, done) {
@@ -43,6 +43,7 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + '/public'));
 app.use('/login', login);
 app.use('/', routes);
+app.use('/extract',extractMod);
 
 // Something broke middleware.
 app.use(function(err, req, res, next) {
