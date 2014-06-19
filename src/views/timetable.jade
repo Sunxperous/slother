@@ -1,0 +1,34 @@
+extends layout
+
+block headScript
+
+block content
+  - var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+  div.tableWrapper
+    table
+      thead
+        tr
+          th.day
+            div.dayText Week 1
+          - for (var i = 0; i < 24; i++)
+            if (i < 5)
+              th.slot.ungodly
+                div= i + ':00'
+            else if (i > 10) && (i < 21)
+              th.slot.stuff
+                div= i + ':00'
+            else
+              th.slot.empty
+                div= i + ':00'
+              
+      tbody
+        div
+        - for (var daysI = 0; daysI < 7; daysI++)
+          tr(class= days[daysI])
+            td.day
+              div.dayText= days[daysI]
+            - for (var i = 0; i < 24; i++)
+              td.slot(class= i)
+
+block footScripts
+  script(src='/js/timetable.js')

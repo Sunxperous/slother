@@ -72,8 +72,10 @@ router.post('/login/default',
 passport.use('nus', new OpenIDStrategy({
     returnURL: 'http://localhost:8000/login/nus/callback',
     realm: 'http://localhost:8000/',
+    profile: true
   },
-  function(identifier, done) { // Only calls this function if successfully, I assume.
+  function(identifier, profile, done) { // Only calls this function if successfully, I assume.
+    console.log(profile);
     var nusId = identifier.slice(26, identifier.length); // Slice identifier: https://openid.nus.edu.sg/[.........] for nusId.
     User.findOne({ nusId: nusId }, function(err, user) {
       if (err) { return done(err); }

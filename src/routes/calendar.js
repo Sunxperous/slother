@@ -2,12 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/', function(req, res) {
-  if (req.user) {
-    res.redirect('/calendar');
-  }
-  else {
-    res.render('index', { title: 'Slother by Sloth'});
-  }
+  res.render('timetable');
 });
 
 module.exports = router;

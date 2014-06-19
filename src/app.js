@@ -21,7 +21,12 @@ app.set('port', 8000);
 // Routing.
 var routes = require('./routes/index');
 var login = require('./routes/login');
+<<<<<<< HEAD
 var extractMod = require('./routes/extractMod.js');
+=======
+var calendar = require('./routes/calendar');
+
+>>>>>>> shift timetable router
 // Passport serialization, e.g. id to user.
 // Something like that I think.
 passport.serializeUser(function(user, done) {
@@ -33,7 +38,7 @@ passport.deserializeUser(function(obj, done) {
 
 // Middleware.
 app.use(cookieParser());
-app.use(session({ secret: 'keyboard neko' }));
+app.use(session({ secret: 'keyboard neko' })); // Move secret to config.js later.
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
@@ -46,8 +51,10 @@ app.use(express.static(__dirname + '/public'));
 app.use('/', login);
 app.use('/', routes);
 app.use('/extract',extractMod);
+app.use('/calendar', calendar);
 
 // Something broke middleware.
+// Maybe can render a Sloth sleeping.
 app.use(function(err, req, res, next) {
   console.error(err.stack);
   res.send(500, 'Something broke...');
