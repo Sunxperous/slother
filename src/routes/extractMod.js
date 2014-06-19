@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var http = require('http');
+var request = require('request');
 //  extract module info from nusmods address.
 //  Input         : address of nusmods 
 //  Output        : Array Events info
@@ -12,8 +13,7 @@ var http = require('http');
 //                  8T9&ST2334=2SL1
 //
 //  Take note of delays from getJSON !!!
-//  Manual enter of semStart date in line 44
-console.log("testets");
+//  Manual enter of semStart date 
 
 function extract(addr) {
 
@@ -23,10 +23,8 @@ function extract(addr) {
   addr = addr.substring(38);
   mod = addr.split("&");
   mod.sort();
-  //console.log(mod); //For checking
   var tempMod = mod.pop().split("=");
   while(tempMod !== undefined) {
-    
     var tempOb = {
       codeNo: tempMod[0],
       lect: [], lab: [], sect: [], tut: []
@@ -42,8 +40,7 @@ function extract(addr) {
     }
     modDetailInfo[tempOb.codeNo] = tempOb;
   }
-  console.log(modDetailInfo);
-  
+  //console.log(modDetailInfo);
   var semStart = semesterStart(year,sem);
   //Manual key calender and Monday as start day
 
@@ -54,16 +51,9 @@ function extract(addr) {
   for(var x in modDetailInfo) {
     tempURL = tempURL.replace(tempModCode,x); 
     tempModCode = x;
-    console.log(tempURL);
-    http.get(tempURL, function(res) {
-      console.log("http gotten");
-      var body = '';
-      res.on('data', function(chunk) {
-        body += chunk;
-      });
-      res.on('end', function() {
-        var modJSON = JSON.parse(body);
-        console.log(modJSON);
+    request({ url: tempURL, json: true}, 
+      function (error, res, body) {
+        var modJSON = res.body;
         for(var y in modJSON.Timetable) {
           //Go through and copy each element.
           //First, handle normal lesson timetable.
@@ -78,19 +68,13 @@ function extract(addr) {
         }
         //Next, exam info
         eventInfo.push(buildNUSExam(modJSON,
-          new Date(semStart.getTime())));
-    
-        console.log(eventInfo);
-      });
-    }).on('error', function(err) {
-      console.log("Got error '"+ err +"' from NUSAPI JSON.");
+          new Date(semStart.getTime()))); 
     });
-    
   }
   setTimeout(function() {
     console.log(eventInfo);
     return eventInfo;
-  }, 5000);
+  }, 1000); //delay so that the request can be done
 }
 
 //Return class type string
@@ -235,7 +219,7 @@ function buildNUSExam(data, semStart) {
         // location, dateEnd, exclude
   };
   temp.dateEnd = new Date(temp.dateStart.getTime() + 10800000);
-  console.log("Exam of " + temp.summary + " start at "+temp.dateStart)
+  //console.log("Exam of " + temp.summary + " start at "+temp.dateStart)
   return temp;
 }
 
