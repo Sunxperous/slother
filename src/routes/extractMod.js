@@ -132,6 +132,7 @@ function checkLessonTaken(timetable, lessonNo) {
 //Output: An ics event class of NUS module lesson
 //Input : Data from NUSAPI, semester of the class, 
 //        classNo of NUSAPI timetable array   
+//NOTE: corrected to UTC
 function buildNUSEvent(data, semStart, classNo) {
   //console.log("semStart = " + semStart + ", data = "+data.ModuleCode);
   var temp = {
@@ -153,19 +154,16 @@ function buildNUSEvent(data, semStart, classNo) {
     case "TUTORIAL": temp.summary = temp.summary + " (TUT)"; break;
   }
   switch(data.Timetable[classNo].DayText) {
-    case "SUNDAY" :  semStart.setDate(semStart.getDate()+6); break;
-    case "SATURDAY" :  semStart.setDate(semStart.getDate() + 5); break;
-    case "FRIDAY" : semStart.setDate(semStart.getDate() + 4); break;
-    case "THURSDAY" : semStart.setDate(semStart.getDate() + 3); break;
-    case "WEDNESDAY" : semStart.setDate(semStart.getDate() + 2); break;
-    case "TUESDAY" : semStart.setDate(semStart.getDate() + 1); break;
-    case "MONDAY" : semStart.setDate(semStart.getDate()); break;
+    case "SUNDAY" :  semStart.setDate(semStart.getDate() + 7); break;
+    case "SATURDAY" :  semStart.setDate(semStart.getDate() + 6); break;
+    case "FRIDAY" : semStart.setDate(semStart.getDate() + 5); break;
+    case "THURSDAY" : semStart.setDate(semStart.getDate() + 4); break;
+    case "WEDNESDAY" : semStart.setDate(semStart.getDate() + 3); break;
+    case "TUESDAY" : semStart.setDate(semStart.getDate() + 2); break;
+    case "MONDAY" : semStart.setDate(semStart.getDate()+1); break;
   }
-  semStart.setHours(parseInt(data.Timetable[classNo].StartTime.substring(0,2)));
+  semStart.setHours(parseInt(data.Timetable[classNo].StartTime.substring(0,2)-8));
   
-  //console.log(semStart.getTime());
-  //console.log(semStart.toString());
-  //console.log(data.Timetable[classNo].WeekText);
   switch(data.Timetable[classNo].WeekText) {
     case "ODD&nbsp;WEEK": {
       temp.exclude.push(new Date(semStart.getTime() + 604800000)); //week 2
@@ -212,6 +210,8 @@ function buildNUSEvent(data, semStart, classNo) {
 //Build an event class for NUS module
 //Output: An ics event class of NUS module FINAL EXAM
 //Input : Data from NUSAPI, semester of the class,
+//DEFAULT exam time is 3 hours
+//NOTE: corrected to UTC
 function buildNUSExam(data, semStart) {
   var examD = data.ExamDate,
       temp = {
@@ -223,7 +223,7 @@ function buildNUSExam(data, semStart) {
         dateStart: new Date(parseInt(examD.substring(0,4)),
                         parseInt(examD.substring(6,7))-1,
                         parseInt(examD.substring(8,10)),
-                        parseInt(examD.substring(11,13))),
+                        parseInt(examD.substring(11,13))-8),
         // location, dateEnd, exclude
   };
   temp.dateEnd = new Date(temp.dateStart.getTime() + 10800000);
@@ -235,29 +235,30 @@ function buildNUSExam(data, semStart) {
 //Output: Smester start date in js date format
 //Input: year (eg. "2013-2014") and 
 //       semester (eg. "1") string 
+//NOTE: corrected to UTC timezone
 function semesterStart(year,sem) {
   var semStart = new Date();
   switch(year) {
 
     case "2013-2014": {
       //13-01-2014 & 12-08-2013
-      (sem=="1")?semStart.setTime(1376236800000): 
-                 semStart.setTime(1389542400000);
+      (sem=="1")?semStart.setTime(1376208000000): 
+                 semStart.setTime(1389513600000);
     } break; 
     case "2012-2013": {
       //14-01-2013 & 13-08-2012
-      (sem=="1")?semStart.setTime(1344787200000):
-                 semStart.setTime(1358092800000);
+      (sem=="1")?semStart.setTime(1344758400000):
+                 semStart.setTime(1358064000000);
     } break;
     case "2011-2012": {
       //09-01-2012 & 08-08-2011
-      (sem=="1")?semStart.setTime(1312732800000):
-                 semStart.setTime(1326038400000);
+      (sem=="1")?semStart.setTime(1312704000000):
+                 semStart.setTime(1326009600000);
     } break;
     case "2010-2011": {
       //10-01-2011 & 09-08-2010
-      (sem=="1")?semStart.setTime(1281283200000):
-                 semStart.setTime(1294588800000);
+      (sem=="1")?semStart.setTime(1281254400000):
+                 semStart.setTime(1294560000000);
     } break;
   }
   return semStart;
