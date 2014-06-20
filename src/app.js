@@ -21,12 +21,9 @@ app.set('port', 8000);
 // Routing.
 var routes = require('./routes/index');
 var login = require('./routes/login');
-<<<<<<< HEAD
 var extractMod = require('./routes/extractMod.js');
-=======
 var calendar = require('./routes/calendar');
 
->>>>>>> shift timetable router
 // Passport serialization, e.g. id to user.
 // Something like that I think.
 passport.serializeUser(function(user, done) {
