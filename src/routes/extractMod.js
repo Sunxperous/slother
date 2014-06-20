@@ -15,8 +15,8 @@ var request = require('request');
 //  Take note of delays from getJSON !!!
 //  Manual enter of semStart date 
 
-function extract(addr) {
-
+function extract(addr, callback) {
+  
   var year = addr.substring(19,28),
       sem = addr.substring(32,33),
       modDetailInfo = {};
@@ -47,8 +47,10 @@ function extract(addr) {
   var tempURL = "http://api.nusmods.com/"+year+"/"
                 +sem+'/modules/FE5218.json',
       tempModCode = "FE5218",
-      eventInfo = [];
+      eventInfo = [],
+      isDone = {};
   for(var x in modDetailInfo) {
+    isDone[x] = false;
     tempURL = tempURL.replace(tempModCode,x); 
     tempModCode = x;
     request({ url: tempURL, json: true}, 
@@ -68,13 +70,19 @@ function extract(addr) {
         }
         //Next, exam info
         eventInfo.push(buildNUSExam(modJSON,
-          new Date(semStart.getTime()))); 
+          new Date(semStart.getTime())));
+        isDone[modJSON.ModuleCode] = true;
+        var allDone = true;
+        for(var z in isDone) {
+          if(!isDone[z]) {
+            allDone = false;
+          }
+        }
+        if(allDone) {
+          callback(null, eventInfo);
+        }
     });
   }
-  setTimeout(function() {
-    console.log(eventInfo);
-    return eventInfo;
-  }, 1000); //delay so that the request can be done
 }
 
 //Return class type string
@@ -257,10 +265,16 @@ function semesterStart(year,sem) {
 
 
 router.get('/', function (req,res) {
-    
   console.log("showing "+req.query.addr);
-  var body = extract(decodeURIComponent(req.query.addr));
-  res.send(body);
+  extract(decodeURIComponent(req.query.addr), function(err, eventInfo) {
+    if(err) {
+
+    }
+    else {
+      console.log(eventInfo);
+      res.send(eventInfo);
+    }
+  });
 });
 
 module.exports = router;
