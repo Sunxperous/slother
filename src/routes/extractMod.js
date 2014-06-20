@@ -199,7 +199,7 @@ function buildNUSEvent(data, semStart, classNo) {
         temp.exclude.push(new Date(semStart.getTime() + 604800000));
   }
   temp.dateStart = new Date(semStart.getTime());
-  semStart.setHours(parseInt(data.Timetable[classNo].EndTime.substring(0,2)));
+  semStart.setHours(parseInt(data.Timetable[classNo].EndTime.substring(0,2)-8));
   temp.dateEnd = new Date(semStart.getTime());
   temp.exclude.sort();
   //console.log("Class of " + temp.summary  + " start at "+ temp.dateStart);
