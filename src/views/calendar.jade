@@ -9,16 +9,16 @@ block content
       thead
         tr
           th.day
-            div.dayText Week 1
+            div.dayText#weekText Week 1
           - for (var i = 0; i < 24; i++)
             if (i < 5)
-              th.slot.ungodly
+              th.slot
                 div= i + ':00'
             else if (i > 10) && (i < 21)
-              th.slot.stuff
+              th.slot
                 div= i + ':00'
             else
-              th.slot.empty
+              th.slot
                 div= i + ':00'
               
       tbody
@@ -29,6 +29,15 @@ block content
               div.dayText= days[daysI]
             - for (var i = 0; i < 24; i++)
               td.slot(class= i)
+
+  div.control-block
+    button#left <
+    button#right >
+
+  div.control-block
+    label(for='link') Add your NUSMods: 
+    input#nusmods_addr(type='text', placeholder='http://nusmods.com/2014-2015/sem1/v1/', name='link')
+    input#add_nusmods(type='submit' value='Add')
 
 block footScripts
   script(src='/js/timetable.js')

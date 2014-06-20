@@ -155,4 +155,18 @@ th div {
   font-size: 12px;
   box-sizing: border-box;
 }
+
+input#nusmods_addr {
+  width: 200px;
+}
+div.control-block {
+  margin-top: 8px;
+}
+#left {
+  margin-right: 32px;
+}
+button {
+  height: 40px;
+  width: 40px;
+}
 /*^ timetable.jade ^*/
