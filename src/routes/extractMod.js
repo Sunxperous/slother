@@ -69,8 +69,10 @@ function extract(addr, callback) {
               new Date(semStart.getTime()),y));
         }
         //Next, exam info
-        eventInfo.push(buildNUSExam(modJSON,
-          new Date(semStart.getTime())));
+        if(modJSON.ExamDate !== undefined) {
+          eventInfo.push(buildNUSExam(modJSON,
+            new Date(semStart.getTime())));
+        }
         isDone[modJSON.ModuleCode] = true;
         var allDone = true;
         for(var z in isDone) {
@@ -227,7 +229,6 @@ function buildNUSExam(data, semStart) {
         // location, dateEnd, exclude
   };
   temp.dateEnd = new Date(temp.dateStart.getTime() + 10800000);
-  //console.log("Exam of " + temp.summary + " start at "+temp.dateStart)
   return temp;
 }
 
@@ -272,7 +273,8 @@ router.get('/', function (req,res) {
 
     }
     else {
-      console.log(eventInfo);
+      //console.log(eventInfo);
+      console.log("Events created.")
       res.send(eventInfo);
     }
   });
