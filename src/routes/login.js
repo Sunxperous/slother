@@ -6,6 +6,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var OpenIDStrategy = require('passport-openid').Strategy;
 var router = express.Router();
 var config = require('../config');
+var bcrypt = require('bcrypt-nodejs');
 
 
 
@@ -15,28 +16,18 @@ router.get('/login', function(req, res) {
 })
 
 // http://mongoosejs.com/docs/index.html
-//
-// Insert a mock user in MongoDB:
-//   Run "mongo" in the console, then
-//     > db.users.insert({username: 'qwe', password: 'qwe'});
-//     > db.users.find()
-// Go to localhost:port/login and enter the username and password,
-//   login should be successful and redirect to /.  
 var userSchema = mongoose.Schema({
   username: String,
   password: String,
   nusId: String
 });
-userSchema.methods.validPassword = function(password) {
-  // Needs an encryption solution, probably bcrypt.
-
+userSchema.methods.authPassword = function(password, callback) {
+  bcrypt.compare(password, this.password, function(err, res) {
+    callback(res);
+  });
   // Apparently disallows empty passwords (if they registered via openID).
-  return password === this.password;
 };
-// Mongoose expects the collection name to be the plural
-//   lowercase (?) form of 'User', i.e. 'users'.
 var User = mongoose.model('User', userSchema);
-
 
 
 // http://passportjs.org/guide/username-password/
@@ -47,10 +38,16 @@ passport.use(new LocalStrategy(
       if (!user) {
         return done(null, false, { message: 'Invalid login.' });
       }
-      if (!user.validPassword(password)) {
-        return done(null, false, { message: 'Invalid login.' });
+      else {
+        user.authPassword(password, function(res) {
+          if (!res) {
+            return done(null, false, { message: 'Invalid login.' });
+          }
+          else {
+            return done(null, user);
+          }
+        });
       }
-      return done(null, user);
     });
   }
 ));
@@ -63,7 +60,6 @@ router.post('/login/default',
     failureFlash: true
   })
 );
-
 
 
 // http://passportjs.org/guide/openid/
@@ -91,7 +87,7 @@ passport.use('nus', new OpenIDStrategy({
   }
 ));
 
-// Nus login.
+// NUS login.
 router.get('/login/nus', passport.authenticate('nus'));
 router.get('/login/nus/callback', passport.authenticate('nus', {
     successRedirect: '/',
@@ -107,20 +103,21 @@ router.get('/register', function(req, res) {
 
 router.post('/register', function(req, res) {
   // Assuming valid, non-existing user...
-  User.create({
-    username: req.body.username,
-    password: req.body.password
-  }, function(err, user) {
-    if (err) { res.redirect('/register'); }
-    if (user) {
-      req.login(user, function(err_login) {
-        if (err) { res.redirect('/register'); }        
-        return res.redirect('/');
-      });
-    }
-  });
+  bcrypt.hash(req.body.password, null, null, function(err, hash) {
+    User.create({
+      username: req.body.username,
+      password: hash
+    }, function(err, user) {
+      if (err) { res.redirect('/register'); }
+      if (user) {
+        req.login(user, function(err_login) {
+          if (err) { res.redirect('/register'); }        
+          return res.redirect('/');
+        });
+      }
+    });  
+  });  
 });
-
 
 
 // Logout
