@@ -142,9 +142,10 @@ th div {
   text-align: right;
   margin-top: 1px;
   border: 0;
-  border-bottom: 1px solid #999;
-  border-right: 1px solid #999;
   padding-right: 10px;
+}
+.dateDisplay {
+  font-size: 11px;
 }
 .item {
   position: relative;

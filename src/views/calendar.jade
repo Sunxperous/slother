@@ -9,7 +9,7 @@ block content
       thead
         tr
           th.day
-            div.dayText#weekText Week 1
+            div.dayText#monthDisplay
           - for (var i = 0; i < 24; i++)
             if (i < 5)
               th.slot
@@ -26,7 +26,9 @@ block content
         - for (var daysI = 0; daysI < 7; daysI++)
           tr(class= days[daysI])
             td.day
-              div.dayText= days[daysI]
+              div.dayText.dateDisplay
+                p= days[daysI]
+                p.dayDate
             - for (var i = 0; i < 24; i++)
               td.slot(class= i)
 
