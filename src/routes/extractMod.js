@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var http = require('http');
 var request = require('request');
+var schema = require('mongoose');
 //  extract module info from nusmods address.
 //  Input         : address of nusmods 
 //  Output        : Array Events info
@@ -274,7 +275,11 @@ router.get('/', function (req,res) {
     }
     else {
       //console.log(eventInfo);
-      console.log("Events created.")
+      console.log("Events created.");
+      if(req.user)
+        console.log("logged in");
+      else
+        console.log("not yet login");
       res.send(eventInfo);
     }
   });
