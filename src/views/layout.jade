@@ -21,7 +21,9 @@ html(lang='en')
           h1 Slother
       nav
         if (user)
-          span= 'Hey ' + user.username
+          span
+            | Hey 
+            span#username= user.username
           a(href='/logout') Logout
         else
           a(href='/login') Login

@@ -11,15 +11,8 @@ block content
           th.day
             div.dayText#monthDisplay
           - for (var i = 0; i < 24; i++)
-            if (i < 5)
-              th.slot
-                div= i + ':00'
-            else if (i > 10) && (i < 21)
-              th.slot
-                div= i + ':00'
-            else
-              th.slot
-                div= i + ':00'
+            th
+              div= i + ':00'
               
       tbody
         div

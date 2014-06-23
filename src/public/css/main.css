@@ -79,7 +79,7 @@ nav {
   display: inline-block;
   text-align: right;
 }
-nav * {
+nav > * {
   padding-left: 16px;
 }
 #alert {
@@ -108,6 +108,7 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
   box-sizing: border-box;
+  table-layout: fixed;
 }
 thead th {
   border: 0;
@@ -122,6 +123,9 @@ td, th {
 td {
   vertical-align: top;
   padding-bottom: 8px;
+}
+.slot {
+  position: relative;
 }
 th div {
   text-align: left;
@@ -148,12 +152,12 @@ th div {
   font-size: 11px;
 }
 .item {
-  position: relative;
+  position: absolute;
   z-index: 50;
   padding: 2px;
   overflow: hidden;
   white-space: pre;
-  font-size: 12px;
+  font-size: 10px;
   box-sizing: border-box;
 }
 
