@@ -7,7 +7,6 @@ var Schema = mongoose.Schema;
 
 var temp = new Schema({
           name: String,
-          password: String,
           events: String
         });
 var user = mongoose.model('user',temp);
@@ -22,7 +21,6 @@ var user = mongoose.model('user',temp);
 //                  v1/#IS1103=63&ST2334=2SL1&ST2334=
 //                  8T9&ST2334=2SL1
 //
-//  Take note of delays from getJSON !!!
 //  Manual enter of semStart date 
 
 function extract(addr, callback) {
@@ -277,7 +275,7 @@ function semesterStart(year,sem) {
 
 
 router.get('/', function (req,res) {
-  console.log("showing "+req.query.addr);
+  //console.log("showing "+req.query.addr);
   
   //console.log(eventInfo);
   if(req.user) {
