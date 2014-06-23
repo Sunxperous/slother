@@ -23,6 +23,7 @@ var routes = require('./routes/index');
 var login = require('./routes/login');
 var extractMod = require('./routes/extractMod.js');
 var calendar = require('./routes/calendar');
+var group = require('./routes/group');
 
 // Passport serialization, e.g. id to user.
 // Something like that I think.
@@ -49,6 +50,7 @@ app.use('/', login);
 app.use('/', routes);
 app.use('/extract',extractMod);
 app.use('/calendar', calendar);
+app.use('/group',group);
 
 // Something broke middleware.
 // Maybe can render a Sloth sleeping.
