@@ -2,7 +2,16 @@ var express = require('express');
 var router = express.Router();
 var http = require('http');
 var request = require('request');
-var schema = require('mongoose');
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+
+var temp = new Schema({
+          name: String,
+          password: String,
+          events: String
+        });
+var user = mongoose.model('user',temp);
+
 //  extract module info from nusmods address.
 //  Input         : address of nusmods 
 //  Output        : Array Events info
@@ -269,20 +278,30 @@ function semesterStart(year,sem) {
 
 router.get('/', function (req,res) {
   console.log("showing "+req.query.addr);
-  extract(decodeURIComponent(req.query.addr), function(err, eventInfo) {
-    if(err) {
-
-    }
-    else {
-      //console.log(eventInfo);
-      console.log("Events created.");
-      if(req.user)
-        console.log("logged in");
-      else
-        console.log("not yet login");
-      res.send(eventInfo);
-    }
-  });
+  
+  //console.log(eventInfo);
+  if(req.user) {
+    extract(decodeURIComponent(req.query.addr), 
+      function(err, eventInfo) {
+        if(err) {console.log("err :'"+err+"'.");}
+        else {
+          console.log("Logged in as " + req.user.username);
+          console.log("Updating database...");        
+          user.update({ username: req.user.username},
+                      {$set: {events: eventInfo}},
+                      {upsert: true},
+                      function() {
+                        console.log("Updated!!");
+                        res.send(eventInfo);
+          });
+        }
+    });
+  }
+  else {
+      console.log("Not login yet.");
+      res.redirect('/login');
+  }
 });
+
 
 module.exports = router;
