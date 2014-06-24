@@ -41,5 +41,10 @@ block content
     input#nusmods_addr(type='text', placeholder='http://nusmods.com/2014-2015/sem1/v1/', name='link')
     input#add_nusmods(type='submit' value='Add')
 
+  div.control-block
+    label(for='createG') Create new Group: 
+    input#groupName(type='text', placeholder='New Name', name='createG')
+    input#create_group(type='submit' value='Create')
+
 block footScripts
   script(src='/js/timetable.js')

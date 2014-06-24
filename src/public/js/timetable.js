@@ -91,6 +91,16 @@
       }
     );
   });
+  // Add new Group.
+  $('#create_group').click(function(event) {
+    clearItems();
+    $.getJSON('/group',
+      { groupName: $('#groupName').val() },
+      function(res) {
+        console.log(res);
+      }
+    );
+  });
 
   // Update week number.
   //   Probably divide between NUS-style or default-style.

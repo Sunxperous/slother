@@ -21,7 +21,7 @@ app.set('port', 8000);
 // Routing.
 var routes = require('./routes/index');
 var login = require('./routes/login');
-var extractMod = require('./routes/extractMod.js');
+var extractMod = require('./routes/extractMod');
 var calendar = require('./routes/calendar');
 var group = require('./routes/group');
 
@@ -48,9 +48,9 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + '/public'));
 app.use('/', login);
 app.use('/', routes);
-app.use('/extract',extractMod);
+app.use('/extract', extractMod);
 app.use('/calendar', calendar);
-app.use('/group',group);
+app.use('/group', group);
 
 // Something broke middleware.
 // Maybe can render a Sloth sleeping.
