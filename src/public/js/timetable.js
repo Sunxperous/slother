@@ -94,8 +94,21 @@
   // Add new Group.
   $('#create_group').click(function(event) {
     clearItems();
-    $.getJSON('/group',
+    $.getJSON('/group/createGroup',
       { groupName: $('#groupName').val() },
+      function(res) {
+        console.log(res);
+      }
+    );
+  });
+
+  // Add new Group.
+  $('#add_person').click(function(event) {
+    clearItems();
+    $.getJSON('/group/addPerson',
+      { person: $('#person').val(),
+        group: $('#group').val()
+      },
       function(res) {
         console.log(res);
       }

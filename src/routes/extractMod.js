@@ -7,8 +7,9 @@ var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
           name: String,
-          events: String
-        });
+          events: Array
+});
+
 var User = mongoose.model('user',userSchema);
 
 //  extract module info from nusmods address.
