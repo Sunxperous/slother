@@ -16,21 +16,8 @@
   var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   var users = [];
 
-  // Add NUSMods address.
-  $('#add_nusmods').click(function(event) {
-    clearItems();
-    $.getJSON('/extract',
-      { addr: encodeURIComponent($('#nusmods_addr').val()) },
-      function(res) {
-        nusmods_data = res;
-        update();
-      }
-    );
-  });
-
   // Add new Group.
   $('#create_group').click(function(event) {
-    clearItems();
     $.getJSON('/group/createGroup',
       { groupName: $('#groupName').val() },
       function(res) {
@@ -41,7 +28,6 @@
 
   // Add new Person.
   $('#add_person').click(function(event) {
-    clearItems();
     $.getJSON('/group/addPerson',
       { person: $('#person').val(),
         group: $('#group').val()
