@@ -5,11 +5,11 @@ var request = require('request');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var temp = new Schema({
+var userSchema = new Schema({
           name: String,
           events: String
         });
-var user = mongoose.model('user',temp);
+var User = mongoose.model('user',userSchema);
 
 //  extract module info from nusmods address.
 //  Input         : address of nusmods 
@@ -31,14 +31,20 @@ function extract(addr, callback) {
   addr = addr.substring(38);
   mod = addr.split("&");
   mod.sort();
+  //console.log(mod);
   var tempMod = mod.pop().split("=");
   while(tempMod !== undefined) {
     var tempOb = {
       codeNo: tempMod[0],
-      lect: [], lab: [], sect: [], tut: []
+      lect: [], lab: [], sect: [], tut: [], reci: [],
+      tut2: [], tut3: []
     };
-    //console.log(tempOb);
+    
+  //console.log(tempOb);
     while(tempMod[0] == tempOb.codeNo) {
+        // console.log("tempMod 0 is "+tempMod[0]);
+        // console.log("tempMod 1 is "+tempMod[1]);
+        // console.log("type is "+noToLessonType(tempMod[1]))
         tempOb[noToLessonType(tempMod[1])].
           push(tempMod[1].substring(1));  
         tempMod = mod.pop();
@@ -100,10 +106,14 @@ function extract(addr, callback) {
 //        eg. "8T04" of "MA2213=8T04"
 function noToLessonType(lesson) {
   switch(lesson.substring(0,1)) {
-  case '1': return "lab";
-  case '2': return "lect";
-  case '6': return "sect";
-  case '8': return "tut";
+  case '1': return "lab"; //Laboratory
+  case '2': return "lect"; //Lecture
+  case '5': return "reci"; //Recitation Group
+  case '6': return "sect"; //Sectional Teaching
+  case '8': return "tut"; //Tutorial
+  case '9': return "tut2"; //Tutorial 2
+  case 'A': return "tut3"; //Tutorial 3
+  default: console.log("Unknown type: '"+lesson.substring(0,1)+"'");
   }
 }
 
@@ -112,7 +122,6 @@ function noToLessonType(lesson) {
 //Input:  timetable class from nusmods
 //        lessonNo class grouped by lect,lab,tut,sect
 function checkLessonTaken(timetable, lessonNo) {
-  //console.log(lessonNo)
   switch(timetable.LessonType) {
       case "LECTURE": 
         for(var x in lessonNo.lect)
@@ -126,10 +135,23 @@ function checkLessonTaken(timetable, lessonNo) {
         for(var x in lessonNo.tut)
           return (timetable.ClassNo == 
             lessonNo.tut[x])?true:false;
+      case "TUTORIAL TYPE 2":
+        for(var x in lessonNo.tut2)
+          return (timetable.ClassNo == 
+            lessonNo.tut2[x])?true:false;
+      case "TUTORIAL TYPE 3":
+        for(var x in lessonNo.tut3)
+          return (timetable.ClassNo == 
+            lessonNo.tut3[x])?true:false;
       case "SECTIONAL TEACHING": 
         for(var x in lessonNo.sect)
           return (timetable.ClassNo == 
             lessonNo.sect[x])?true:false;
+      case "RECITATION":
+        for(var x in lessonNo.reci)
+          return (timetable.ClassNo == 
+            lessonNo.reci[x])?true:false;
+
       default: 
         console.log("Non-defined lesson-type")
         return false;
@@ -161,7 +183,10 @@ function buildNUSEvent(data, semStart, classNo) {
     case "LABORATORY": temp.summary = temp.summary +  " (LAB)"; break;
     case "SECTIONAL TEACHING": temp.summary = temp.summary +  " (SEC)"; break;
     case "LECTURE": temp.summary = temp.summary + " (LECT)"; break;
-    case "TUTORIAL": temp.summary = temp.summary + " (TUT)"; break;
+    case "TUTORIAL": 
+    case "TUTORIAL TYPE 2":
+    case "TUTORIAL TYPE 3": temp.summary = temp.summary + " (TUT)"; break;
+    case "RECITATION":  temp.summary = temp.summary + " (RECI)"; break;
   }
   switch(data.Timetable[classNo].DayText) {
     case "SUNDAY" :  semStart.setDate(semStart.getDate() + 7); break;
@@ -202,6 +227,8 @@ function buildNUSEvent(data, semStart, classNo) {
   temp.exclude.push(new Date(semStart.getTime() + 3628800000));
   
   if(data.Timetable[classNo].LessonType == "TUTORIAL" || 
+    data.Timetable[classNo].LessonType == "TUTORIAL TYPE 2" ||
+    data.Timetable[classNo].LessonType == "TUTORIAL TYPE 3" ||
     data.Timetable[classNo].LessonType == "LABORATORY") {
       if(data.Timetable[classNo].WeekText !== "EVEN&nbsp;WEEK")
         temp.exclude.push(new Date(semStart.getTime()));
@@ -231,7 +258,7 @@ function buildNUSExam(data, semStart) {
           freq: "ONCE"
         },
         dateStart: new Date(parseInt(examD.substring(0,4)),
-                        parseInt(examD.substring(6,7))-1,
+                        parseInt(examD.substring(5,7))-1,
                         parseInt(examD.substring(8,10)),
                         parseInt(examD.substring(11,13))-8),
         // location, dateEnd, exclude
@@ -284,8 +311,9 @@ router.get('/', function (req,res) {
         if(err) {console.log("err :'"+err+"'.");}
         else {
           console.log("Logged in as " + req.user.username);
+          //console.log(eventInfo);
           console.log("Updating database...");        
-          user.update({ username: req.user.username},
+          User.update({ username: req.user.username},
                       {$set: {events: eventInfo}},
                       {upsert: true},
                       function() {
