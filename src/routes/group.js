@@ -1,5 +1,15 @@
 var mongoose = require('mongoose');
-var Group = require('./groupSchema.js');
+var express = require('express');
+var router = express.Router();
+var Schema = mongoose.Schema;
+
+var groupSchema = new Schema({
+  groupName: String,
+  member: Array,
+});
+
+var Group = mongoose.model('group',groupSchema);
+
 
 function searchGroup(groupName) {
   Group.findOne({groupName: groupName}, function (req,res) {
@@ -36,12 +46,13 @@ router.post('/addPerson',function (req,res) {
         function(err,user) {
           return {name: user.username,
                     events: user.events};
-      })}, 
-      function(err) {
-        if(err) {console.log("err '"+err+"'.")};
+      })}}, 
+      function (err) {
+        if(err) {console.log("err '"+err+"'.")}
         else
           console.log("Updated " + req.body.member);
-      };
+      }
+  );
 });
 
 
