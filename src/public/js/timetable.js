@@ -18,29 +18,36 @@
 
   // Add new Group.
   $('#create_group').click(function(event) {
-    $.getJSON('/group/createGroup',
+    $.post('/group/createGroup',
       { groupName: $('#groupName').val() },
       function(res) {
         console.log(res);
-        $('#groupName').val('');
       }
     );
   });
 
   // Add new Person.
   $('#add_person').click(function(event) {
-    $.getJSON('/group/addPerson',
+    $.post('/group/addPerson',
       { user: $('#user').val(),
         group: $('#group').val()
       },
       function(res) {
         console.log(res);
-        $('#user').val('');
-        $('#group').val(''); 
       }
     );
   });
 
+  $('#remove_person').click(function(event) {
+    $.post('/group/removePerson',
+      { user: $('#user').val(),
+        group: $('#group').val()
+      },
+      function(res) {
+        console.log(res);
+      }
+    );
+  });
   // Update week number.
   //   Probably divide between NUS-style or default-style.
   var updateDates = function(){
