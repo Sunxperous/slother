@@ -12,7 +12,8 @@ var groupSchema = new Schema({
 //   username: String,
 //   events: Array
 // });
-// var User = mongoose.model('user',userSchema);
+var userSchema = require('mongoose').model('user');
+var User = mongoose.model('user',userSchema);
 
 var Group = mongoose.model('group',groupSchema);
 
@@ -51,11 +52,12 @@ function generateFreeslot() {};
 //Post request to create new Group
 router.get('/createGroup', function (req,res) {
   //console.log("COme into create group");
+  console.log(req.user.events);
   var member = [];
   member.push({name: req.user.username,
                 events: req.user.events});
-  var check = searchGroup(req.query.groupName);
-  console.log("check " +check);
+  //var check = searchGroup(req.query.groupName);
+  //console.log("check " +check);
   Group.findOne({groupName: req.query.groupName}, function(err,group) {
     //console.log("group "+group);
     if(group !== null) {
@@ -75,18 +77,17 @@ router.get('/createGroup', function (req,res) {
 
 //Post request to add person to a group
 router.get('/addPerson',function (req,res) {
-  Group.findOneAndUpdate({groupName: req.body.groupName},
-    {$push:{member: User.findOne({username: req.body.member}, 
-        function(err,user) {
-          return {name: user.username,
-                    events: user.events};
-      })}}, 
-      function (err) {
-        if(err) {console.log("err '"+err+"'.")}
-        else
-          console.log("Updated " + req.body.member);
-      }
-  );
+  User.findOne({username: req.query.user}, 
+    function(err,user) {
+      Group.findOneAndUpdate({groupName: req.query.group}, 
+        {$push:{member: {name: user.username,
+          events: user.events
+        }}}, function (err, group) {
+          if(!err) console.log("User "+user.username+" added into group"+req.query.group);
+          else console.log("err '"+err+"'.");
+          res.send(group);
+      });
+  });
 });
 
 

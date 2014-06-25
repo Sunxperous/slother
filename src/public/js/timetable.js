@@ -22,6 +22,7 @@
       { groupName: $('#groupName').val() },
       function(res) {
         console.log(res);
+        $('#groupName').val('');
       }
     );
   });
@@ -29,11 +30,13 @@
   // Add new Person.
   $('#add_person').click(function(event) {
     $.getJSON('/group/addPerson',
-      { person: $('#person').val(),
+      { user: $('#user').val(),
         group: $('#group').val()
       },
       function(res) {
         console.log(res);
+        $('#user').val('');
+        $('#group').val(''); 
       }
     );
   });
