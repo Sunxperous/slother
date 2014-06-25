@@ -46,7 +46,7 @@
     updateDates();
 
     // Reset <td> rows.
-    $('td.slot').removeData('rows');
+    $('td.slot').removeData('rows').height('auto');
 
     // All users to refresh their calendar display.
     users.forEach(function(user, index) {
