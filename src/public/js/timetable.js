@@ -16,38 +16,6 @@
   var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   var users = [];
 
-  // Add new Group.
-  $('#create_group').click(function(event) {
-    $.post('/group/createGroup',
-      { groupName: $('#groupName').val() },
-      function(res) {
-        console.log(res);
-      }
-    );
-  });
-
-  // Add new Person.
-  $('#add_person').click(function(event) {
-    $.post('/group/addPerson',
-      { user: $('#user').val(),
-        group: $('#group').val()
-      },
-      function(res) {
-        console.log(res);
-      }
-    );
-  });
-
-  $('#remove_person').click(function(event) {
-    $.post('/group/removePerson',
-      { user: $('#user').val(),
-        group: $('#group').val()
-      },
-      function(res) {
-        console.log(res);
-      }
-    );
-  });
   // Update week number.
   //   Probably divide between NUS-style or default-style.
   var updateDates = function(){
@@ -270,13 +238,16 @@
   $('.tableWrapper').scrollLeft(428);
 
   // Adds logged in user (via greeting message).
-  users.push(new User($('#username').text(), null, '#ffcccc', true));
+  $.getJSON('/user/timetable', function(res) {
+    console.log(res);
+    users.push(new User($('#username').text(), res, '#ffcccc', true));
+  });
 
   // Temporary.
-  users.push(new User('Mock2', mock2, '#ccccff'));
-  users.push(new User('Mock3', mock3, '#cccc99'));
-  users.push(new User('Mock', mock, '#ccffcc'));
-  users.push(new User('Mock4', mock4, '#99cccc'));
+  // users.push(new User('Mock2', mock2, '#ccccff'));
+  // users.push(new User('Mock3', mock3, '#cccc99'));
+  // users.push(new User('Mock', mock, '#ccffcc'));
+  // users.push(new User('Mock4', mock4, '#99cccc'));
 
 })();
 

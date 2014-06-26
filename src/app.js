@@ -24,6 +24,7 @@ var login = require('./routes/login');
 var extractMod = require('./routes/extractMod');
 var calendar = require('./routes/calendar');
 var group = require('./routes/group');
+var user = require('./routes/user');
 
 // Passport serialization, e.g. id to user.
 // Something like that I think.
@@ -48,9 +49,11 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + '/public'));
 app.use('/', login);
 app.use('/', routes);
+// Needs an isAuthenticated middleware here to prevent unloggedin requests.
 app.use('/extract', extractMod);
 app.use('/calendar', calendar);
 app.use('/group', group);
+app.use('/user', user);
 
 // Something broke middleware.
 // Maybe can render a Sloth sleeping.
