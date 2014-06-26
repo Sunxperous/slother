@@ -6,114 +6,129 @@ var groupSchema = new Schema({
   groupName: String,
   member: Array,
 });
-
 var userSchema = require('mongoose').model('user');
 var User = mongoose.model('user',userSchema);
-
 var Group = mongoose.model('group',groupSchema);
 
-function searchGroup(groupName) {
-  //Option 1
-  // Group.findOne({groupName: groupName}).exec(function (err, group) {
-  //   if(err) {
-  //     console.log("err is "+err);
-  //     return err;
-  //   }
-  //   else{
-  //     console.log(group);
-  //     if(group.groupName == groupName) {
-  //       return true;
-
-  //     }
-  //     else 
-  //       return false;
-  //   }
-  // })
-
-  //End
-
-  //Option 2
-  Group.findOne({groupName: groupName}, function(err,group) {
-    console.log("group "+group);
-    if(group !== null) return true;
-    else return false;
+//Return boolean of user existance in db by callback
+function searchUser(username, callback) {
+  User.findOne({username: username}, function (err, user) {
+    if(user !== null) return callback(null,true);
+    else return callback(null,false);
   });
 }
 
-function updatePerson() {};
-function removePerson() {};
-function generateFreeslot() {};
+//Return boolean of user existance of a group in db by callback
+//Note: if group does not exist, function will return false
+function searchUserInGroup(username, groupName, callback) {
+  
+  Group.findOne({groupName: groupName, member:{$in:[username]}},
+    function (err,userInGroup) {
+      if(userInGroup !== null) return callback(null,true);
+      else return callback(null,false);
+  });
+}
+
+//Return boolean of group existance in db by callback
+function searchGroup(groupName, callback) {
+  Group.findOne({groupName: groupName}, function (err,group) {
+    if(group !== null) return callback(null,true);
+    else return callback(null,false);
+  });
+}
 
 //Post request to create new Group
 router.post('/createGroup', function (req,res) {
   var member = [];
-  member.push({name: req.user.username,
-                events: req.user.events});
-  //var check = searchGroup(req.query.groupName);
-  //console.log("check " +check);
-  Group.findOne({groupName: req.body.groupName}, function(err,group) {
-    if(group !== null) {
-      console.log("Group name already exist.");
-      res.send(null);
+  member.push(req.user.username);
+  searchGroup (req.body.groupName, function (dummy, found) {
+    console.log("found "+found);
+    if(found) {
+      res.send("Group name already exist.");
     }
     else {
       var temp = {
         groupName: req.body.groupName,
         member: member
-      }
+      };
       Group.create(temp);
       res.send(temp);
     }
-  }); 
+  });
 });
 
 //Post request to add person to a group
 router.post('/addPerson',function (req,res) {
-  User.findOne({username: req.body.user}, 
-    function(userErr,user) {
-      if(userErr) res.send("err '"+userErr+"'.");
-      else if(user == null) {
-        res.send("User does not exist.");
-      }
-      else {
-        Group.findOneAndUpdate({groupName: req.body.group}, 
-          {$push:{member: {name: user.username,
-            events: user.events
-          }}}, function (err, group) {
-            if(err) {
-              res.send("Error '"+err+"'.");
+  searchGroup(req.body.group, function (err,foundGroup){
+    if(foundGroup) {
+      searchUserInGroup(req.body.user,req.body.group, function (err, foundUserInGroup) {
+        if(foundUserInGroup)
+          res.send(req.body.user+" is in the group.");
+        else {
+          searchUser(req.body.user, function (err, foundUser) {
+            if(foundUser) {
+              Group.findOneAndUpdate({groupName: req.body.group}, 
+               {$push:{member:req.body.user}}, 
+               function (err, group) {
+                 if(err) 
+                   res.send("Error '"+err+"'.");
+                 else if(group == null) 
+                     res.send("Group not found. Error occurs."); 
+                 else {
+                  res.send("User "+req.body.user+
+                     " added into group "+req.body.group);
+                 }      
+               });
             }
-            else if(group == null) {
-              res.send("Group not found.");
-            } 
-            else {
-              console.log("User "+user.username+
-                " added into group "+req.body.group);
-              res.send(group);
-            }
-        }); 
-      }
+            else
+              res.send("User "+req.body.user+" does not exist in the system.");
+          });
+        }
+      });
+    }
+    else
+      res.send("Group not found. Please create the group first.");  
   });
 });
 
 //Post request to remove person to a group
 router.post('/removePerson', function (req,res) {
-  Group.findOne({groupName: req.body.group}, function (err, found) {
-    if(err) {
-      res.send(err);
+  searchGroup(req.body.group, function (err,foundGroup) {
+    if(foundGroup) {
+      searchUserInGroup(req.body.user,req.body.group, function (err, foundUserInGroup) {
+        if(foundUserInGroup) {
+          Group.update({groupName: req.body.group,},
+            {$pull:{member:req.body.user}},
+            function (err2) {
+              if(err2)
+                console.log("err "+err);
+              else
+                res.send("Member "+req.body.user+" is removed from the group");
+           });
+        }
+        else {
+          res.send(req.body.user+" is not in the group.");
+        }
+      });
     }
-    else if(found == null) {
-      res.send("Group is not in the list.");
-    }
-    else {
-      Group.update({groupName: req.body.group,},
-        {$pull:{member:{name: req.body.user}}},
-          function (err2) {
-            res.send(200,"Member removed");
-          });
-    }
+    else
+      res.send("Group not found. Operation aborted."); 
   });
-   
+  //   Group.findOne({groupName: req.body.group}, function (err, found) {
+  //   if(err) {
+  //     res.send(err);
+  //   }
+  //   else if(found == null) {
+  //     res.send("Group is not in the list.");
+  //   }
+  //   else {
+  //     Group.update({groupName: req.body.group,},
+  //       {$pull:{member:req.body.user}},
+  //         function (err2) {
+  //           res.send(200,"Member removed");
+  //         });
+  //   }
+  // });
 });
 
 module.exports = router;
