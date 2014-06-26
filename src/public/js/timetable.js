@@ -239,7 +239,6 @@
 
   // Adds logged in user (via greeting message).
   $.getJSON('/user/timetable', function(res) {
-    console.log(res);
     users.push(new User($('#username').text(), res, '#ffcccc', true));
   });
 

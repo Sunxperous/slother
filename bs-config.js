@@ -38,7 +38,7 @@ module.exports = {
      |--------------------------------------------------------------------------
      | https://github.com/shakyShane/browser-sync/wiki/options#wiki-server
      */
-    server: false,
+    //server: false,
 
     /*
      |--------------------------------------------------------------------------
@@ -49,7 +49,7 @@ module.exports = {
     proxy: 'localhost:8000',
 
     ports: {
-        min: 8010,
+        min: 8012,
         max: 8020
     },
 
