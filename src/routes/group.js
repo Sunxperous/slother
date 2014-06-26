@@ -114,21 +114,6 @@ router.post('/removePerson', function (req,res) {
     else
       res.send("Group not found. Operation aborted."); 
   });
-  //   Group.findOne({groupName: req.body.group}, function (err, found) {
-  //   if(err) {
-  //     res.send(err);
-  //   }
-  //   else if(found == null) {
-  //     res.send("Group is not in the list.");
-  //   }
-  //   else {
-  //     Group.update({groupName: req.body.group,},
-  //       {$pull:{member:req.body.user}},
-  //         function (err2) {
-  //           res.send(200,"Member removed");
-  //         });
-  //   }
-  // });
 });
 
 module.exports = router;
