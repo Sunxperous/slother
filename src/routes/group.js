@@ -111,4 +111,25 @@ router.post('/removePerson', function (req,res) {
   });
 });
 
+router.get('/calendar', function(req, res) {
+  var userEvents = [];
+  Group.findOne({ groupName: req.query.groupName }, function(err, group) {
+    if (err) { console.log(err); }
+    else if (group) {
+      group.member.forEach(function(username, index) {
+        User.findOne({ username: username }, function(errUser, user) {
+          userEvents.push({
+            username: user.username,
+            events: user.events
+          });
+
+          if (index >= group.member.length - 1) {
+            res.send(userEvents);
+          }
+        });
+      });
+    }
+  });
+});
+
 module.exports = router;

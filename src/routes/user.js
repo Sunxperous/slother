@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 
 var User = mongoose.model('user');
 
-router.get('/timetable', function(req, res) {
+router.get('/calendar', function(req, res) {
   if (req.user) {
     User.findOne({username: req.user.username}, function(err, user) {
       if (err) {

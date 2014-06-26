@@ -237,10 +237,24 @@
   // Scrolls immediately to 7:00am.
   $('.tableWrapper').scrollLeft(428);
 
-  // Adds logged in user (via greeting message).
-  $.getJSON('/user/timetable', function(res) {
-    users.push(new User($('#username').text(), res, '#ffcccc', true));
-  });
+  if (window.location.pathname !== '/calendar') { // If group timetable...
+    var groupName = 'testing';
+    $.getJSON('/group/calendar',
+      { groupName: groupName },
+      function(res) {
+        // Array of objects { username, events }. 
+        res.forEach(function(user, index) {
+          users.push(new User(user.username, user.events, '#ff' + (3333 * index), false));
+        })
+      }
+    );
+  }
+  else { // If not group timetable...
+    // Adds logged in user (via greeting message).
+    $.getJSON('/user/calendar', function(res) {
+      users.push(new User($('#username').text(), res, '#ffcccc', true));
+    });
+  }
 
   // Temporary.
   // users.push(new User('Mock2', mock2, '#ccccff'));
