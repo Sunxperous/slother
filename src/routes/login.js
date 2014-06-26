@@ -15,19 +15,8 @@ router.get('/login', function(req, res) {
   res.render('login', { message: req.flash('error') });
 })
 
-// http://mongoosejs.com/docs/index.html
-var userSchema = mongoose.Schema({
-  username: String,
-  password: String,
-  nusId: String
-});
-userSchema.methods.authPassword = function(password, callback) {
-  bcrypt.compare(password, this.password, function(err, res) {
-    callback(res);
-  });
-  // Apparently disallows empty passwords (if they registered via openID).
-};
-var User = mongoose.model('User', userSchema);
+var userSchema = require('mongoose').model('user');
+var User = mongoose.model('user', userSchema);
 
 
 // http://passportjs.org/guide/username-password/

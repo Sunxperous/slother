@@ -4,18 +4,11 @@ var http = require('http');
 var request = require('request');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-
-var userSchema = new Schema({
-          username: String,
-          events: Array,
-          group: Array
-});
-
-var User = mongoose.model('user',userSchema);
+var User = require('../schema/userSchema');
 
 //  extract module info from nusmods address.
 //  Input         : address of nusmods 
-//  Output        : Array Events info
+//  Output        : Array Events info by callback
 //  Output format : <VarName>[]
 //  Array includes: dateStart,dateEnd,description,
 //                  summary,exclude,location,rrule
@@ -24,7 +17,6 @@ var User = mongoose.model('user',userSchema);
 //                  8T9&ST2334=2SL1
 //
 //  Manual enter of semStart date 
-
 function extract(addr, callback) {
   
   var year = addr.substring(19,28),
@@ -33,7 +25,6 @@ function extract(addr, callback) {
   addr = addr.substring(38);
   mod = addr.split("&");
   mod.sort();
-  //console.log(mod);
   var tempMod = mod.pop().split("=");
   while(tempMod !== undefined) {
     var tempOb = {
@@ -42,11 +33,7 @@ function extract(addr, callback) {
       tut2: [], tut3: []
     };
     
-  //console.log(tempOb);
     while(tempMod[0] == tempOb.codeNo) {
-        // console.log("tempMod 0 is "+tempMod[0]);
-        // console.log("tempMod 1 is "+tempMod[1]);
-        // console.log("type is "+noToLessonType(tempMod[1]))
         tempOb[noToLessonType(tempMod[1])].
           push(tempMod[1].substring(1));  
         tempMod = mod.pop();
@@ -56,7 +43,6 @@ function extract(addr, callback) {
     }
     modDetailInfo[tempOb.codeNo] = tempOb;
   }
-  //console.log(modDetailInfo);
   var semStart = semesterStart(year,sem);
   //Manual key calender and Monday as start day
 
@@ -168,7 +154,6 @@ function checkLessonTaken(timetable, lessonNo) {
 //        classNo of NUSAPI timetable array   
 //NOTE: corrected to UTC
 function buildNUSEvent(data, semStart, classNo) {
-  //console.log("semStart = " + semStart + ", data = "+data.ModuleCode);
   var temp = {
         summary: data.ModuleCode,
         description: data.ModuleTitle + " - ClassNo: " 
@@ -241,7 +226,6 @@ function buildNUSEvent(data, semStart, classNo) {
   semStart.setHours(parseInt(data.Timetable[classNo].EndTime.substring(0,2)-8));
   temp.dateEnd = new Date(semStart.getTime());
   temp.exclude.sort();
-  //console.log("Class of " + temp.summary  + " start at "+ temp.dateStart);
   return temp;
 }
 

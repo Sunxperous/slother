@@ -2,13 +2,8 @@ var mongoose = require('mongoose');
 var express = require('express');
 var router = express.Router();
 var Schema = mongoose.Schema;
-var groupSchema = new Schema({
-  groupName: String,
-  member: Array,
-});
-var userSchema = require('mongoose').model('user');
-var User = mongoose.model('user',userSchema);
-var Group = mongoose.model('group',groupSchema);
+var User = require('../schema/userSchema');
+var Group = require('../schema/groupSchema');
 
 //Return boolean of user existance in db by callback
 function searchUser(username, callback) {
