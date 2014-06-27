@@ -164,7 +164,6 @@ function buildNUSEvent(data, semStart, classNo) {
           count: 14 //default semester week
         },
         exclude: []
-         // dateStart, dateEnd, 
   };
   switch(data.Timetable[classNo].LessonType) {
     case "LABORATORY": temp.summary = temp.summary +  " (LAB)"; break;
@@ -246,8 +245,7 @@ function buildNUSExam(data, semStart) {
         dateStart: new Date(parseInt(examD.substring(0,4)),
                         parseInt(examD.substring(5,7))-1,
                         parseInt(examD.substring(8,10)),
-                        parseInt(examD.substring(11,13))-8),
-        // location, dateEnd, exclude
+                        parseInt(examD.substring(11,13))-8)
   };
   temp.dateEnd = new Date(temp.dateStart.getTime() + 10800000);
   return temp;
@@ -286,18 +284,13 @@ function semesterStart(year,sem) {
   return semStart;
 }
 
-
 router.get('/', function (req,res) {
-  //console.log("showing "+req.query.addr);
-  
-  //console.log(eventInfo);
   if(req.user) {
     extract(decodeURIComponent(req.query.addr), 
       function(err, eventInfo) {
         if(err) {console.log("err :'"+err+"'.");}
         else {
           console.log("Logged in as " + req.user.username);
-          //console.log(eventInfo);
           console.log("Updating database...");        
           User.update({ username: req.user.username},
                       {$set: {events: eventInfo}},
@@ -314,6 +307,5 @@ router.get('/', function (req,res) {
       res.redirect('/login');
   }
 });
-
 
 module.exports = router;

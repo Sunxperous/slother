@@ -47,7 +47,10 @@ router.post('/createGroup', function (req,res) {
         member: member
       };
       Group.create(temp);
-      res.send(temp);
+      User.findOneAndUpdate({username:req.user.username},
+        {$push:{group:req.body.groupName}}, function (err,user) {
+          res.send("Group created");
+        });
     }
   });
 });
@@ -63,17 +66,19 @@ router.post('/addPerson',function (req,res) {
           searchUser(req.body.user, function (err, foundUser) {
             if(foundUser) {
               Group.findOneAndUpdate({groupName: req.body.group}, 
-               {$push:{member:req.body.user}}, 
-               function (err, group) {
-                 if(err) 
-                   res.send("Error '"+err+"'.");
-                 else if(group == null) 
-                     res.send("Group not found. Error occurs."); 
-                 else {
-                  res.send("User "+req.body.user+
-                     " added into group "+req.body.group);
-                 }      
-               });
+                {$push:{member:req.body.user}}, 
+                function (err, group) {
+                  if(err) 
+                    res.send("Error '"+err+"'."); 
+                  else {
+                    User.findOneAndUpdate({username:req.body.user},
+                      {$push:{group:req.body.group}},
+                      function (err,user) {
+                        res.send("User "+req.body.user+
+                          " added into group "+req.body.group);
+                    });
+                  }
+              });
             }
             else
               res.send("User "+req.body.user+" does not exist in the system.");
@@ -97,8 +102,12 @@ router.post('/removePerson', function (req,res) {
             function (err2) {
               if(err2)
                 console.log("err "+err);
-              else
-                res.send("Member "+req.body.user+" is removed from the group");
+              else {
+                User.findOneAndUpdate({username: req.body.user},
+                  {$pull:{group:{$in:[req.body.group]}}}, function (err,user) {
+                    res.send("Member "+req.body.user+" is removed from the group");
+                  });
+              }
            });
         }
         else {
