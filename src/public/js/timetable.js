@@ -29,12 +29,12 @@
   };
 
   // Switch weeks.
-  $('#left').click(function(event) {
+  $('#before').click(function(event) {
     now.add(-1, 'weeks');
     update();
   });
 
-  $('#right').click(function(event) {
+  $('#after').click(function(event) {
     now.add(1, 'weeks');
     update();
   });
@@ -237,16 +237,17 @@
   // Scrolls immediately to 7:00am.
   $('.tableWrapper').scrollLeft(428);
 
+  // Temporary solution for different colours.
   var colors = ['#f99', '#9f9', '#99f', '#61a0a0', '#f2eda7', '#a6d4e0', '#3ea1bb', '#ff8700', '#b6965c', '#bfc0c0'];
-
-  if (window.location.pathname !== '/calendar') { // If group timetable...
-    var groupName = 'testing';
+  
+  var pathname = window.location.pathname;
+  if (pathname !== '/calendar') { // If group timetable...
+    var groupName = pathname.substr(pathname.lastIndexOf('/') + 1, pathname.length);
     $.getJSON('/group/calendar',
       { groupName: groupName },
       function(res) {
         // Array of objects { username, events }. 
         var rand = Math.floor(Math.random() * 7);
-        console.log(rand);
         res.forEach(function(user, index) {
           users.push(new User(user.username, user.events, colors[index + rand], false));
         })

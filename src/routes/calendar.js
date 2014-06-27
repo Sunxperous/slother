@@ -1,18 +1,29 @@
 var express = require('express');
 var router = express.Router();
+var User = require('../schema/userSchema');
 
 router.get('/group/:name', function(req, res) {
   // Maybe we should use id or generate a unique id like YouTube.
   //   Then append their name at the end, e.g.
   //   .../group/aBcDeFgI123/TheGroupName
   //   even though the group name is just for show.
-  var groupName = req.params.name;
-  res.render('calendar');
+  if (req.user) {
+    var groupName = req.params.name;
+    User.findOne({ username: req.user.username }, function(err, user) {
+      res.render('calendar', { groups: user.group });
+    })
+  }
+  else {
+    req.flash('error', 'Please log in.');
+    res.redirect('/login');
+  }
 });
 
 router.get('/', function(req, res) {
   if (req.user) {
-    res.render('calendar');
+    User.findOne({ username: req.user.username }, function(err, user) {
+      res.render('calendar', { groups: user.group });
+    })
   }
   else {
     req.flash('error', 'Please log in.');
