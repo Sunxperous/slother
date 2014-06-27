@@ -7,6 +7,7 @@ var OpenIDStrategy = require('passport-openid').Strategy;
 var router = express.Router();
 var config = require('../config');
 var bcrypt = require('bcrypt-nodejs');
+var User = require('../schema/userSchema');
 
 
 
@@ -14,9 +15,6 @@ var bcrypt = require('bcrypt-nodejs');
 router.get('/login', function(req, res) {
   res.render('login', { message: req.flash('error') });
 })
-
-var userSchema = require('mongoose').model('user');
-var User = mongoose.model('user', userSchema);
 
 
 // http://passportjs.org/guide/username-password/
@@ -55,8 +53,8 @@ router.post('/login/default',
 // login via NUS only via localhost:8000,
 // then continue development on original port.
 passport.use('nus', new OpenIDStrategy({
-    returnURL: 'http://localhost:8000/login/nus/callback',
-    realm: 'http://localhost:8000/',
+    returnURL: config.nus.openId + '/login/nus/callback',
+    realm: config.nus.openId,
     profile: true
   },
   function(identifier, profile, done) { // Only calls this function if successfully, I assume.

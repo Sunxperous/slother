@@ -19,9 +19,6 @@ app.set('view engine', 'jade');
 app.set('port', 8000);
 
 // Routing.
-var User = require('./schema/userSchema');
-var Group = require('./schema/groupSchema');
-var userSchema = require('mongoose').model('user');
 var routes = require('./routes/index');
 var login = require('./routes/login');
 var extractMod = require('./routes/extractMod');

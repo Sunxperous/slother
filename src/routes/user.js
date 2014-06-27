@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var User = require('../schema/userSchema');
 
-var User = mongoose.model('user');
-
+// /user/calendar
 router.get('/calendar', function(req, res) {
   if (req.user) {
     User.findOne({username: req.user.username}, function(err, user) {

@@ -1,6 +1,6 @@
 var config = {};
 
-config.ivle = {};
-config.ivle.key = '';
+config.nus = {};
+config.nus.openId = 'http://localhost:8000';
 
 module.exports = config;
