@@ -59,7 +59,7 @@
   update();
 
   var Calendar = (function() {
-    var CELL_WIDTH      = 61; // Cell width.
+    var CELL_WIDTH      = 76; // Cell width.
     var CELL_HEIGHT     = 14; // Cell height.
     var RIGHT_DIV_TRIM  = 2;  // Pixels to trim at the right of each item div.
 
@@ -237,14 +237,18 @@
   // Scrolls immediately to 7:00am.
   $('.tableWrapper').scrollLeft(428);
 
+  var colors = ['#f99', '#9f9', '#99f', '#61a0a0', '#f2eda7', '#a6d4e0', '#3ea1bb', '#ff8700', '#b6965c', '#bfc0c0'];
+
   if (window.location.pathname !== '/calendar') { // If group timetable...
     var groupName = 'testing';
     $.getJSON('/group/calendar',
       { groupName: groupName },
       function(res) {
         // Array of objects { username, events }. 
+        var rand = Math.floor(Math.random() * 7);
+        console.log(rand);
         res.forEach(function(user, index) {
-          users.push(new User(user.username, user.events, '#ff' + (3333 * index), false));
+          users.push(new User(user.username, user.events, colors[index + rand], false));
         })
       }
     );
