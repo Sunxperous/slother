@@ -6,6 +6,9 @@
       { groupName: $('#groupName').val() },
       function(res) {
         console.log(res);
+        if (typeof res == 'string') {
+          $('#response').text(res);
+        }
       }
     );
   });
@@ -18,6 +21,9 @@
       },
       function(res) {
         console.log(res);
+        if (typeof res == 'string') {
+          $('#response').text(res);
+        }
       }
     );
   });
@@ -29,6 +35,9 @@
       },
       function(res) {
         console.log(res);
+        if (typeof res == 'string') {
+          $('#response').text(res);
+        }
       }
     );
   });
