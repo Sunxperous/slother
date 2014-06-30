@@ -82,12 +82,17 @@ nav {
 nav > * {
   padding-left: 16px;
 }
-#alert {
+#errors, #alerts {
   padding: 0;
   text-align: center;
 }
-.message {
+#errors .message {
   color: #f66;
+  display: block;
+  padding: 4px;
+}
+#alerts .message {
+  color: #c93;
   display: block;
   padding: 4px;
 }

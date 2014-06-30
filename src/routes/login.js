@@ -20,7 +20,7 @@ function redirectIfAuthenticated(req, res, next) {
 // Login page.
 router.get('/login', redirectIfAuthenticated,
   function(req, res) {
-    res.render('login', { message: req.flash('error') });
+    res.render('login');
   }
 );
 

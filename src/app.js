@@ -40,10 +40,7 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser());
-app.use(function(req, res, next) {
-  app.locals.user = req.user; // Exposes user to all views.
-  next();
-});
+app.use(applyLocals()); // Locals for jade templates.
 app.use(express.static(__dirname + '/public'));
 app.use('/', login);
 app.use('/', routes);
@@ -62,5 +59,16 @@ app.use(function(err, req, res, next) {
 var server = app.listen(app.get('port'), function() {
   console.log('Listening on port %d', server.address().port);
 });
+
+function applyLocals() {
+  return function(req, res, next) {
+    app.locals.user = req.user;
+    var flashMessages = {};
+    flashMessages.alerts = req.flash('alert');
+    flashMessages.errors = req.flash('error');
+    app.locals.messages = flashMessages;
+    next();
+  }
+}
 
 module.exports = app;
