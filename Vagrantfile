@@ -12,4 +12,6 @@ Vagrant.configure('2') do |config|
     puppet.manifests_path = 'puppet/manifests'
     puppet.module_path = 'puppet/modules'
   end
+
+  config.ssh.forward_agent = true
 end
