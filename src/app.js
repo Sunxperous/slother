@@ -47,7 +47,6 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + '/public'));
 app.use('/', login);
 app.use('/', routes);
-// Needs an isAuthenticated middleware here to prevent unloggedin requests.
 app.use('/extract', extractMod);
 app.use('/calendar', calendar);
 app.use('/group', group);

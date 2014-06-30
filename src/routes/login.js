@@ -9,12 +9,20 @@ var config = require('../config');
 var bcrypt = require('bcrypt-nodejs');
 var User = require('../schema/userSchema');
 
-
+function redirectIfAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    req.flash('alert', 'You are already logged in.');
+    res.redirect('/calendar');
+  }
+  else { next(); }
+}
 
 // Login page.
-router.get('/login', function(req, res) {
-  res.render('login', { message: req.flash('error') });
-})
+router.get('/login', redirectIfAuthenticated,
+  function(req, res) {
+    res.render('login', { message: req.flash('error') });
+  }
+);
 
 
 // http://passportjs.org/guide/username-password/
@@ -75,7 +83,11 @@ passport.use('nus', new OpenIDStrategy({
 ));
 
 // NUS login.
-router.get('/login/nus', passport.authenticate('nus'));
+router.get('/login/nus', redirectIfAuthenticated,
+  function(req, res) {
+    passport.authenticate('nus');
+  }
+);
 router.get('/login/nus/callback', passport.authenticate('nus', {
     successRedirect: '/',
     failureRedirect: '/login'
@@ -84,9 +96,11 @@ router.get('/login/nus/callback', passport.authenticate('nus', {
 
 
 // Default registration.
-router.get('/register', function(req, res) {
-  res.render('register');
-});
+router.get('/register', redirectIfAuthenticated,
+  function(req, res) {
+    res.render('register');
+  }
+);
 
 router.post('/register', function(req, res) {
   // Assuming valid, non-existing user...
