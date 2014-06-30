@@ -23,3 +23,4 @@ test_out/
 
 # Config
 config.js
+src/config.js

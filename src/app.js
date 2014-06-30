@@ -11,12 +11,12 @@ var http = require('http');
 var config = require('./config');
 
 // Mongoose and Express.
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect(config.db.uri);
 var app = express();
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
-app.set('port', 8000);
+app.set('port', config.app.port);
 
 // Routing.
 var routes = require('./routes/index');
@@ -25,8 +25,7 @@ var extractMod = require('./routes/extractMod');
 var calendar = require('./routes/calendar');
 var group = require('./routes/group');
 var user = require('./routes/user');
-// Passport serialization, e.g. id to user.
-// Something like that I think.
+
 passport.serializeUser(function(user, done) {
   done(null, user);
 });
@@ -36,7 +35,7 @@ passport.deserializeUser(function(obj, done) {
 
 // Middleware.
 app.use(cookieParser());
-app.use(session({ secret: 'keyboard neko' })); // Move secret to config.js later.
+app.use(session({ secret: config.app.sessionSecret }));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
@@ -61,7 +60,7 @@ app.use(function(err, req, res, next) {
   res.send(500, 'Something broke...');
 });
 
-var server = app.listen(8000, function() {
+var server = app.listen(app.get('port'), function() {
   console.log('Listening on port %d', server.address().port);
 });
 
