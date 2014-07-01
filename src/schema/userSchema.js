@@ -6,7 +6,8 @@ var userSchema = mongoose.Schema({
   password: String,
   nusId: String,
   events: Array,
-  group: Array
+  group: Array,
+  request: Array
 });
 
 userSchema.methods.authPassword = function(password, callback) {
