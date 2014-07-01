@@ -5,7 +5,7 @@ var request = require('request');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var User = require('../schema/userSchema');
-
+var moment = require('moment');
 //  extract module info from nusmods address.
 //  Input         : address of nusmods 
 //  Output        : Array Events info by callback
@@ -43,22 +43,25 @@ function extract(addr, callback) {
     }
     modDetailInfo[tempOb.codeNo] = tempOb;
   }
-  var semStart = semesterStart(year,sem);
+  var semStart = moment(semesterStart(year,sem));
   //Manual key calender and Monday as start day
-
   var tempURL = "http://api.nusmods.com/"+year+"/"
                 +sem+'/modules/FE5218.json',
       tempModCode = "FE5218",
       eventInfo = [],
       isDone = {};
+      tempSem = semStart.toDate();
   for(var x in modDetailInfo) {
     isDone[x] = false;
     tempURL = tempURL.replace(tempModCode,x); 
     tempModCode = x;
     request({ url: tempURL, json: true}, 
       function (error, res, body) {
-        var modJSON = res.body;
+
+        var modJSON = res.body,
+            exam = false;
         for(var y in modJSON.Timetable) {
+          semStart = moment(tempSem);
           //Go through and copy each element.
           //First, handle normal lesson timetable.
           var timetable = modJSON.Timetable[y],
@@ -67,13 +70,13 @@ function extract(addr, callback) {
           if(lessonType == false)
             continue;
           else
-            eventInfo.push(buildNUSEvent(modJSON,
-              new Date(semStart.getTime()),y));
-        }
-        //Next, exam info
-        if(modJSON.ExamDate !== undefined) {
-          eventInfo.push(buildNUSExam(modJSON,
-            new Date(semStart.getTime())));
+            eventInfo.push(buildNUSEvent(modJSON,semStart,y));
+        
+          //Next, exam info
+          if(modJSON.ExamDate !== undefined && exam == false) {
+            eventInfo.push(buildNUSExam(modJSON,semStart));
+            exam = true;
+          }
         }
         isDone[modJSON.ModuleCode] = true;
         var allDone = true;
@@ -175,56 +178,60 @@ function buildNUSEvent(data, semStart, classNo) {
     case "RECITATION":  temp.summary = temp.summary + " (RECI)"; break;
   }
   switch(data.Timetable[classNo].DayText) {
-    case "SUNDAY" :  semStart.setDate(semStart.getDate() + 7); break;
-    case "SATURDAY" :  semStart.setDate(semStart.getDate() + 6); break;
-    case "FRIDAY" : semStart.setDate(semStart.getDate() + 5); break;
-    case "THURSDAY" : semStart.setDate(semStart.getDate() + 4); break;
-    case "WEDNESDAY" : semStart.setDate(semStart.getDate() + 3); break;
-    case "TUESDAY" : semStart.setDate(semStart.getDate() + 2); break;
-    case "MONDAY" : semStart.setDate(semStart.getDate()+1); break;
+    case "SUNDAY" :  semStart.add('day',6); break;
+    case "SATURDAY" :  semStart.add('day',5); break;
+    case "FRIDAY" : semStart.add('day',4); break;
+    case "THURSDAY" : semStart.add('day',3); break;
+    case "WEDNESDAY" : semStart.add('day',2); break;
+    case "TUESDAY" : semStart.add('day',1); break;
+    case "MONDAY" : semStart; break;
   }
-  semStart.setHours(parseInt(data.Timetable[classNo].StartTime.substring(0,2)-8));
-  
+  semStart.hour(parseInt(data.Timetable[classNo].StartTime.substring(0,2)));
+  //Correct to UTC timezone
+  var oriDate = moment(semStart.subtract('hour',8).clone());
   switch(data.Timetable[classNo].WeekText) {
     case "ODD&nbsp;WEEK": {
-      temp.exclude.push(new Date(semStart.getTime() + 604800000)); //week 2
-      temp.exclude.push(new Date(semStart.getTime() + 1814400000)); //week 4
-      temp.exclude.push(new Date(semStart.getTime() + 3024000000)); //week 6
-      temp.exclude.push(new Date(semStart.getTime() + 4838400000)); //week 9
-      temp.exclude.push(new Date(semStart.getTime() + 6048000000)); //week 11 
-      temp.exclude.push(new Date(semStart.getTime() + 7257600000)); //week 13
+      temp.exclude.push(semStart.add('days',7).clone().toDate()); //week 2
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 4
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 6
+      temp.exclude.push(semStart.add('days',7).clone().toDate()); //recess week 7
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 9
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 11 
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 13
       
     } break;
     case "EVEN&nbsp;WEEK": {
-      temp.exclude.push(new Date(semStart.getTime())); //week 1
-      temp.exclude.push(new Date(semStart.getTime() + 1209600000)); //week 3    
-      temp.exclude.push(new Date(semStart.getTime() + 2419200000)); //week 5
-      temp.exclude.push(new Date(semStart.getTime() + 4233600000)); //week 8
-      temp.exclude.push(new Date(semStart.getTime() + 5443200000)); //week 10       
-      temp.exclude.push(new Date(semStart.getTime() + 6652800000)); //week 12
-      temp.exclude.push(new Date(semStart.getTime() + 7862400000)); //week 14
+      temp.exclude.push(semStart.clone().toDate()); //week 1
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 3
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 5
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //recess week 7
+      temp.exclude.push(semStart.add('days',7).clone().toDate()); //week 8
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 10
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 12
+      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 14
       
     } break;
-    case "EVERY&nbsp;WEEK": break;
+    case "EVERY&nbsp;WEEK":
+      temp.exclude.push(semStart.add('days',42).clone().toDate()); //recess week 7
+      break;
 
   }
+  semStart = oriDate.clone(); //Reset
   temp.rrule.freq = "WEEKLY";
-  //Recess week
-  temp.exclude.push(new Date(semStart.getTime() + 3628800000));
-  
   if(data.Timetable[classNo].LessonType == "TUTORIAL" || 
     data.Timetable[classNo].LessonType == "TUTORIAL TYPE 2" ||
     data.Timetable[classNo].LessonType == "TUTORIAL TYPE 3" ||
     data.Timetable[classNo].LessonType == "LABORATORY") {
       if(data.Timetable[classNo].WeekText !== "EVEN&nbsp;WEEK")
-        temp.exclude.push(new Date(semStart.getTime()));
+        temp.exclude.push(semStart.clone().toDate());
       if(data.Timetable[classNo].WeekText !== "ODD&nbsp;WEEK")
-        temp.exclude.push(new Date(semStart.getTime() + 604800000));
+        temp.exclude.push(semStart.add('day',7).clone().toDate());
   }
-  temp.dateStart = new Date(semStart.getTime());
-  semStart.setHours(parseInt(data.Timetable[classNo].EndTime.substring(0,2)-8));
-  temp.dateEnd = new Date(semStart.getTime());
-  temp.exclude.sort();
+  semStart = oriDate.clone(); //Reset
+  temp.dateStart = semStart.clone().toDate();
+  semStart.hour(parseInt(data.Timetable[classNo].EndTime.substring(0,2))-8); //To UTC
+  temp.dateEnd = semStart.clone().toDate();
+  semStart = oriDate.clone(); //Reset
   return temp;
 }
 
@@ -235,53 +242,54 @@ function buildNUSEvent(data, semStart, classNo) {
 //DEFAULT exam time is 3 hours
 //NOTE: corrected to UTC
 function buildNUSExam(data, semStart) {
-  var examD = data.ExamDate,
-      temp = {
+  var examD = data.ExamDate;
+  var tempT = parseInt(examD.substring(11,13))-8; //To UTC
+  examD = examD.substring(0,4)+examD.substring(5,7)+
+    examD.substring(8,10);
+  var temp = {
         summary: data.ModuleCode + " (EXAM)",
         description: data.ModuleTitle, 
         rrule: {
           freq: "ONCE"
         },
-        dateStart: new Date(parseInt(examD.substring(0,4)),
-                        parseInt(examD.substring(5,7))-1,
-                        parseInt(examD.substring(8,10)),
-                        parseInt(examD.substring(11,13))-8)
+        dateStart: moment(examD,"YYYYMMDD").add('hour',tempT)
   };
-  temp.dateEnd = new Date(temp.dateStart.getTime() + 10800000);
+  temp.dateEnd = temp.dateStart.clone().add('hour',3).toDate();
+  temp.dateStart = temp.dateStart.clone().toDate();
   return temp;
 }
 
-// Return the semester start date 
-//Output: Smester start date in js date format
+//Return the semester start date 
+//Output: Semester start date in js date format
 //Input: year (eg. "2013-2014") and 
 //       semester (eg. "1") string 
 //NOTE: corrected to UTC timezone
+//Manual key calender and Monday as start day
 function semesterStart(year,sem) {
-  var semStart = new Date();
+  var test;
   switch(year) {
-
     case "2013-2014": {
       //13-01-2014 & 12-08-2013
-      (sem=="1")?semStart.setTime(1376208000000): 
-                 semStart.setTime(1389513600000);
+      (sem=="1")?test = moment("12082013","DDMMYYYY"): 
+                 test = moment("13012014","DDMMYYYY");
     } break; 
     case "2012-2013": {
       //14-01-2013 & 13-08-2012
-      (sem=="1")?semStart.setTime(1344758400000):
-                 semStart.setTime(1358064000000);
+      (sem=="1")?test = moment("13082012","DDMMYYYY"):
+                 test = moment("14012013","DDMMYYYY");
     } break;
     case "2011-2012": {
       //09-01-2012 & 08-08-2011
-      (sem=="1")?semStart.setTime(1312704000000):
-                 semStart.setTime(1326009600000);
+      (sem=="1")?test = moment("08082011","DDMMYYYY"):
+                 test = moment("09012012","DDMMYYYY");
     } break;
     case "2010-2011": {
       //10-01-2011 & 09-08-2010
-      (sem=="1")?semStart.setTime(1281254400000):
-                 semStart.setTime(1294560000000);
+      (sem=="1")?test = moment("09082010","DDMMYYYY"):
+                 test = moment("10012011","DDMMYYYY");
     } break;
   }
-  return semStart;
+  return test.toDate();
 }
 
 router.get('/', function (req,res) {
