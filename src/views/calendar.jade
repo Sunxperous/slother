@@ -4,12 +4,16 @@ block headScript
 
 block content
   - var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+  #calendar_controls
+    button#before <
+    button#after >
   div.tableWrapper
     table
       thead
         tr
           th.day
-            div.dayText#monthDisplay
+            div.dayText
+              span#monthDisplay
           - for (var i = 0; i < 24; i++)
             th
               div= i + ':00'
@@ -24,10 +28,6 @@ block content
                 p.dayDate
             - for (var i = 0; i < 24; i++)
               td.slot(class= i)
-
-  div.control-block
-    button#left <
-    button#right >
 
   if (groups)
     div.control-block

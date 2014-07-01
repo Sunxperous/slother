@@ -29,12 +29,12 @@
   };
 
   // Switch weeks.
-  $('#left').click(function(event) {
+  $('#before').click(function(event) {
     now.add(-1, 'weeks');
     update();
   });
 
-  $('#right').click(function(event) {
+  $('#after').click(function(event) {
     now.add(1, 'weeks');
     update();
   });
