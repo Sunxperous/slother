@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
+var timestamps = require('mongoose-timestamp');
 var Schema = mongoose.Schema;
+
 var userSchema = mongoose.Schema({
   username: String,
   password: String,
@@ -15,5 +17,7 @@ userSchema.methods.authPassword = function(password, callback) {
     callback(res);
   });
 };
+
+userSchema.plugin(timestamps);
 
 module.exports = mongoose.model('user',userSchema);
