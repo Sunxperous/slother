@@ -34,17 +34,17 @@ function searchGroup(groupName, callback) {
 
 //Post request to create new Group
 router.post('/createGroup', function (req,res) {
-  var member = [];
-  member.push(req.user.username);
   searchGroup (req.body.groupName, function (dummy, found) {
-    console.log("found "+found);
     if(found) {
       res.send("Group name already exist.");
     }
     else {
+      var member = [];
+      member.push(req.user.username);
       var temp = {
         groupName: req.body.groupName,
-        member: member
+        member: member,
+        admin: req.user.username
       };
       Group.create(temp);
       User.findOneAndUpdate({username:req.user.username},
@@ -55,8 +55,35 @@ router.post('/createGroup', function (req,res) {
   });
 });
 
+router.post('/joinGroup', function (req, res) {
+  searchUserInGroup(req.user.username ,req.body.group, function (err,found) {
+    if(found) {
+      res.send("User is in the group already.");
+    }
+    else{
+      Group.findOneAndUpdate({groupName: req.body.group}, 
+        {$push:{member:req.user.username},
+         $pull:{requested:req.user.username}
+        }, 
+        function (err, group) {
+          if(err) 
+            res.send("Error '"+err+"'."); 
+          else {
+            User.findOneAndUpdate({username:req.user.username},
+              {$push:{group:req.body.group},
+               $pull:{request:req.body.group}
+              }, function (err,user) {
+                res.send("User "+req.user.username+
+                  " added into group "+req.body.group);
+            });
+          }
+      });
+    }
+  });
+});
+
 //Post request to add person to a group
-router.post('/addPerson',function (req,res) {
+router.post('/sendRequest', function (req,res) {
   searchGroup(req.body.group, function (err,foundGroup){
     if(foundGroup) {
       searchUserInGroup(req.body.user,req.body.group, function (err, foundUserInGroup) {
@@ -66,16 +93,15 @@ router.post('/addPerson',function (req,res) {
           searchUser(req.body.user, function (err, foundUser) {
             if(foundUser) {
               Group.findOneAndUpdate({groupName: req.body.group}, 
-                {$push:{member:req.body.user}}, 
+                {$push:{requested:req.body.user}}, 
                 function (err, group) {
                   if(err) 
                     res.send("Error '"+err+"'."); 
                   else {
                     User.findOneAndUpdate({username:req.body.user},
-                      {$push:{group:req.body.group}},
+                      {$push:{request:req.body.group}},
                       function (err,user) {
-                        res.send("User "+req.body.user+
-                          " added into group "+req.body.group);
+                        res.send("Request has been sent to "+req.body.user);
                     });
                   }
               });
@@ -92,7 +118,7 @@ router.post('/addPerson',function (req,res) {
 });
 
 //Post request to remove person to a group
-router.post('/removePerson', function (req,res) {
+router.post('/removeMember', function (req,res) {
   searchGroup(req.body.group, function (err,foundGroup) {
     if(foundGroup) {
       searchUserInGroup(req.body.user,req.body.group, function (err, foundUserInGroup) {

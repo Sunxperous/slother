@@ -3,7 +3,7 @@
   // Add new Group.
   $('#create_group').click(function(event) {
     $.post('/group/createGroup',
-      { groupName: $('#groupName').val() },
+      {groupName: $('#groupName').val()},
       function(res) {
         console.log(res);
         if (typeof res == 'string') {
@@ -14,8 +14,21 @@
   });
 
   // Add new Person.
+  $('#accept_request').click(function(event) {
+    console.log($('#request_group'));
+    $.post('/group/joinGroup',
+      {group: $('#request_group').val()},
+      function(res) {
+        if (typeof res == 'string') {
+          $('#response').text(res);
+        }
+      }
+    );
+  });
+
+  // Send request to join
   $('#add_person').click(function(event) {
-    $.post('/group/addPerson',
+    $.post('/group/sendRequest',
       { user: $('#user').val(),
         group: $('#group').val()
       },
@@ -28,8 +41,9 @@
     );
   });
 
+  // Remove a member
   $('#remove_person').click(function(event) {
-    $.post('/group/removePerson',
+    $.post('/group/removeMember',
       { user: $('#user').val(),
         group: $('#group').val()
       },

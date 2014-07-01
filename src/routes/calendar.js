@@ -10,7 +10,9 @@ router.get('/group/:name', function(req, res) {
   if (req.user) {
     var groupName = req.params.name;
     User.findOne({ username: req.user.username }, function(err, user) {
-      res.render('calendar', { groups: user.group });
+      res.render('calendar', { groups: user.group,
+                               requests: user.request
+      });
     })
   }
   else {
@@ -22,8 +24,9 @@ router.get('/group/:name', function(req, res) {
 router.get('/', function(req, res) {
   if (req.user) {
     User.findOne({ username: req.user.username }, function(err, user) {
-      res.render('calendar', { groups: user.group });
-    })
+      res.render('calendar', { groups: user.group, requests: user.request 
+      });
+    });
   }
   else {
     req.flash('error', 'Please log in.');

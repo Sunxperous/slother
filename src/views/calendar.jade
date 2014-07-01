@@ -55,6 +55,18 @@ block content
     input#add_person(type='submit' value='Add Person')
     input#remove_person(type='submit' value='Remove Person')
 
+  if (requests)
+    div.control-block
+      span Your Request:
+      ul#requests
+        - each requestGroup in requests
+          li
+            = requestGroup + " "
+            input#request_group(value=requestGroup type='hidden')
+            input#accept_request(type='submit' value='Join')
+            input#reject_request(type='submit' value='Reject')
+
+
   div.control-block
     span.message#response
       
