@@ -1,13 +1,14 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
 var timestamps = require('mongoose-timestamp');
+var eventSchema = require('../schema/eventSchema');
 var Schema = mongoose.Schema;
 
-var userSchema = mongoose.Schema({
+var userSchema = Schema({
   username: String,
   password: String,
   nusId: String,
-  events: Array,
+  events: [eventSchema],
   group: Array,
   request: Array
 });

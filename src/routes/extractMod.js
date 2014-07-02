@@ -297,22 +297,18 @@ router.get('/', function (req,res) {
     extract(decodeURIComponent(req.query.addr), 
       function(err, eventInfo) {
         if(err) {console.log("err :'"+err+"'.");}
-        else {
-          console.log("Logged in as " + req.user.username);
-          console.log("Updating database...");        
+        else {     
           User.update({ username: req.user.username},
                       {$set: {events: eventInfo}},
                       {upsert: true},
                       function() {
-                        console.log("Updated!!");
                         res.send(eventInfo);
           });
         }
     });
   }
   else {
-      console.log("Not login yet.");
-      res.redirect('/login');
+    req.send(null);
   }
 });
 
