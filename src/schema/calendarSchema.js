@@ -11,6 +11,6 @@ var calendarSchema = Schema({
 });
 
 
-userSchema.plugin(timestamps);
+calendarSchema.plugin(timestamps);
 
 module.exports = calendarSchema;

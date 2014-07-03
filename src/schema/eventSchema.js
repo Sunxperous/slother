@@ -12,6 +12,6 @@ var eventSchema = Schema({
   dateEnd: Date
 });
 
-userSchema.plugin(timestamps);
+eventSchema.plugin(timestamps);
 
 module.exports = eventSchema;

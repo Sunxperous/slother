@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
 var timestamps = require('mongoose-timestamp');
-var calenderSchema = require('../schema/calendarSchema');
+var calendarSchema = require('../schema/calendarSchema');
 var Schema = mongoose.Schema;
 
 var userSchema = Schema({
