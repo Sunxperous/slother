@@ -55,29 +55,26 @@ a:link, a:active, a:visited, a:hover {
 /*v layout.jade v*/
 body {
   font-family: 'Helvetica', 'Arial', sans-serif;
-  padding: 10px 0;
   overflow-x: hidden;
   font-size: 14px;
+  margin-bottom: 60px;
 }
 h1 {
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 600;
-  margin: 8px;
+  margin: 4px;
 }
 h2 {
-  font-size: 22px;
-  margin: 12px;
+  font-size: 20px;
+  margin: 4px;
 }
 #header {
   position: relative;
-  margin: 0 40px 10px 40px;
+  background-color: #fff;
+  padding: 2px 24px;
 }
 #brand {
   display: inline-block;
-}
-nav {
-  display: inline-block;
-  text-align: right;
 }
 nav > * {
   padding-left: 16px;
@@ -104,12 +101,12 @@ nav > * {
 
 /*v timetable.jade v*/
 div.tableWrapper {
-  margin-left: 115px;
+  margin: 0 12px;
   overflow-x: scroll;
-  margin-right: 24px;
   text-align: left;
 }
 table {
+  margin-bottom: 8px;
   border-collapse: collapse;
   border-spacing: 0;
   box-sizing: border-box;
@@ -118,16 +115,19 @@ table {
 thead th {
   border: 0;
 }
-td, th {
-  border: 1px solid #999;
+td {
+  border: 1px solid #ccc;
   padding: 0px;
   min-width: 75px;
   max-width: 75px;
   height: 30px;
 }
+th {
+  padding-bottom: 2px;
+}
 td {
   vertical-align: top;
-  padding-bottom: 8px;
+  padding-bottom: 12px;
 }
 .slot {
   position: relative;
@@ -137,28 +137,33 @@ th div {
   font-size: 10px;
 }
 .day {
-  z-index: 50;
-  vertical-align: top;
+  z-index: 5;
   background-color: #fff;
   border: 0;
   max-width: 0;
   min-width: 0;
+  vertical-align: bottom;
 }
-.dayText {
-  position: absolute;
-  width: 100px;
-  left: 0;
-  text-align: right;
-  margin-top: 1px;
-  border: 0;
-  padding-right: 10px;
+.dayDay {
+  text-transform: capitalize;
 }
 .dateDisplay {
-  font-size: 11px;
+  z-index: 10;
+  background-color: rgba(240, 240, 224, 0.8);
+  position: absolute;
+  left: 0;
+  line-height: 10px;
+  height: 10px;
+  border: 0;
+  border-top-right-radius: 16px;
+  width: 75px;
+  margin-top: -2px;
+  padding: 2px 0 2px 8px;
+  font-size: 10px;
 }
 .item {
   position: absolute;
-  z-index: 50;
+  z-index: 5;
   padding: 2px;
   overflow: hidden;
   white-space: pre;
@@ -170,7 +175,6 @@ input#nusmods_addr {
   width: 200px;
 }
 div.control-block {
-  float: left;
   padding: 8px;
   line-height: 30px;
   min-height: 30px;
@@ -179,19 +183,27 @@ div.control-block {
 }
 
 #calendar_controls {
-  text-align: left;
-  padding-left: 20px;
-  margin: 8px;
-}
-#before {
-  margin-right: 32px;
+  z-index: 15;
+  width: 100%;
+  display: block;
+  height: 40px;
+  background-color: #ccb;
+  position: fixed;
+  bottom: 0;
+  margin: auto auto;
+  text-align: center;
+  padding: 8px 0;
 }
 button {
-  height: 20px;
-  width: 20px;
+  height: 40px;
+  width: 40px;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 16px;
   border: 0;
+}
+#monthDisplay {
+  font-size: 12px;
+  padding: 0 24px;
 }
 #groups li {
   margin: 2px;

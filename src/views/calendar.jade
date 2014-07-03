@@ -3,17 +3,12 @@ extends layout
 block headScript
 
 block content
-  - var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-  #calendar_controls
-    button#before <
-    button#after >
+  - var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
   div.tableWrapper
     table
       thead
         tr
-          th.day
-            div.dayText
-              span#monthDisplay
+          th.time
           - for (var i = 0; i < 24; i++)
             th
               div= i + ':00'
@@ -23,9 +18,9 @@ block content
         - for (var daysI = 0; daysI < 7; daysI++)
           tr(class= days[daysI])
             td.day
-              div.dayText.dateDisplay
-                p= days[daysI]
-                p.dayDate
+              div.dateDisplay
+                span.dayDay= days[daysI] + ', '
+                span.dayDate
             - for (var i = 0; i < 24; i++)
               td.slot(class= i)
 
@@ -69,6 +64,11 @@ block content
 
   div.control-block
     span.message#response
+
+  div#calendar_controls
+    button#before <
+    span#monthDisplay
+    button#after >
       
 block footScripts
   script(src='/js/timetable.js')

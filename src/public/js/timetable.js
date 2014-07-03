@@ -1,6 +1,9 @@
 (function() {
 
   'use strict';
+  var CELL_WIDTH      = 76; // Cell width.
+  var CELL_HEIGHT     = 14; // Cell height.
+  var RIGHT_DIV_TRIM  = 2;  // Pixels to trim at the right of each item div.
 
   var mock = JSON.parse('[{"summary":"CS2100 (LAB)","description":"Computer Organisation - ClassNo: 14","location":"COM1-0114","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T08:00:00.000Z","2014-01-16T08:00:00.000Z","2014-01-23T08:00:00.000Z"],"dateStart":"2014-01-16T08:00:00.000Z","dateEnd":"2014-01-16T09:00:00.000Z"},{"summary":"CS2100 (LECT)","description":"Computer Organisation - ClassNo: 1","location":"i3-Aud","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-26T04:00:00.000Z"],"dateStart":"2014-01-15T04:00:00.000Z","dateEnd":"2014-01-15T06:00:00.000Z"},{"summary":"CS2100 (LECT)","description":"Computer Organisation - ClassNo: 1","location":"i3-Aud","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T06:00:00.000Z"],"dateStart":"2014-01-16T06:00:00.000Z","dateEnd":"2014-01-16T07:00:00.000Z"},{"summary":"CS2100 (TUT)","description":"Computer Organisation - ClassNo: 13","location":"COM1-0208","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-25T05:00:00.000Z","2014-01-14T05:00:00.000Z","2014-01-21T05:00:00.000Z"],"dateStart":"2014-01-14T05:00:00.000Z","dateEnd":"2014-01-14T06:00:00.000Z"},{"summary":"CS2100 (EXAM)","description":"Computer Organisation","rrule":{"freq":"ONCE"},"dateStart":"2014-04-29T01:00:00.000Z","dateEnd":"2014-04-29T04:00:00.000Z"},{"summary":"HY2242 (LECT)","description":"Singapore\'s Military History - ClassNo: 1","location":"AS4-0206","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T02:00:00.000Z"],"dateStart":"2014-01-13T02:00:00.000Z","dateEnd":"2014-01-13T04:00:00.000Z"},{"summary":"HY2242 (LECT)","description":"Singapore\'s Military History - ClassNo: 1","location":"AS4-0206","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T04:00:00.000Z"],"dateStart":"2014-01-16T04:00:00.000Z","dateEnd":"2014-01-16T06:00:00.000Z"},{"summary":"HY2242 (TUT)","description":"Singapore\'s Military History - ClassNo: W1","location":"AS1-0204","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T02:00:00.000Z","2014-01-13T02:00:00.000Z","2014-01-20T02:00:00.000Z"],"dateStart":"2014-01-13T02:00:00.000Z","dateEnd":"2014-01-13T04:00:00.000Z"},{"summary":"HY2242 (EXAM)","description":"Singapore\'s Military History","rrule":{"freq":"ONCE"},"dateStart":"2014-05-07T01:00:00.000Z","dateEnd":"2014-05-07T04:00:00.000Z"},{"summary":"GEK1008 (LECT)","description":"Southeast Asia: A Changing Region - ClassNo: 1","location":"UT-AUD1","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-28T06:00:00.000Z"],"dateStart":"2014-01-17T06:00:00.000Z","dateEnd":"2014-01-17T08:00:00.000Z"},{"summary":"GEK1008 (TUT)","description":"Southeast Asia: A Changing Region - ClassNo: D18","location":"ERC-SR11","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-04-11T08:00:00.000Z","2014-02-07T08:00:00.000Z","2014-02-21T08:00:00.000Z","2014-02-28T08:00:00.000Z","2014-01-17T08:00:00.000Z","2014-01-24T08:00:00.000Z","2014-03-14T08:00:00.000Z","2014-03-28T08:00:00.000Z"],"dateStart":"2014-01-17T08:00:00.000Z","dateEnd":"2014-01-17T10:00:00.000Z"},{"summary":"GEK1008 (EXAM)","description":"Southeast Asia: A Changing Region","rrule":{"freq":"ONCE"},"dateStart":"2014-04-28T05:00:00.000Z","dateEnd":"2014-04-28T08:00:00.000Z"},{"summary":"SSA1201 (LECT)","description":"Singapore Society - ClassNo: 1","location":"LT11","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T08:00:00.000Z"],"dateStart":"2014-01-13T08:00:00.000Z","dateEnd":"2014-01-13T10:00:00.000Z"},{"summary":"SSA1201 (TUT)","description":"Singapore Society - ClassNo: E1","location":"AS1-0204","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-04-02T08:00:00.000Z","2014-04-16T08:00:00.000Z","2014-02-12T08:00:00.000Z","2014-02-26T08:00:00.000Z","2014-01-15T08:00:00.000Z","2014-01-22T08:00:00.000Z","2014-01-29T08:00:00.000Z","2014-03-05T08:00:00.000Z","2014-03-19T08:00:00.000Z"],"dateStart":"2014-01-15T08:00:00.000Z","dateEnd":"2014-01-15T10:00:00.000Z"},{"summary":"SSA1201 (EXAM)","description":"Singapore Society","rrule":{"freq":"ONCE"},"dateStart":"2014-04-30T01:00:00.000Z","dateEnd":"2014-04-30T04:00:00.000Z"},{"summary":"CS1010 (SEC)","description":"Programming Methodology - ClassNo: 1","location":"i3-0345","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-25T02:00:00.000Z"],"dateStart":"2014-01-14T02:00:00.000Z","dateEnd":"2014-01-14T05:00:00.000Z"},{"summary":"CS1010 (TUT)","description":"Programming Methodology - ClassNo: 2","location":"COM1-B108","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-28T04:00:00.000Z","2014-01-17T04:00:00.000Z","2014-01-24T04:00:00.000Z"],"dateStart":"2014-01-17T04:00:00.000Z","dateEnd":"2014-01-17T06:00:00.000Z"},{"summary":"CS1010 (EXAM)","description":"Programming Methodology","rrule":{"freq":"ONCE"},"dateStart":"2014-04-30T09:00:00.000Z","dateEnd":"2014-04-30T12:00:00.000Z"}]');
   var mock2 = JSON.parse('[{"summary":"MA1101R (LECT)","description":"Linear Algebra I - ClassNo: SL1","location":"LT25","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T08:00:00.000Z"],"dateStart":"2014-01-13T08:00:00.000Z","dateEnd":"2014-01-13T10:00:00.000Z"},{"summary":"MA1101R (LECT)","description":"Linear Algebra I - ClassNo: SL1","location":"LT25","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T08:00:00.000Z"],"dateStart":"2014-01-16T08:00:00.000Z","dateEnd":"2014-01-16T10:00:00.000Z"},{"summary":"MA1101R (TUT)","description":"Linear Algebra I - ClassNo: T03","location":"S16-0433","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-26T01:00:00.000Z","2014-01-15T01:00:00.000Z","2014-01-22T01:00:00.000Z"],"dateStart":"2014-01-15T01:00:00.000Z","dateEnd":"2014-01-15T02:00:00.000Z"},{"summary":"MA1101R (EXAM)","description":"Linear Algebra I","rrule":{"freq":"ONCE"},"dateStart":"2014-05-05T05:00:00.000Z","dateEnd":"2014-05-05T08:00:00.000Z"},{"summary":"IS1103 (SEC)","description":"Computing and Society - ClassNo: 3","location":"COM1-B103","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T01:00:00.000Z"],"dateStart":"2014-01-13T01:00:00.000Z","dateEnd":"2014-01-13T04:00:00.000Z"},{"summary":"IS1103 (EXAM)","description":"Computing and Society","rrule":{"freq":"ONCE"},"dateStart":"2014-05-02T06:00:00.000Z","dateEnd":"2014-05-02T09:00:00.000Z"},{"summary":"CS2105 (LECT)","description":"Introduction to Computer Networks - ClassNo: 1","location":"LT15","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T06:00:00.000Z"],"dateStart":"2014-01-13T06:00:00.000Z","dateEnd":"2014-01-13T08:00:00.000Z"},{"summary":"CS2105 (TUT)","description":"Introduction to Computer Networks - ClassNo: 4","location":"COM1-0207","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-25T05:00:00.000Z","2014-01-14T05:00:00.000Z","2014-01-21T05:00:00.000Z"],"dateStart":"2014-01-14T05:00:00.000Z","dateEnd":"2014-01-14T06:00:00.000Z"},{"summary":"CS2105 (EXAM)","description":"Introduction to Computer Networks","rrule":{"freq":"ONCE"},"dateStart":"2014-04-30T01:00:00.000Z","dateEnd":"2014-04-30T04:00:00.000Z"},{"summary":"CS2100 (LAB)","description":"Computer Organisation - ClassNo: 13","location":"COM1-0114","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T04:00:00.000Z","2014-01-16T04:00:00.000Z","2014-01-23T04:00:00.000Z"],"dateStart":"2014-01-16T04:00:00.000Z","dateEnd":"2014-01-16T05:00:00.000Z"},{"summary":"CS2100 (LECT)","description":"Computer Organisation - ClassNo: 1","location":"i3-Aud","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-26T04:00:00.000Z"],"dateStart":"2014-01-15T04:00:00.000Z","dateEnd":"2014-01-15T06:00:00.000Z"},{"summary":"CS2100 (LECT)","description":"Computer Organisation - ClassNo: 1","location":"i3-Aud","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T06:00:00.000Z"],"dateStart":"2014-01-16T06:00:00.000Z","dateEnd":"2014-01-16T07:00:00.000Z"},{"summary":"CS2100 (TUT)","description":"Computer Organisation - ClassNo: 14","location":"COM1-0203","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-25T04:00:00.000Z","2014-01-14T04:00:00.000Z","2014-01-21T04:00:00.000Z"],"dateStart":"2014-01-14T04:00:00.000Z","dateEnd":"2014-01-14T05:00:00.000Z"},{"summary":"CS2100 (EXAM)","description":"Computer Organisation","rrule":{"freq":"ONCE"},"dateStart":"2014-04-29T01:00:00.000Z","dateEnd":"2014-04-29T04:00:00.000Z"},{"summary":"CS2010 (LAB)","description":"Data Structures and Algorithms II - ClassNo: 2","location":"COM1-B109","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-25T07:00:00.000Z","2014-01-14T07:00:00.000Z","2014-01-21T07:00:00.000Z"],"dateStart":"2014-01-14T07:00:00.000Z","dateEnd":"2014-01-14T08:00:00.000Z"},{"summary":"CS2010 (LECT)","description":"Data Structures and Algorithms II - ClassNo: 1","location":"LT19","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T02:00:00.000Z"],"dateStart":"2014-01-16T02:00:00.000Z","dateEnd":"2014-01-16T04:00:00.000Z"},{"summary":"CS2010 (TUT)","description":"Data Structures and Algorithms II - ClassNo: 3","location":"COM1-0208","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-26T03:00:00.000Z","2014-01-15T03:00:00.000Z","2014-01-22T03:00:00.000Z"],"dateStart":"2014-01-15T03:00:00.000Z","dateEnd":"2014-01-15T04:00:00.000Z"},{"summary":"CS2010 (EXAM)","description":"Data Structures and Algorithms II","rrule":{"freq":"ONCE"},"dateStart":"2014-04-28T09:00:00.000Z","dateEnd":"2014-04-28T12:00:00.000Z"}]');
@@ -13,7 +16,7 @@
   var sunOfWeek = now.subtract(now.day(), 'days');
   var satOfWeek = moment(sunOfWeek).add(6, 'days');
 
-  var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   var users = [];
 
   // Update week number.
@@ -24,7 +27,7 @@
 
     date.subtract(1, 'day'); // For Sunday.
     $('.dayDate').each(function (index, day) {
-      $(day).text(date.add(1, 'day').format("DD MMM 'YY"));
+      $(day).text(date.add(1, 'day').format("DD MMM"));
     });
   };
 
@@ -59,9 +62,6 @@
   update();
 
   var Calendar = (function() {
-    var CELL_WIDTH      = 76; // Cell width.
-    var CELL_HEIGHT     = 14; // Cell height.
-    var RIGHT_DIV_TRIM  = 2;  // Pixels to trim at the right of each item div.
 
     function Calendar(owner, items) {
       this.items = items;
@@ -235,7 +235,7 @@
   })();
 
   // Scrolls immediately to 7:00am.
-  $('.tableWrapper').scrollLeft(428);
+  $('.tableWrapper').scrollLeft(7 * CELL_WIDTH + 1);
 
   // Temporary solution for different colours.
   var colors = ['#f99', '#9f9', '#99f', '#61a0a0', '#f2eda7', '#a6d4e0', '#3ea1bb', '#ff8700', '#b6965c', '#bfc0c0'];
@@ -262,10 +262,10 @@
   }
 
   // Temporary.
-  // users.push(new User('Mock2', mock2, '#ccccff'));
-  // users.push(new User('Mock3', mock3, '#cccc99'));
-  // users.push(new User('Mock', mock, '#ccffcc'));
-  // users.push(new User('Mock4', mock4, '#99cccc'));
+  users.push(new User('Mock2', mock2, '#ccccff'));
+  users.push(new User('Mock3', mock3, '#cccc99'));
+  users.push(new User('Mock', mock, '#ccffcc'));
+  users.push(new User('Mock4', mock4, '#99cccc'));
 
 })();
 
