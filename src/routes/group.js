@@ -32,6 +32,11 @@ function searchGroup(groupName, callback) {
   });
 }
 
+
+
+
+
+
 //Post request to create new Group
 router.post('/createGroup', function (req,res) {
   searchGroup (req.body.groupName, function (dummy, found) {

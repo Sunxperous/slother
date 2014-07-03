@@ -1,14 +1,14 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
 var timestamps = require('mongoose-timestamp');
-var calenderSchema = require('../schema/calenderSchema');
+var calenderSchema = require('../schema/calendarSchema');
 var Schema = mongoose.Schema;
 
 var userSchema = Schema({
   username: String,
   password: String,
   nusId: String,
-  calender: [{ type: Schema.Types.ObjectId, ref: 'Calender' }],
+  calendar: [{ type: Schema.Types.ObjectId, ref: 'Calendar' }],
   groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
   requests: [{ type: Schema.Types.ObjectId, ref: 'Group' }]
 });

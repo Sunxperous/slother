@@ -3,11 +3,14 @@ var timestamps = require('mongoose-timestamp');
 var Schema = mongoose.Schema;
 var eventSchema = require('./eventSchema');
 
-var calenderSchema = Schema({
+var calendarSchema = Schema({
   type: String,
   semester: String, //Only for NUS Event 
   events:[eventSchema],
-  username:{ type: Schema.Types.ObjectId, ref: 'User' }
+  user:{ type: Schema.Types.ObjectId, ref: 'User' }
 });
 
-module.exports = calenderSchema;
+
+userSchema.plugin(timestamps);
+
+module.exports = calendarSchema;
