@@ -186,52 +186,46 @@ function buildNUSEvent(data, semStart, classNo) {
     case "TUESDAY" : semStart.add('day',1); break;
     case "MONDAY" : semStart; break;
   }
-  semStart.hour(parseInt(data.Timetable[classNo].StartTime.substring(0,2)));
+  var tempTime = semStart.clone().hour(parseInt(data.Timetable[classNo].StartTime.substring(0,2)));
   //Correct to UTC timezone
-  var oriDate = moment(semStart.subtract('hour',8).clone());
+  tempTime.subtract('hour',8);
   switch(data.Timetable[classNo].WeekText) {
     case "ODD&nbsp;WEEK": {
-      temp.exclude.push(semStart.add('days',7).clone().toDate()); //week 2
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 4
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 6
-      temp.exclude.push(semStart.add('days',7).clone().toDate()); //recess week 7
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 9
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 11 
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 13
+      temp.exclude.push(tempTime.clone().add('week',1).toDate()); //week 2
+      temp.exclude.push(tempTime.clone().add('week',3).toDate()); //week 4
+      temp.exclude.push(tempTime.clone()..add('week',5).toDate()); //week 6
+      temp.exclude.push(tempTime.clone().add('week',6).toDate()); //recess week 7
+      temp.exclude.push(tempTime.clone().add('week',8).toDate()); //week 9
+      temp.exclude.push(tempTime.clone().add('week',10).toDate()); //week 11 
+      temp.exclude.push(tempTime.clone().add('week',12).toDate()); //week 13
       
     } break;
     case "EVEN&nbsp;WEEK": {
-      temp.exclude.push(semStart.clone().toDate()); //week 1
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 3
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 5
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //recess week 7
-      temp.exclude.push(semStart.add('days',7).clone().toDate()); //week 8
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 10
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 12
-      temp.exclude.push(semStart.add('days',14).clone().toDate()); //week 14
+      temp.exclude.push(tempTime.clone().toDate()); //week 1
+      temp.exclude.push(tempTime.clone().add('week',2).toDate()); //week 3
+      temp.exclude.push(tempTime.clone().add('week',4).toDate()); //week 5
+      temp.exclude.push(tempTime.clone().add('week',6).toDate()); //recess week 7
+      temp.exclude.push(tempTime.clone().add('week',7).toDate()); //week 8
+      temp.exclude.push(tempTime.clone().add('week',9).toDate()); //week 10
+      temp.exclude.push(tempTime.clone().add('week',11).toDate()); //week 12
+      temp.exclude.push(tempTime.clone().add('week',13).toDate()); //week 14
       
     } break;
     case "EVERY&nbsp;WEEK":
-      temp.exclude.push(semStart.add('days',42).clone().toDate()); //recess week 7
+      temp.exclude.push(tempTime.clone().add('week',6).toDate()); //recess week 7
       break;
-
-  }
-  semStart = oriDate.clone(); //Reset
   temp.rrule.freq = "WEEKLY";
   if(data.Timetable[classNo].LessonType == "TUTORIAL" || 
     data.Timetable[classNo].LessonType == "TUTORIAL TYPE 2" ||
     data.Timetable[classNo].LessonType == "TUTORIAL TYPE 3" ||
     data.Timetable[classNo].LessonType == "LABORATORY") {
       if(data.Timetable[classNo].WeekText !== "EVEN&nbsp;WEEK")
-        temp.exclude.push(semStart.clone().toDate());
+        temp.exclude.push(tempTime.clone().toDate());
       if(data.Timetable[classNo].WeekText !== "ODD&nbsp;WEEK")
-        temp.exclude.push(semStart.add('day',7).clone().toDate());
-  }
-  semStart = oriDate.clone(); //Reset
-  temp.dateStart = semStart.clone().toDate();
-  semStart.hour(parseInt(data.Timetable[classNo].EndTime.substring(0,2))-8); //To UTC
-  temp.dateEnd = semStart.clone().toDate();
-  semStart = oriDate.clone(); //Reset
+        temp.exclude.push(tempTime.clone().add('week',1).toDate());
+  temp.dateStart = tempTime.clone().toDate();
+  tempTime.hour(parseInt(data.Timetable[classNo].EndTime.substring(0,2))-8); //To UTC
+  temp.dateEnd = tempTime.clone().toDate();
   return temp;
 }
 
