@@ -39,18 +39,22 @@ router.post('/createGroup', function (req,res) {
       res.send("Group name already exist.");
     }
     else {
-      var member = [];
-      member.push(req.user.username);
-      var temp = {
-        groupName: req.body.groupName,
-        member: member,
-        admin: req.user.username
-      };
-      Group.create(temp);
-      User.findOneAndUpdate({username:req.user.username},
-        {$push:{group:req.body.groupName}}, function (err,user) {
-          res.send("Group created");
-        });
+      User.findOne({ username: req.user.username }, function(err, user) {
+        if (err) { console.log(err); }
+        if (user) {
+          Group.create({
+            groupName: req.body.groupName,
+            members: [user._id],
+            admins: [user._id]
+          }, function(err, group) {
+            if (err) { console.log(err); }
+            user.groups.push(group);
+            user.save(function(err, user) {
+              if (err) { console.log(err); }
+            });
+          });
+        }
+      });
     }
   });
 });
@@ -62,7 +66,7 @@ router.post('/joinGroup', function (req, res) {
     }
     else{
       Group.findOneAndUpdate({groupName: req.body.group}, 
-        {$push:{member:req.user.username},
+        {$push:{members:req.user.username},
          $pull:{requested:req.user.username}
         }, 
         function (err, group) {
@@ -92,18 +96,18 @@ router.post('/sendRequest', function (req,res) {
         else {
           searchUser(req.body.user, function (err, foundUser) {
             if(foundUser) {
-              Group.findOneAndUpdate({groupName: req.body.group}, 
-                {$push:{requested:req.body.user}}, 
-                function (err, group) {
-                  if(err) 
-                    res.send("Error '"+err+"'."); 
-                  else {
-                    User.findOneAndUpdate({username:req.body.user},
-                      {$push:{request:req.body.group}},
-                      function (err,user) {
-                        res.send("Request has been sent to "+req.body.user);
-                    });
-                  }
+              Group.findOne({groupName: req.body.group}, function(err, group) {
+                if (err) { res.send("Error '"+err+"'."); }
+                else {
+                  User.findOneAndUpdate({username:req.body.user}, function (err,user) {
+                    if (err) { res.send("Error '" + err "'."); }
+                    else {
+                      group.requests.push(user);
+                      user.requests.push(group);
+                      res.send("Request has been sent to "+req.body.user);
+                    }
+                  });
+                }
               });
             }
             else
@@ -148,22 +152,23 @@ router.post('/removeMember', function (req,res) {
 
 router.get('/calendar', function(req, res) {
   var userEvents = [];
-  Group.findOne({ groupName: req.query.groupName }, function(err, group) {
+  Group
+  .findOne({ groupName: req.query.groupName })
+  .populate('members', 'username events')
+  .exec(function(err, group) {
     if (err) { console.log(err); }
     else if (group) {
-      group.member.forEach(function(username, index) {
-        User.findOne({ username: username }, function(errUser, user) {
-          userEvents.push({
-            username: user.username,
-            events: user.events
-          });
-
-          if (index >= group.member.length - 1) {
-            res.send(userEvents);
-          }
+      group.members.forEach(function(member, index) {
+        userEvents.push({
+          username: member.username,
+          events: member.events
         });
+
+        if (index >= group.members.length - 1) {
+          res.send(userEvents);
+        }
       });
-    }
+    };
   });
 });
 

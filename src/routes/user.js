@@ -29,7 +29,7 @@ router.get('/request', function (req, res) {
       if(err) 
         res.send("err '"+err+"'.");
       else 
-        res.send(user.request);
+        res.send(user.requests);
     })
   }
 });

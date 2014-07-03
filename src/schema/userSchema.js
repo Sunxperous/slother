@@ -9,8 +9,8 @@ var userSchema = Schema({
   password: String,
   nusId: String,
   events: [eventSchema],
-  group: Array,
-  request: Array
+  groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
+  requests: [{ type: Schema.Types.ObjectId, ref: 'Group' }]
 });
 
 userSchema.methods.authPassword = function(password, callback) {
@@ -21,4 +21,4 @@ userSchema.methods.authPassword = function(password, callback) {
 
 userSchema.plugin(timestamps);
 
-module.exports = mongoose.model('user',userSchema);
+module.exports = mongoose.model('User', userSchema);

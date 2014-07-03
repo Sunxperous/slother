@@ -9,11 +9,15 @@ router.get('/group/:name', function(req, res) {
   //   even though the group name is just for show.
   if (req.user) {
     var groupName = req.params.name;
-    User.findOne({ username: req.user.username }, function(err, user) {
-      res.render('calendar', { groups: user.group,
-                               requests: user.request
+    User
+    .findOne({ username: req.user.username })
+    .populate('groups')
+    .exec(function(err, user) {
+      res.render('calendar', {
+        groups: user.groups,
+        requests: user.requests
       });
-    })
+    });
   }
   else {
     req.flash('error', 'Please log in.');
@@ -23,8 +27,13 @@ router.get('/group/:name', function(req, res) {
 
 router.get('/', function(req, res) {
   if (req.user) {
-    User.findOne({ username: req.user.username }, function(err, user) {
-      res.render('calendar', { groups: user.group, requests: user.request 
+    User
+    .findOne({ username: req.user.username })
+    .populate('groups')
+    .exec(function(err, user) {
+      res.render('calendar', {
+        groups: user.groups,
+        requests: user.requests
       });
     });
   }

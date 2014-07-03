@@ -33,9 +33,9 @@ block content
     div.control-block
       span Your groups:
       ul#groups
-        - each groupName in groups
+        - each group in groups
           li
-            a(href='/calendar/group/' + groupName)= groupName
+            a(href='/calendar/group/' + group.groupName)= group.groupName
 
   div.control-block
     label(for='link') Add your NUSMods: 
