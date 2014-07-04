@@ -65,10 +65,16 @@ block content
   div.control-block
     span.message#response
 
-  div#calendar_controls
-    button#before <
-    span#monthDisplay
-    button#after >
+  div#calendar_controls_wrapper
+    div#calendar_controls
+      button#before <
+      div#date_info
+        p
+          span#sun_day
+          span  - 
+          span#sat_day
+        p#year_display
+      button#after >
       
 block footScripts
   script(src='/js/timetable.js')

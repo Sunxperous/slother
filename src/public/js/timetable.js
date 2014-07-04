@@ -23,7 +23,9 @@
   //   Probably divide between NUS-style or default-style.
   var updateDates = function(){
     var date = moment(sunOfWeek);
-    $('#monthDisplay').text(date.format("MMMM YYYY"));
+    $('#year_display').text(date.format("YYYY"));
+    $('#sun_day').text(date.format("DD MMM"));
+    $('#sat_day').text(satOfWeek.format("DD MMM"));
 
     date.subtract(1, 'day'); // For Sunday.
     $('.dayDate').each(function (index, day) {
@@ -235,6 +237,7 @@
   })();
 
   // Scrolls immediately to 7:00am.
+  //   Limit the scrolling for screens with large width.
   $('.tableWrapper').scrollLeft(7 * CELL_WIDTH + 1);
 
   // Temporary solution for different colours.

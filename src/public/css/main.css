@@ -182,28 +182,47 @@ div.control-block {
   background-color: #eee;
 }
 
-#calendar_controls {
+#calendar_controls_wrapper {
   z-index: 15;
   width: 100%;
   display: block;
-  height: 40px;
+  height: 30px;
   background-color: #ccb;
   position: fixed;
   bottom: 0;
-  margin: auto auto;
   text-align: center;
-  padding: 8px 0;
+  padding: 7px 0 9px 0;
+}
+#calendar_controls {
+  margin: auto auto;
+  white-space: nowrap;
 }
 button {
-  height: 40px;
-  width: 40px;
+  height: 34px;
+  width: 20%;
+  max-width: 34px;
+  font-size: 20px;
   text-align: center;
-  border-radius: 16px;
+  border-radius: 8px;
   border: 0;
+  top: -4px;
 }
-#monthDisplay {
+#before {
+  display: inline-block;
+  position: relative;
+  left: 0;
+}
+#after {
+  display: inline-block;
+  position: relative;
+  right: 0;
+}
+#date_info {
+  width: 60%;
+  max-width: 400px;
+  display: inline-block;
   font-size: 12px;
-  padding: 0 24px;
+  line-height: 14px;
 }
 #groups li {
   margin: 2px;
