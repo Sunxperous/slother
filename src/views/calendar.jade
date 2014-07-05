@@ -4,7 +4,7 @@ block headScript
 
 block content
   - var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
-  div.tableWrapper
+  .tableWrapper
     table
       thead
         tr
@@ -18,37 +18,80 @@ block content
         - for (var daysI = 0; daysI < 7; daysI++)
           tr(class= days[daysI])
             td.day
-              div.dateDisplay
+              .dateDisplay
                 span.dayDay= days[daysI] + ', '
                 span.dayDate
             - for (var i = 0; i < 24; i++)
               td.slot(class= i)
+      tfoot
+        tr
+          th.time
+          - for (var i = 0; i < 24; i++)
+            th
+              div= i + ':00'
 
-  if (groups)
-    div.control-block
-      span Your groups:
-      ul#groups
-        - each group in groups
-          li
-            a(href='/calendar/group/' + group.groupName)= group.groupName
+  #popup_wrapper(style='display: none;')
+    #popup
+      #existing(style='display: none;')
+        div
+          span.label Summary
+          span.summary
+        div
+          span.label Description
+          span.description
+        div
+          span.label Location
+          span.location
+        div
+          span.label Date
+          span.exactDateStart
+          br
+          |  to 
+          span.exactDateEnd
+        div
+          span.label Repeating
+          span.rruleFreq
+          span.rruleInfo
+            |  for 
+            span.rruleCount
+            |  times from 
+            span.dateStart
+        div
+          span.label Excluding
+          ul.exclude
+      #new(style='display: none;')
+        | rofl
+  
+  //- div#info_controls
+  //-   div#info
+  //-     p Who (colours)
+  //-   div#info
+  //-     p Map?!
+  //- if (groups)
+  //-   div.control-block
+  //-     span Your groups:
+  //-     ul#groups
+  //-       - each group in groups
+  //-         li
+  //-           a(href='/calendar/group/' + group.groupName)= group.groupName
 
-  div.control-block
-    label(for='link') Add your NUSMods: 
-    input#nusmods_addr(type='text', placeholder='http://nusmods.com/2014-2015/sem1/v1/', name='link')
-    input#add_nusmods(type='submit' value='Add')
+  //- div.control-block
+  //-   label(for='link') Add your NUSMods: 
+  //-   input#nusmods_addr(type='text', placeholder='http://nusmods.com/2014-2015/sem1/v1/', name='link')
+  //-   input#add_nusmods(type='submit' value='Add')
 
-  div.control-block
-    label(for='createG') Create new Group: 
-    input#groupName(type='text', placeholder='New Name', name='createG')
-    input#create_group(type='submit' value='Create')
+  //- div.control-block
+  //-   label(for='createG') Create new Group: 
+  //-   input#groupName(type='text', placeholder='New Name', name='createG')
+  //-   input#create_group(type='submit' value='Create')
 
-  div.control-block
-    label(for='addPerson') Add person: 
-    input#user(type='text', placeholder='Person Name', name='createG')
-    input#group(type='text', placeholder='Group Name', 
-    name='createG')
-    input#add_person(type='submit' value='Add Person')
-    input#remove_person(type='submit' value='Remove Person')
+  //- div.control-block
+  //-   label(for='addPerson') Add person: 
+  //-   input#user(type='text', placeholder='Person Name', name='createG')
+  //-   input#group(type='text', placeholder='Group Name', 
+  //-   name='createG')
+  //-   input#add_person(type='submit' value='Add Person')
+  //-   input#remove_person(type='submit' value='Remove Person')
 
   if (requests)
     div.control-block
@@ -62,8 +105,8 @@ block content
             input#reject_request(type='submit' value='Reject')
 
 
-  div.control-block
-    span.message#response
+  //- div.control-block
+  //-   span.message#response
 
   div#calendar_controls_wrapper
     div#calendar_controls

@@ -29,7 +29,8 @@
 
     date.subtract(1, 'day'); // For Sunday.
     $('.dayDate').each(function (index, day) {
-      $(day).text(date.add(1, 'day').format("DD MMM"));
+      $(day).data('date', date.add(1, 'day').clone());
+      $(day).text($(day).data('date').format("DD MMM"));
     });
   };
 
@@ -63,6 +64,55 @@
   };
   update();
 
+  var popupActive = false;
+  $('#popup_wrapper').click(function closePopup(event) {
+    if (!popupActive) { return; }
+    if ($(event.target).attr('id') !== 'popup_wrapper') { return; }
+    popupActive = false;
+    $('#popup_wrapper').hide();
+  });
+  function displayPopupOfExisting(event) {
+    if (popupActive) { return; }
+    popupActive = true;
+
+    var item = $(event.target).data('item');
+    var exactDate = $(event.target).data('exactDate');
+    var duration = $(event.target).data('duration');
+
+    $('#existing .summary').text(item.summary);
+    $('#existing .description').text(item.description);
+    $('#existing .location').text(item.location);
+
+    $('#existing .exactDateStart').text(
+      exactDate.format("dddd DD MMM 'YY, HH:mm"));
+    $('#existing .exactDateEnd').text(
+      exactDate.add(duration, 'milliseconds').format("dddd DD MMM 'YY, HH:mm"));
+
+    if (item.rrule.freq === 'ONCE') {
+      $('#existing .rruleFreq').text('');
+      $('#existing .rruleInfo').hide();
+    }
+    else {
+      $('#existing .rruleFreq').text(item.rrule.freq.toLowerCase());
+      $('#existing .rruleCount').text(item.rrule.count);
+      $('#existing .dateStart').text(
+        moment(item.dateStart).format("dddd DD MMM 'YY, HH:mm"));
+    }
+
+    $('#existing .exclude').empty();
+    if (item.exclude && item.exclude.length > 0) {
+      item.exclude.forEach(function (exclude) {
+        var li = $('<li>');
+        li.text(moment(exclude).format("DD MMM 'YY, HH:mm"));
+        $('#existing .exclude').append(li);
+      });
+    }
+
+    $('#existing').show();
+    $('#new').hide();
+    $('#popup_wrapper').show();
+  }
+
   var Calendar = (function() {
 
     function Calendar(owner, items) {
@@ -80,8 +130,9 @@
       var _this = this;
       if (this.items) {
         this.items.forEach(function(item, index) {
+          var date = duringDisplayedWeek(item);
           if (duringDisplayedWeek(item)) {
-            _this.onDisplay.push(insertEvent(item, _this.owner));
+            _this.onDisplay.push(insertEvent(item, _this.owner, date));
           }
         });
       }
@@ -104,7 +155,7 @@
         for (var i = 0; i < item.exclude.length; i++) {
           date = moment(item.exclude[i]);
           if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
-            return false;
+            return null;
           }
         }
       }
@@ -112,7 +163,7 @@
       // Then check for normal dates.
       date = moment(item.dateStart);
       if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
-        return true; // First date is during, return true.
+        return date; // First date is during, return true.
       }
       else if (item.rrule.freq != 'ONCE') { // Repeating event...
         rruleCount--; // Already tested first event date.
@@ -124,30 +175,33 @@
           }
 
           if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
-            return true; // Currently checked date is during, return true.
+            return date; // Currently checked date is during, return true.
           }
 
           rruleCount--;
         }
       }
-      return false;
+      return null;
     };
 
     // Adds an item to be shown on the timetable.
-    var insertEvent = function(item, owner) {
+    var insertEvent = function(item, owner, exactDate) {
       var dateStart = moment(item.dateStart);
       var dateEnd = moment(item.dateEnd);
       var day = dateStart.day();
-      var duration = dateEnd.diff(dateStart, 'h');
+      var durationInHours = dateEnd.diff(dateStart, 'h');
+      var durationInMilli = dateEnd.diff(dateStart);
 
       var div = $('<div>');
-      var width = duration * CELL_WIDTH;
+      var width = durationInHours * CELL_WIDTH;
       div.width(width - RIGHT_DIV_TRIM)
         .css('background-color', owner.getColor())
         .addClass('item')
         .text(item.summary)
         .data({
-          'owner': owner.getName()
+          'item': item,
+          'duration': durationInMilli,
+          'exactDate': exactDate
         });
 
       var dayTr = $('tr.' + days[day]);
@@ -157,7 +211,7 @@
       var found = false;
       while (!found) {
         found = true;
-        for (var i = 0; i < duration; i = i + 1) {
+        for (var i = 0; i < durationInHours; i = i + 1) {
           var td = dayTr.children('td.' + (moment(dateStart).hour() + i));
           if (td.data('rows') && $.inArray(height, td.data('rows')) != -1) {
             found = false;
@@ -168,7 +222,7 @@
       }
       height--;
       // Found next available height:
-      for (var i = 0; i < duration; i = i + 1) {
+      for (var i = 0; i < durationInHours; i = i + 1) {
         var td = dayTr.children('td.' + (moment(dateStart).hour() + i));
         addToTdRows(td, height);
       }
@@ -176,6 +230,7 @@
       var sourceTd = dayTr.children('td.' + moment(dateStart).hour());
       div.css('top', height * CELL_HEIGHT);
       sourceTd.append(div);
+      div.click(displayPopupOfExisting);
       return div;
     };
 
