@@ -30,6 +30,7 @@ router.get('/', function(req, res) {
     User
     .findOne({ username: req.user.username })
     .populate('groups')
+    .populate('requests')
     .exec(function(err, user) {
       res.render('calendar', {
         groups: user.groups,

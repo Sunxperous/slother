@@ -5,154 +5,276 @@ var Schema = mongoose.Schema;
 var User = require('../schema/userSchema');
 var Group = require('../schema/groupSchema');
 
-//Return boolean of user existance in db by callback
-function searchUser(username, callback) {
-  User.findOne({username: username}, function (err, user) {
-    if(user !== null) return callback(null,true);
-    else return callback(null,false);
+//***************Middleware*******************************//
+
+//Check logged in, else direct to login page
+//Attach: myself - user info
+function loggedIn(req, res, next) {
+  if(req.attach == null) req.attach = {};
+  if (req.user) { 
+    req.attach.myself = req.user;
+    next();  
+  }
+  else { 
+    res.redirect('/login'); 
+    res.send({error: "Please log in"});
+  }
+}
+
+//Check for user existance
+//Attach: user - user info
+function searchUser(req, res, next) {
+  if(req.attach == null) req.attach = {};
+  User.findOne({username: req.body.user}, function (err, user) {
+    if(err) { console.log(err); res.send(null); }
+    else if(user !== null) {
+      req.attach.user = user;
+      next();
+    }
+    else res.send({error:"User not found in database"});
   });
 }
 
-//Return boolean of user existance of a group in db by callback
-//Note: if group does not exist, function will return false
-function searchUserInGroup(username, groupName, callback) {
-  
-  Group.findOne({groupName: groupName, member:{$in:[username]}},
-    function (err,userInGroup) {
-      if(userInGroup !== null) return callback(null,true);
-      else return callback(null,false);
-  });
+//Check for group existance
+//Attach: group - group info
+function searchGroup(positive) {
+  return function (req, res, next) {
+    if(req.attach == null) req.attach = {};
+    Group.findOne({groupName: req.body.groupName}, function (err,group) {
+      if(err) { console.log(err); res.send(null); }
+      else if(positive){
+        if(group !== null) {
+          req.attach.group = group;
+          next();
+        }
+        else res.send({error:"Group not found in database"}); 
+      }
+      else {
+        if(group !== null) res.send({error:"Same group name exist."});
+        else next();
+      }
+    });
+  };
 }
 
-//Return boolean of group existance in db by callback
-function searchGroup(groupName, callback) {
-  Group.findOne({groupName: groupName}, function (err,group) {
-    if(group !== null) return callback(null,true);
-    else return callback(null,false);
-  });
+//TRUE - Check for group existance and request existance
+//attach: group - group info
+//        requested - request's username and id
+//FALSE - Check for group existance and request absence
+//attach: group - group info
+function searchGroupAndRequest(positive) {
+  return function (req, res, next) {
+    var sent = false;
+    if(req.attach == null) req.attach = {};
+    Group.findOne({groupName:req.body.groupName})
+    .populate("requested","username _id")
+    .exec( function (err, group) {
+      if(err) { console.log(err); res.send(null); }
+      req.attach.group = group;
+      if (group == null) 
+        res.send({error:"Group does not exist."});
+      else {
+        group.requested.forEach(function (request) {
+          if(request.username == req.user.username && positive) {
+            req.attach.requested = request;
+            sent = true;
+            next();
+          }
+          else if(request.username == req.body.user && !positive) {
+            sent = true;
+            res.send({error:"Request has been sent previously."});
+          }
+          else if(request.username == req.body.user && positive) {
+            req.attach.requested = request;
+            sent = true;
+            next();
+          }
+        });
+        if(positive && !sent)
+          res.send({error:"Group request has not been sent to you."});
+        else if(!positive && !sent) {
+          next();
+        }
+      }
+    });
+  }
 }
 
+//Check for group admin existance
+//attach: admin - admin info
+function isAdmin(req, res, next) {
+  if(req.attach == null) req.attach = {};
+  var sent = false;
+  Group.findOne({groupName:req.body.groupName})
+  .populate("admins","username")
+  .exec(function (err,group) {
+    group.admins.forEach(function (admin, index) {
+      if(admin.username == req.user.username && !sent) {
+        req.attach.admin = admin;
+        next();
+        sent = true;
+      }
+      else if(index >= group.admins.length-1 && !sent) {
+        sent = true;
+        res.send({error:"You are not authorized to"
+                    +" modify the group."});
+      }
+    });
+  })
+}
 
-
-
-
+//TRUE - check for user in group existance
+//attach - group: group info
+//         member: member info
+//FALSE - check for user in group absence
+//attach - group: group info
+//IF group not exist, 
+function searchUserInGroup(positive) {
+  return function (req, res, next) {
+    if(req.attach == null) req.attach = {};
+    var sent = false;
+    Group.findOne({groupName: req.body.groupName})
+    .populate('members',"username _id")
+    .exec(function (err, group) {
+      if(err) { console.log(err); res.send(null); }
+      else if(group == null) {
+         sent = true;
+         res.send({error:"Group not found in database."});
+      }
+      else {
+        req.attach.group = group;
+        group.members.forEach(function (member) {
+          if(member.username == req.body.user) {
+            if(positive) {
+              req.attach.member = member;
+              sent = true;
+              next();
+            }
+            else {
+              sent = true;
+              res.send({error:"User is already in the group."});
+            }
+          }
+        });
+        if(positive && !sent) {
+          console.log(req.body)
+          sent = true;
+          res.send({error:"User "+req.body.user+
+                      " is not in the group."});
+        }
+        else if(!positive && !sent) 
+          next();
+      }
+    });
+  }
+}
 
 //Post request to create new Group
-router.post('/createGroup', function (req,res) {
-  searchGroup (req.body.groupName, function (dummy, found) {
-    if(found) {
-      res.send("Group name already exist.");
-    }
-    else {
-      User.findOne({ username: req.user.username }, function(err, user) {
-        if (err) { console.log(err); }
-        if (user) {
-          Group.create({
-            groupName: req.body.groupName,
-            members: [user._id],
-            admins: [user._id]
-          }, function(err, group) {
-            if (err) { console.log(err); }
-            user.groups.push(group);
-            user.save(function(err, user) {
-              if (err) { console.log(err); }
-            });
+router.post('/createGroup', loggedIn, 
+  searchGroup(false), function (req, res) {
+    User.findOne({username:req.user.username}).
+    exec(function (err, user) {
+      Group.create({
+        groupName: req.body.groupName,
+        members: [user._id],
+        admins: [user._id],
+        requested: []
+      }, function (err, group) {
+        if(err) { console.log(err); res.send(null); }
+        else {
+          user.groups.push(group._id);
+          user.save(function (err, user) {
+            if(err) { console.log(err); res.send(null); }
+            else { 
+              res.send({success:"New group '"+
+                req.body.groupName+"' is created."});
+            }
           });
         }
       });
-    }
-  });
+    });
 });
 
-router.post('/joinGroup', function (req, res) {
-  searchUserInGroup(req.user.username ,req.body.group, function (err,found) {
-    if(found) {
-      res.send("User is in the group already.");
-    }
-    else{
-      Group.findOneAndUpdate({groupName: req.body.group}, 
-        {$push:{members:req.user.username},
-         $pull:{requested:req.user.username}
-        }, 
-        function (err, group) {
-          if(err) 
-            res.send("Error '"+err+"'."); 
-          else {
-            User.findOneAndUpdate({username:req.user.username},
-              {$push:{group:req.body.group},
-               $pull:{request:req.body.group}
-              }, function (err,user) {
-                res.send("User "+req.user.username+
-                  " added into group "+req.body.group);
+//Post request to send invitation to person
+router.post('/sendRequest', loggedIn, isAdmin, searchUser, 
+  searchUserInGroup(false), searchGroupAndRequest(false), 
+  function (req,res) {
+    console.log("reach the end")
+    User.findOne({username:req.body.user})
+    .exec(function (err,user) {
+      if(err) { console.log(err); res.send(null); }
+        Group.findOneAndUpdate({groupName:req.body.groupName},
+          {$push:{requested:user._id}}, function (err, group) {
+            if(err) { console.log(err); res.send(null); }
+              user.requests.push(group._id);
+              user.save(function(err) {
+                if(err) { console.log(err); res.send(null); }
+                res.send({success:"Request has been sent to "
+                          +req.body.user});   
+              });       
+        });
+    });
+});
+
+//Post request to accept request
+router.post('/acceptInvitation', loggedIn, searchGroupAndRequest(true), 
+  function (req, res) {
+    Group.findOneAndUpdate({groupName: req.body.groupName},
+      {$push:{members:req.attach.requested._id}, 
+       $pull:{requested:req.attach.requested._id}},
+      function (err, group) {
+        if(err) { console.log(err); res.send(null); }
+        User.findOneAndUpdate({username:req.user.username},
+          {$push:{groups:group._id}, $pull:{requests:group._id}}, 
+          function (err, user) {
+            if(err) { console.log(err); res.send(null); }
+            res.send({sucess:"User "+req.user.username+
+                    " added into group "+req.body.groupName});
+        }); 
+    }); 
+});
+
+//Post request to reject invitation
+router.post('/rejectInvitation', loggedIn, searchGroupAndRequest(true), 
+  function (req, res) {
+    Group.findOneAndUpdate({groupName: req.body.groupName},
+      {$pull:{requested:req.attach.requested._id}},
+      function (err, group) {
+        if(err) { console.log(err); res.send(null); }
+        User.findOneAndUpdate({username:req.user.username},
+          {$pull:{requests:group._id}}, function (err, user) {
+            if(err) { console.log(err); res.send(null); }
+            res.send({sucess:"User "+req.user.username+
+                    " has rejected the invitation into group "+req.body.groupName});
+        }); 
+    }); 
+});
+   
+//Post request to remove person to a group
+router.post('/removeMember', loggedIn, searchGroup(true), 
+  searchUserInGroup(true), function (req,res) {
+    var sent = false;
+    Group.findOneAndUpdate({groupName:req.body.groupName},
+      {$pull:{members:req.attach.member._id}}, 
+      function (err, group) {
+        if(err) { console.log(err); res.send(null); }
+        User.findOneAndUpdate({username:req.body.user},
+        {$pull:{groups:group._id}}, function (err, user) {
+          if(err) { console.log(err); res.send(null); }
+          if(group.members.length == 0 && !sent) {
+            sent = true;
+            group.remove(function (err, deleted) {
+              console.log("deleted");
+              res.send({success:"User "+req.body.user+
+                    " is removed from group, group deleted."});
             });
           }
-      });
-    }
-  });
-});
-
-//Post request to add person to a group
-router.post('/sendRequest', function (req,res) {
-  searchGroup(req.body.group, function (err,foundGroup){
-    if(foundGroup) {
-      searchUserInGroup(req.body.user,req.body.group, function (err, foundUserInGroup) {
-        if(foundUserInGroup)
-          res.send(req.body.user+" is in the group.");
-        else {
-          searchUser(req.body.user, function (err, foundUser) {
-            if(foundUser) {
-              Group.findOne({groupName: req.body.group}, function(err, group) {
-                if (err) { res.send("Error '"+err+"'."); }
-                else {
-                  User.findOneAndUpdate({username:req.body.user}, function (err,user) {
-                    if (err) { res.send("Error '" + err "'."); }
-                    else {
-                      group.requests.push(user);
-                      user.requests.push(group);
-                      res.send("Request has been sent to "+req.body.user);
-                    }
-                  });
-                }
-              });
-            }
-            else
-              res.send("User "+req.body.user+" does not exist in the system.");
-          });
-        }
-      });
-    }
-    else
-      res.send("Group not found. Please create the group first.");  
-  });
-});
-
-//Post request to remove person to a group
-router.post('/removeMember', function (req,res) {
-  searchGroup(req.body.group, function (err,foundGroup) {
-    if(foundGroup) {
-      searchUserInGroup(req.body.user,req.body.group, function (err, foundUserInGroup) {
-        if(foundUserInGroup) {
-          Group.update({groupName: req.body.group,},
-            {$pull:{member:req.body.user}},
-            function (err2) {
-              if(err2)
-                console.log("err "+err);
-              else {
-                User.findOneAndUpdate({username: req.body.user},
-                  {$pull:{group:{$in:[req.body.group]}}}, function (err,user) {
-                    res.send("Member "+req.body.user+" is removed from the group");
-                  });
-              }
-           });
-        }
-        else {
-          res.send(req.body.user+" is not in the group.");
-        }
-      });
-    }
-    else
-      res.send("Group not found. Operation aborted."); 
-  });
+          else if(!sent) {
+            res.send({success:"User "+req.body.user+
+                    " is removed from group."});
+          }
+        });
+    });
 });
 
 router.get('/calendar', function(req, res) {
@@ -163,7 +285,7 @@ router.get('/calendar', function(req, res) {
   .exec(function(err, group) {
     if (err) { console.log(err); }
     else if (group) {
-      group.members.forEach(function(member, index) {
+      group.members.forEach(function (member, index) {
         userEvents.push({
           username: member.username,
           events: member.events

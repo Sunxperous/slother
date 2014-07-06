@@ -13,12 +13,25 @@
     );
   });
 
-  // Add new Person.
+  // Accept Request.
   $('#accept_request').click(function(event) {
-    console.log($('#request_group'));
-    $.post('/group/joinGroup',
-      {group: $('#request_group').val()},
+    $.post('/group/acceptInvitation',
+      {groupName: $('#request_group').val()},
       function(res) {
+        console.log(res)
+        if (typeof res == 'string') {
+          $('#response').text(res);
+        }
+      }
+    );
+  });
+
+  //Reject Request
+  $('#reject_request').click(function(event) {
+    $.post('/group/rejectInvitation',
+      {groupName: $('#request_group').val()},
+      function(res) {
+        console.log(res)
         if (typeof res == 'string') {
           $('#response').text(res);
         }
@@ -30,7 +43,7 @@
   $('#add_person').click(function(event) {
     $.post('/group/sendRequest',
       { user: $('#user').val(),
-        group: $('#group').val()
+        groupName: $('#group').val()
       },
       function(res) {
         console.log(res);
@@ -45,7 +58,7 @@
   $('#remove_person').click(function(event) {
     $.post('/group/removeMember',
       { user: $('#user').val(),
-        group: $('#group').val()
+        groupName: $('#group').val()
       },
       function(res) {
         console.log(res);

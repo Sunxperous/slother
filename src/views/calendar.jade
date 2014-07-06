@@ -59,10 +59,10 @@ block content
     div.control-block
       span Your Request:
       ul#requests
-        - each requestGroup in requests
+        - each request in requests
           li
-            = requestGroup + " "
-            input#request_group(value=requestGroup type='hidden')
+            = request.groupName + " "
+            input#request_group(value=request.groupName type='hidden')
             input#accept_request(type='submit' value='Join')
             input#reject_request(type='submit' value='Reject')
 
