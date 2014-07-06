@@ -168,7 +168,7 @@ function searchUserInGroup(positive) {
     });
   }
 }
-
+//*****************POST REQUEST*************************************//
 //Post request to create new Group
 router.post('/createGroup', loggedIn, 
   searchGroup(false), function (req, res) {

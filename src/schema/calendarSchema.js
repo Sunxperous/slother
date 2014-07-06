@@ -13,4 +13,4 @@ var calendarSchema = Schema({
 
 calendarSchema.plugin(timestamps);
 
-module.exports = calendarSchema;
+module.exports = mongoose.model('Calendar',calendarSchema);
