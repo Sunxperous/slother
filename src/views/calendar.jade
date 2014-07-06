@@ -5,7 +5,7 @@ block headScript
 block content
   - var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
   .tableWrapper
-    table
+    table#calendar
       thead
         tr
           th.time
@@ -30,9 +30,12 @@ block content
             th
               div= i + ':00'
 
-  #popup_wrapper(style='display: none;')
+  #popup_wrapper.hidden
     #popup
-      #existing(style='display: none;')
+      #popup_header
+        #popup_title
+        #popup_close &#215;
+      #existing.hidden
         div
           span.label Summary
           span.summary
@@ -49,7 +52,7 @@ block content
           |  to 
           span.exactDateEnd
         div
-          span.label Repeating
+          span.label Repeat
           span.rruleFreq
           span.rruleInfo
             |  for 
@@ -57,11 +60,34 @@ block content
             |  times from 
             span.dateStart
         div
-          span.label Excluding
+          span.label Exclude
           ul.exclude
-      #new(style='display: none;')
-        | rofl
-  
+      #new.hidden
+        div
+          span.label Summary
+          input.summary.fullLength
+        div
+          span.label Description
+          textarea.description(rows='2')
+        div
+          span.label Location
+          input.location.fullLength
+        div
+          span.label Date
+          input.dateStart.shortLength(type='date')
+          input.timeStart.shortLength(type='time')
+          br
+          |  to 
+          input.dateEnd.shortLength(type='date')
+          input.timeEnd.shortLength(type='time')
+        div
+          span.label Repeat
+          input.rruleFreq
+          span.rruleInfo
+            |  for 
+            input.rruleCount(type='number' min='0' max='1024')
+            |  times
+
   //- div#info_controls
   //-   div#info
   //-     p Who (colours)
@@ -110,14 +136,14 @@ block content
 
   div#calendar_controls_wrapper
     div#calendar_controls
-      button#before <
+      button#before &#9664;
       div#date_info
         p
           span#sun_day
           span  - 
           span#sat_day
         p#year_display
-      button#after >
+      button#after &#9654;
       
 block footScripts
   script(src='/js/timetable.js')

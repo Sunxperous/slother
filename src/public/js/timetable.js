@@ -65,12 +65,21 @@
   update();
 
   var popupActive = false;
+  // Close popup when outside is clicked.
   $('#popup_wrapper').click(function closePopup(event) {
     if (!popupActive) { return; }
     if ($(event.target).attr('id') !== 'popup_wrapper') { return; }
+    $('#popup_wrapper').addClass('hidden');
     popupActive = false;
-    $('#popup_wrapper').hide();
   });
+  // Close popup when X is clicked.
+  $('#popup_close').click(function closePopup(event) {
+    if (!popupActive) { return; }
+    $('#popup_wrapper').addClass('hidden');
+    popupActive = false;
+  });
+
+  // Popup for existing event when clicked.
   function displayPopupOfExisting(event) {
     if (popupActive) { return; }
     popupActive = true;
@@ -78,6 +87,8 @@
     var item = $(event.target).data('item');
     var exactDate = $(event.target).data('exactDate');
     var duration = $(event.target).data('duration');
+
+    $('#popup_title').text('Event details');
 
     $('#existing .summary').text(item.summary);
     $('#existing .description').text(item.description);
@@ -90,9 +101,10 @@
 
     if (item.rrule.freq === 'ONCE') {
       $('#existing .rruleFreq').text('');
-      $('#existing .rruleInfo').hide();
+      $('#existing .rruleInfo').addClass('hidden');
     }
     else {
+      $('#existing .rruleInfo').removeClass('hidden');
       $('#existing .rruleFreq').text(item.rrule.freq.toLowerCase());
       $('#existing .rruleCount').text(item.rrule.count);
       $('#existing .dateStart').text(
@@ -108,10 +120,22 @@
       });
     }
 
-    $('#existing').show();
-    $('#new').hide();
-    $('#popup_wrapper').show();
+    $('#existing').removeClass('hidden');
+    $('#new').addClass('hidden');
+    $('#popup_wrapper').removeClass('hidden');
   }
+
+  // Popup for new event when empty areas of calendar are clicked.
+  $('#calendar').click(function createNewEvent(event) {
+    if (popupActive) { return; }
+    if (!$(event.target).hasClass('slot')) { return; }
+    popupActive = true;
+
+    $('#popup_title').text('Add event');
+    $('#existing').addClass('hidden');
+    $('#new').removeClass('hidden');
+    $('#popup_wrapper').removeClass('hidden');
+  });
 
   var Calendar = (function() {
 
