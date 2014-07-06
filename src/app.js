@@ -40,7 +40,7 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser());
-app.use(applyLocals()); // Locals for jade templates.
+app.use(applyLocals()); // Locals for jade templates, attaches for user-defined functions.
 app.use(express.static(__dirname + '/public'));
 app.use('/', login);
 app.use('/', routes);
@@ -67,6 +67,8 @@ function applyLocals() {
     flashMessages.alerts = req.flash('alert');
     flashMessages.errors = req.flash('error');
     app.locals.messages = flashMessages;
+
+    req.attach = {};
     next();
   }
 }

@@ -10,7 +10,6 @@ var Group = require('../schema/groupSchema');
 //Check logged in, else direct to login page
 //Attach: myself - user info
 function loggedIn(req, res, next) {
-  if(req.attach == null) req.attach = {};
   if (req.user) { 
     req.attach.myself = req.user;
     next();  
@@ -24,7 +23,6 @@ function loggedIn(req, res, next) {
 //Check for user existance
 //Attach: user - user info
 function searchUser(req, res, next) {
-  if(req.attach == null) req.attach = {};
   User.findOne({username: req.body.user}, function (err, user) {
     if(err) { console.log(err); res.send(null); }
     else if(user !== null) {
@@ -39,7 +37,6 @@ function searchUser(req, res, next) {
 //Attach: group - group info
 function searchGroup(positive) {
   return function (req, res, next) {
-    if(req.attach == null) req.attach = {};
     Group.findOne({groupName: req.body.groupName}, function (err,group) {
       if(err) { console.log(err); res.send(null); }
       else if(positive){
@@ -65,7 +62,6 @@ function searchGroup(positive) {
 function searchGroupAndRequest(positive) {
   return function (req, res, next) {
     var sent = false;
-    if(req.attach == null) req.attach = {};
     Group.findOne({groupName:req.body.groupName})
     .populate("requested","username _id")
     .exec( function (err, group) {
@@ -103,7 +99,6 @@ function searchGroupAndRequest(positive) {
 //Check for group admin existance
 //attach: admin - admin info
 function isAdmin(req, res, next) {
-  if(req.attach == null) req.attach = {};
   var sent = false;
   Group.findOne({groupName:req.body.groupName})
   .populate("admins","username")
@@ -131,7 +126,6 @@ function isAdmin(req, res, next) {
 //IF group not exist, 
 function searchUserInGroup(positive) {
   return function (req, res, next) {
-    if(req.attach == null) req.attach = {};
     var sent = false;
     Group.findOne({groupName: req.body.groupName})
     .populate('members',"username _id")
