@@ -222,7 +222,7 @@ div.tableWrapper {
 #existing > div {
   margin-bottom: 8px;
 }
-#new > div {
+#event_details > div {
   margin-bottom: 8px;
 }
 p ol {
@@ -231,7 +231,7 @@ p ol {
 span.rruleFreq {
   text-transform: capitalize;
 }
-span.label {
+span.label, label {
   display: block;
   color: #999;
   text-transform: uppercase;

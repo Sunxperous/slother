@@ -63,30 +63,37 @@ block content
           span.label Exclude
           ul.exclude
       #new.hidden
-        div
-          span.label Summary
-          input.summary.fullLength
-        div
-          span.label Description
-          textarea.description(rows='2')
-        div
-          span.label Location
-          input.location.fullLength
-        div
-          span.label Date
-          input.dateStart.shortLength(type='date')
-          input.timeStart.shortLength(type='time')
-          br
-          |  to 
-          input.dateEnd.shortLength(type='date')
-          input.timeEnd.shortLength(type='time')
-        div
-          span.label Repeat
-          input.rruleFreq
-          span.rruleInfo
-            |  for 
-            input.rruleCount(type='number' min='0' max='1024')
-            |  times
+        form#event_details(method='post')
+          div
+            label(for='summary') Summary
+            input#summary.fullLength(name='summary')
+          div
+            label(for='description') Description
+            textarea#description(rows='2' name='description')
+          div
+            label(for='location') Location
+            input#location.fullLength(name='location')
+          div
+            label(for='date_start') From
+            input#date_start.shortLength(type='date' name='dateStart')
+            input#time_start.shortLength(type='time' name='timeStart')
+            label(for='date_end') until
+            input#date_end.shortLength(type='date' name='dateEnd')
+            input#time_end.shortLength(type='time' name='timeEnd')
+          div
+            label(for='rrule_freq') Repeat
+            select#rrule_freq(name='rrule[freq]')
+              option(value='once' selected) No repeat
+              option(value='daily') Daily
+              option(value='weekly') Weekly
+              option(value='monthly') Monthly
+              option(value='yearly') Yearly
+            span.rruleInfo
+              |  for 
+              input#rrule_count(type='number' value='1' min='1' max='1024' name='rrule[count]')
+              |  times
+          div
+            input(type='submit')
 
   //- div#info_controls
   //-   div#info

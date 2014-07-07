@@ -131,7 +131,27 @@
     if (!$(event.target).hasClass('slot')) { return; }
     popupActive = true;
 
+    var td = $(event.target);
+    var hour;
+    for (var i = 0; i < 24; i++) {
+      if (td.hasClass(i)) { hour = i; }
+    }
+    var tr = td.parent();
+    var day;
+    for (var i = 0; i < 7; i++) {
+      if (tr.hasClass(days[i])) { day = i; }
+    }
+
     $('#popup_title').text('Add event');
+
+    var date = moment(now).clone().add(day, 'days');
+    date.hours(hour);
+
+    $('#date_start').val(date.format("YYYY-MM-DD"));
+    $('#date_end').val(date.format("YYYY-MM-DD"));
+    $('#time_start').val(date.format("HH:mm"));
+    $('#time_end').val(date.add(1, 'hour').format("HH:mm"));
+
     $('#existing').addClass('hidden');
     $('#new').removeClass('hidden');
     $('#popup_wrapper').removeClass('hidden');
