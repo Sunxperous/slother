@@ -69,25 +69,31 @@
   };
   update();
 
-  var popupActive = false;
+  // popupStatus status
+  var popupStatuses = {
+    HIDDEN: 0,
+    READ_ONLY: 1,
+    EDITABLE: 2
+  }
+  var popupStatus = popupStatuses.HIDDEN;
   // Close popup when outside is clicked.
   $('#popup_wrapper').click(function closePopup(event) {
-    if (!popupActive) { return; }
+    if (popupStatus !== popupStatuses.READ_ONLY) { return; }
     if ($(event.target).attr('id') !== 'popup_wrapper') { return; }
     $('#popup_wrapper').addClass('hidden');
-    popupActive = false;
+    popupStatus = popupStatuses.HIDDEN;
   });
   // Close popup when X is clicked.
   $('#popup_close').click(function closePopup(event) {
-    if (!popupActive) { return; }
+    if (popupStatus === popupStatuses.HIDDEN) { return; }
     $('#popup_wrapper').addClass('hidden');
-    popupActive = false;
+    popupStatus = popupStatuses.HIDDEN;
   });
 
   // Popup for existing event when clicked.
   function displayEventDetails(event) {
-    if (popupActive) { return; }
-    popupActive = true;
+    if (popupStatus !== popupStatuses.HIDDEN) { return; }
+    popupStatus = popupStatuses.READ_ONLY;
 
     var item = $(event.target).data('item');
     var exactDateStart = $(event.target).data('exactDate');
@@ -150,6 +156,7 @@
   // Display editable popup.
   //   Input: event object with the following parameters:
   function displayEditablePopup(item) {
+    popupStatus = popupStatuses.EDITABLE;
     Object.keys(item).forEach(function(key) {
       var element = $('#' + key);
       if (element[0].tagName === 'INPUT') {
@@ -183,9 +190,8 @@
 
   // Popup for new event when empty areas of calendar are clicked.
   $('#calendar').click(function createNewEvent(event) {
-    if (popupActive) { return; }
+    if (popupStatus !== popupStatuses.HIDDEN) { return; }
     if (!$(event.target).hasClass('slot')) { return; }
-    popupActive = true;
 
     var td = $(event.target);
     var hour;
@@ -272,7 +278,7 @@
 
           // Assume day is valid, then check for exclusion.
           var day = date.day();
-          var exactDate = sunOfWeek.clone().add(day, 'days');
+          var exactDate = sunOfWeek.clone().day(day);
           var excludeDate;
           if (item.exclude && item.exclude.length > 0) {
             for (var i = 0; i < item.exclude.length; i++) {
@@ -282,7 +288,7 @@
               }
             }
           }
-          return exactDate;
+          return date;
           break;
         default: break;
       }
