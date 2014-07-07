@@ -6,12 +6,18 @@ var User = require('../schema/userSchema');
 // /user/calendar
 router.get('/calendar', function(req, res) {
   if (req.user) {
-    User.findOne({username: req.user.username}, function(err, user) {
+    User
+    .findOne({username: req.user.username})
+    .populate('calendars')
+    .exec(function(err, user) {
       if (err) {
         console.log(err);
       }
       if (user) {
-        res.send(user.events);
+        if (user.calendars.length > 0 && user.calendars[0].events) {
+          res.send(user.calendars[0].events);
+        }
+        else { res.send(null); }
       }
       else {
         res.send(null);

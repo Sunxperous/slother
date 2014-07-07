@@ -323,7 +323,7 @@ router.get('/', loggedIn, function (req,res) {
             calendar.user = user._id;
             calendar.save(function (err,calendar) {
               if(err) { console.log(err); res.send(null); }
-              res.send({success:"Module updated."});
+              res.send(calendar.events);
             });
           }
       });
