@@ -80,12 +80,12 @@
   });
 
   // Popup for existing event when clicked.
-  function displayPopupOfExisting(event) {
+  function displayEventDetails(event) {
     if (popupActive) { return; }
     popupActive = true;
 
     var item = $(event.target).data('item');
-    var exactDate = $(event.target).data('exactDate');
+    var exactDateStart = $(event.target).data('exactDate');
     var duration = $(event.target).data('duration');
 
     $('#popup_title').text('Event details');
@@ -95,9 +95,10 @@
     $('#existing .location').text(item.location);
 
     $('#existing .exactDateStart').text(
-      exactDate.format("dddd DD MMM 'YY, HH:mm"));
+      exactDateStart.format("dddd DD MMM 'YY, HH:mm"));
+    var exactDateEnd = exactDateStart.clone().add(duration, 'milliseconds');
     $('#existing .exactDateEnd').text(
-      exactDate.add(duration, 'milliseconds').format("dddd DD MMM 'YY, HH:mm"));
+      exactDateEnd.format("dddd DD MMM 'YY, HH:mm"));
 
     if (item.rrule.freq === 'ONCE') {
       $('#existing .rruleFreq').text('');
@@ -123,7 +124,57 @@
     $('#existing').removeClass('hidden');
     $('#new').addClass('hidden');
     $('#popup_wrapper').removeClass('hidden');
+
+    $('#edit_event').unbind('click');
+    $('#edit_event').click(function editEvent(event) {
+      displayEditablePopup({
+        popup_title: 'Edit event',
+        summary: item.summary,
+        description: item.description,
+        location: item.location,
+        date_start: exactDateStart.format("YYYY-MM-DD"),
+        date_end: exactDateEnd.format("YYYY-MM-DD"),
+        time_start: exactDateStart.format("HH:mm"),
+        time_end: exactDateEnd.add(1, 'hour').format("HH:mm"),
+        rrule_freq: item.rrule.freq.toLowerCase(),
+        rrule_count: item.rrule.count ? item.rrule.count : 1
+      })
+    });
   }
+
+  // Display editable popup.
+  //   Input: event object with the following parameters:
+  function displayEditablePopup(item) {
+    Object.keys(item).forEach(function(key) {
+      var element = $('#' + key);
+      if (element[0].tagName === 'INPUT') {
+        element.val(item[key]);
+      }
+      else if (element[0].tagName === 'SELECT') {
+        element.val(item[key]);
+      }
+      else {
+        element.text(item[key]);
+      }
+    });
+
+    if ($('#rrule_freq').val() === 'once') {
+      $('#rrule_count').prop('disabled', true);
+    }
+    else { $('#rrule_count').removeAttr('disabled'); }
+
+    $('#existing').addClass('hidden');
+    $('#new').removeClass('hidden');
+    $('#popup_wrapper').removeClass('hidden');
+  }
+
+  // Rrule count toggler.
+  $('#rrule_freq').change(function(event) {
+    if ($('#rrule_freq').val() === 'once') {
+      $('#rrule_count').prop('disabled', true);
+    }
+    else { $('#rrule_count').removeAttr('disabled'); }    
+  });
 
   // Popup for new event when empty areas of calendar are clicked.
   $('#calendar').click(function createNewEvent(event) {
@@ -142,19 +193,21 @@
       if (tr.hasClass(days[i])) { day = i; }
     }
 
-    $('#popup_title').text('Add event');
-
     var date = moment(now).clone().add(day, 'days');
     date.hours(hour);
 
-    $('#date_start').val(date.format("YYYY-MM-DD"));
-    $('#date_end').val(date.format("YYYY-MM-DD"));
-    $('#time_start').val(date.format("HH:mm"));
-    $('#time_end').val(date.add(1, 'hour').format("HH:mm"));
-
-    $('#existing').addClass('hidden');
-    $('#new').removeClass('hidden');
-    $('#popup_wrapper').removeClass('hidden');
+    displayEditablePopup({
+      popup_title: 'Add event',
+      summary: '',
+      description: '',
+      location: '',
+      date_start: date.format("YYYY-MM-DD"),
+      date_end: date.format("YYYY-MM-DD"),
+      time_start: date.format("HH:mm"),
+      time_end: date.add(1, 'hour').format("HH:mm"),
+      rrule_freq: 'once',
+      rrule_count: 1
+    })
   });
 
   var Calendar = (function() {
@@ -274,7 +327,7 @@
       var sourceTd = dayTr.children('td.' + moment(dateStart).hour());
       div.css('top', height * CELL_HEIGHT);
       sourceTd.append(div);
-      div.click(displayPopupOfExisting);
+      div.click(displayEventDetails);
       return div;
     };
 

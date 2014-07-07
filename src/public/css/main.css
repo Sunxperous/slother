@@ -287,7 +287,7 @@ div.control-block {
   margin: auto auto;
   white-space: nowrap;
 }
-button {
+#calendar_controls button {
   height: 34px;
   width: 20%;
   max-width: 34px;

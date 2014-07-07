@@ -62,8 +62,11 @@ block content
         div
           span.label Exclude
           ul.exclude
+        div
+          button#edit_event Edit event
       #new.hidden
         form#event_details(method='post')
+          input#event_id(type='hidden' name='event_id')
           div
             label(for='summary') Summary
             input#summary.fullLength(name='summary')
@@ -82,7 +85,7 @@ block content
             input#time_end.shortLength(type='time' name='timeEnd')
           div
             label(for='rrule_freq') Repeat
-            select#rrule_freq(name='rrule[freq]')
+            select#rrule_freq(name='rrule_freq')
               option(value='once' selected) No repeat
               option(value='daily') Daily
               option(value='weekly') Weekly
@@ -90,7 +93,7 @@ block content
               option(value='yearly') Yearly
             span.rruleInfo
               |  for 
-              input#rrule_count(type='number' value='1' min='1' max='1024' name='rrule[count]')
+              input#rrule_count(type='number' value='1' min='1' max='1024' name='rrule_count')
               |  times
           div
             input(type='submit')
