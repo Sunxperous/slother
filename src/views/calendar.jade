@@ -46,10 +46,9 @@ block content
           span.label Location
           span.location
         div
-          span.label Date
+          span.label From
           span.exactDateStart
-          br
-          |  to 
+          span.label to
           span.exactDateEnd
         div
           span.label Repeat
@@ -80,7 +79,7 @@ block content
             label(for='date_start') From
             input#date_start.shortLength(type='date' name='dateStart')
             input#time_start.shortLength(type='time' name='timeStart')
-            label(for='date_end') until
+            label(for='date_end') to
             input#date_end.shortLength(type='date' name='dateEnd')
             input#time_end.shortLength(type='time' name='timeEnd')
           div

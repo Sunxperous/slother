@@ -1,6 +1,7 @@
 (function() {
 
   'use strict';
+
   var CELL_WIDTH      = 76; // Cell width.
   var CELL_HEIGHT     = 14; // Cell height.
   var RIGHT_DIV_TRIM  = 2;  // Pixels to trim at the right of each item div.
@@ -52,12 +53,16 @@
     updateDates();
 
     // Reset <td> rows.
-    $('td.slot').removeData('rows').height('auto');
+    var tds = $('td.slot');
+    tds.each(function(i, td) {
+      tds.eq(i).data('rows', []).height('auto');
+    });
 
     // All users to refresh their calendar display.
     users.forEach(function(user, index) {
       user.clear();
     });
+
     users.forEach(function(user, index) {
       user.refresh();
     });
@@ -210,6 +215,7 @@
     })
   });
 
+
   var Calendar = (function() {
 
     function Calendar(owner, items) {
@@ -228,7 +234,7 @@
       if (this.items) {
         this.items.forEach(function(item, index) {
           var date = duringDisplayedWeek(item);
-          if (duringDisplayedWeek(item)) {
+          if (date) {
             _this.onDisplay.push(insertEvent(item, _this.owner, date));
           }
         });
@@ -244,39 +250,41 @@
     };
 
     var duringDisplayedWeek = function(item) {
-      var date;
-      var rruleCount = item.rrule.count;
+      var date = moment(item.dateStart);
 
-      // Check for excludes first.
-      if (item.exclude && item.exclude.length > 0) {
-        for (var i = 0; i < item.exclude.length; i++) {
-          date = moment(item.exclude[i]);
-          if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
-            return null;
-          }
-        }
+      // If start event date is after Saturday, it hasn't started.
+      if (date.isAfter(satOfWeek)) {
+        return null;
       }
 
-      // Then check for normal dates.
-      date = moment(item.dateStart);
-      if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
-        return date; // First date is during, return true.
-      }
-      else if (item.rrule.freq != 'ONCE') { // Repeating event...
-        rruleCount--; // Already tested first event date.
-        while (rruleCount > 0) {
-
-          // Apply frequency rules.
-          if (item.rrule.freq === 'WEEKLY') {
-            date.add(1, 'week');
-          }
-
+      switch (item.rrule.freq) {
+        case 'ONCE':
+          // Simple.
           if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
-            return date; // Currently checked date is during, return true.
+            return date;
           }
+          break;
+        case 'WEEKLY':
+          // If end event date is before Sunday, it is over.
+          // var endDate = date.clone().add(item.rrule.count - 1, 'weeks');
+          // if (endDate.isBefore(sunOfWeek)) { return null; }
+          if (sunOfWeek.diff(date, 'week') >= item.rrule.count - 1) { return null;}
 
-          rruleCount--;
-        }
+          // Assume day is valid, then check for exclusion.
+          var day = date.day();
+          var exactDate = sunOfWeek.clone().add(day, 'days');
+          var excludeDate;
+          if (item.exclude && item.exclude.length > 0) {
+            for (var i = 0; i < item.exclude.length; i++) {
+              excludeDate = moment(item.exclude[i]);
+              if (exactDate.isSame(excludeDate, 'day')) {
+                return null;
+              }
+            }
+          }
+          return exactDate;
+          break;
+        default: break;
       }
       return null;
     };
@@ -284,10 +292,10 @@
     // Adds an item to be shown on the timetable.
     var insertEvent = function(item, owner, exactDate) {
       var dateStart = moment(item.dateStart);
-      var dateEnd = moment(item.dateEnd);
       var day = dateStart.day();
-      var durationInHours = dateEnd.diff(dateStart, 'h');
-      var durationInMilli = dateEnd.diff(dateStart);
+      var durationInMilli = moment(item.dateEnd).diff(dateStart);
+      var durationInHours = durationInMilli / 3600000;
+      //var durationInHours = dateEnd.diff(dateStart, 'h');
 
       var div = $('<div>');
       var width = durationInHours * CELL_WIDTH;
@@ -302,15 +310,18 @@
         });
 
       var dayTr = $('tr.' + days[day]);
+      var sourceTd = dayTr.children('td.' + (moment(dateStart).hour()));
 
       // Finding the next available height.
       var height = 0;
       var found = false;
+      var td;
       while (!found) {
         found = true;
-        for (var i = 0; i < durationInHours; i = i + 1) {
-          var td = dayTr.children('td.' + (moment(dateStart).hour() + i));
-          if (td.data('rows') && $.inArray(height, td.data('rows')) != -1) {
+        td = sourceTd;
+        for (var i = 0; i < durationInHours; i++) {
+          td = td.next();
+          if ($.inArray(height, td.data('rows')) != -1) {
             found = false;
             break;
           }
@@ -318,29 +329,26 @@
         height++;
       }
       height--;
+      td = sourceTd;
       // Found next available height:
-      for (var i = 0; i < durationInHours; i = i + 1) {
-        var td = dayTr.children('td.' + (moment(dateStart).hour() + i));
+      for (var i = 0; i < durationInHours; i++) {
+        td = td.next();
         addToTdRows(td, height);
       }
 
-      var sourceTd = dayTr.children('td.' + moment(dateStart).hour());
       div.css('top', height * CELL_HEIGHT);
       sourceTd.append(div);
       div.click(displayEventDetails);
       return div;
     };
 
-    var getMaxOfArray = function(numArray) {
+    function getMaxOfArray(numArray) {
       return Math.max.apply(null, numArray);
     };
 
     // <td> rows stores the slot taken up by each item.
-    var addToTdRows = function(td, height) {
+    function addToTdRows(td, height) {
       var rowsArray = td.data('rows');
-      if (!rowsArray) {
-        rowsArray = [];
-      }
       rowsArray.push(height);
       td.data('rows', rowsArray);
 
