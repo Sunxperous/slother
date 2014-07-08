@@ -30,11 +30,11 @@ function extract(addr, userId, callback) {
   
   var year = "2014-2015",
       sem = "1",
-      modInfo = eval(addr.trim().replace("http://","").
-                replace("nusmods.com/timetable/",""));
+      modInfo = eval(decodeURIComponent(addr.trim().replace("http://","").
+                replace("nusmods.com/timetable/","")));
 
   var semStart = moment(semesterStart(year,sem));
-  //Manual key calender and Monday as start day
+  //Manual key calendar and Monday as start day
   var tempURL = "http://api.nusmods.com/"+year+"/"
                 +sem+'/modules/CS1010.json',
       tempModCode = "CS1010",
@@ -45,6 +45,7 @@ function extract(addr, userId, callback) {
     function (err,oldCalendar) {
     if(err) { console.log(err); res.send(null); }
     else {
+      console.log("Check 2");
       Calendar.create({
         type: "NUS",
         semester: year+"/"+sem,
@@ -53,7 +54,7 @@ function extract(addr, userId, callback) {
       }, function (err,calendar) {
         if(err) { console.log(err); res.send(null); }
         for(var x in modInfo) {
-          isDone[x] = false;
+          isDone[modInfo[x].ModuleCode] = false;
           tempURL = tempURL.replace(tempModCode,modInfo[x].ModuleCode); 
           tempModCode = modInfo[x].ModuleCode;
           request({ url: tempURL, json: true}, 
@@ -68,8 +69,11 @@ function extract(addr, userId, callback) {
                               modInfo[x].selectedLessons);
                 if(lessonType == false)
                   continue;
-                else
+                else{
+                  //console.log(buildNUSEvent(modJSON,semStart,y))
                   calendar.events.push(buildNUSEvent(modJSON,semStart,y));
+                
+                }
                 //Next, exam info
                 if(modJSON.ExamDate !== undefined && exam == false) {
                   calendar.events.push(buildNUSExam(modJSON,semStart));
@@ -84,8 +88,8 @@ function extract(addr, userId, callback) {
                 }
               }
               if(allDone) {
-
-                calendar.save(function (err,calendar) {
+                console.log("AllDone");
+                calendar.save(function (err,calendarss) {
                   var oldExist = false;
                   if(oldCalendar !== null) {
                     oldExist = true;
@@ -94,7 +98,7 @@ function extract(addr, userId, callback) {
                       function (err,user) {
                         if(err) { console.log(err); res.send(null); }
                         callback(null, calendar);
-                      })
+                      });
                   } 
                     if(!oldExist)
                     callback(null, calendar);
@@ -111,8 +115,12 @@ function extract(addr, userId, callback) {
 //Input:  timetable from nusmods
 //        lesson class from nusmods url
 function checkLessonTaken(timetable, lessons) {
-  return (lessons.indexOf({ClassNo:timetable.ClassNo,
-            LessonType:timetable.LessonType})>-1);
+  for(var x in lessons) {
+    if(lessons[x].ClassNo == timetable.ClassNo && 
+        lessons[x].LessonType == timetable.LessonType)
+      return true;
+  }
+  return false;
 }
 
 //Build an event class for NUS module
@@ -190,6 +198,7 @@ function buildNUSEvent(data, semStart, classNo) {
   temp.dateStart = tempTime.clone().toDate();
   tempTime.hour(parseInt(data.Timetable[classNo].EndTime.substring(0,2))-8); //To UTC
   temp.dateEnd = tempTime.clone().toDate();
+
   return temp;
 }
 
@@ -222,7 +231,7 @@ function buildNUSExam(data, semStart) {
 //Input: year (eg. "2013-2014") and 
 //       semester (eg. "1") string 
 //NOTE: corrected to UTC timezone
-//Manual key calender and Monday as start day
+//Manual key calendar and Monday as start day
 function semesterStart(year,sem) {
   var test;
   switch(year) {

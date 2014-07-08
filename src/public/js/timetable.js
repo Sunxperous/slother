@@ -217,7 +217,7 @@
       this.nusmods.display();
     };
 
-    User.prototype.applyFormTriggers = function() {
+    //User.prototype.applyFormTriggers = function() {
       var _this = this;
       // Add NUSMods address.
       $('#add_nusmods').click(function(event) {
@@ -229,7 +229,7 @@
           }
         );
       });
-    }
+    //}
 
     return User;
   })();
