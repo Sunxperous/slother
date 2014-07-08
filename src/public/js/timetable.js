@@ -431,10 +431,10 @@
   }
 
   // Temporary.
-  users.push(new User('Mock2', mock2, '#ccccff'));
-  users.push(new User('Mock3', mock3, '#cccc99'));
-  users.push(new User('Mock', mock, '#ccffcc'));
-  users.push(new User('Mock4', mock4, '#99cccc'));
+  // users.push(new User('Mock2', mock2, '#ccccff'));
+  // users.push(new User('Mock3', mock3, '#cccc99'));
+  // users.push(new User('Mock', mock, '#ccffcc'));
+  // users.push(new User('Mock4', mock4, '#99cccc'));
 
 })();
 

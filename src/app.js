@@ -66,6 +66,7 @@ function applyLocals() {
     var flashMessages = {};
     flashMessages.alerts = req.flash('alert');
     flashMessages.errors = req.flash('error');
+    flashMessages.requests = req.flash('requests');
     app.locals.messages = flashMessages;
 
     req.attach = {};

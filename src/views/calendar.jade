@@ -97,51 +97,48 @@ block content
           div
             input(type='submit')
 
-  //- div#info_controls
-  //-   div#info
-  //-     p Who (colours)
-  //-   div#info
-  //-     p Map?!
-  //- if (groups)
-  //-   div.control-block
-  //-     span Your groups:
-  //-     ul#groups
-  //-       - each group in groups
-  //-         li
-  //-           a(href='/calendar/group/' + group.groupName)= group.groupName
 
-  //- div.control-block
-  //-   label(for='link') Add your NUSMods: 
-  //-   input#nusmods_addr(type='text', placeholder='http://nusmods.com/2014-2015/sem1/v1/', name='link')
-  //-   input#add_nusmods(type='submit' value='Add')
+  div#info_controls
+    | TEMPORARY
+    if (groups)
+      div.control-block
+        span Your groups:
+        ul#groups
+          - each group in groups
+            li
+              a(href='/calendar/group/' + group.groupName)= group.groupName
 
-  //- div.control-block
-  //-   label(for='createG') Create new Group: 
-  //-   input#groupName(type='text', placeholder='New Name', name='createG')
-  //-   input#create_group(type='submit' value='Create')
-
-  //- div.control-block
-  //-   label(for='addPerson') Add person: 
-  //-   input#user(type='text', placeholder='Person Name', name='createG')
-  //-   input#group(type='text', placeholder='Group Name', 
-  //-   name='createG')
-  //-   input#add_person(type='submit' value='Add Person')
-  //-   input#remove_person(type='submit' value='Remove Person')
-
-  if (requests)
     div.control-block
-      span Your Request:
-      ul#requests
-        - each request in requests
-          li
-            = request.groupName + " "
-            input#request_group(value=request.groupName type='hidden')
-            input#accept_request(type='submit' value='Join')
-            input#reject_request(type='submit' value='Reject')
+      label(for='link') Add your NUSMods: 
+      input#nusmods_addr(type='text', placeholder='http://nusmods.com/2014-2015/sem1/v1/', name='link')
+      input#add_nusmods(type='submit' value='Add')
 
+    div.control-block
+      label(for='createG') Create new Group: 
+      input#groupName(type='text', placeholder='New Name', name='createG')
+      input#create_group(type='submit' value='Create')
 
-  //- div.control-block
-  //-   span.message#response
+    div.control-block
+      label(for='addPerson') Add person: 
+      input#user(type='text', placeholder='Person Name', name='createG')
+      input#group(type='text', placeholder='Group Name', 
+      name='createG')
+      input#add_person(type='submit' value='Add Person')
+      input#remove_person(type='submit' value='Remove Person')
+
+    if (requests)
+      div.control-block
+        span Your Request:
+        ul#requests
+          - each request in requests
+            li
+              = request.groupName + " "
+              input#request_group(value=request.groupName type='hidden')
+              input#accept_request(type='submit' value='Join')
+              input#reject_request(type='submit' value='Reject')
+
+    div.control-block
+      span.message#response
 
   div#calendar_controls_wrapper
     div#calendar_controls

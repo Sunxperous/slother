@@ -60,38 +60,79 @@ body {
   margin-bottom: 60px;
 }
 h1 {
-  font-size: 24px;
-  font-weight: 600;
-  margin: 4px;
-}
-h2 {
-  font-size: 20px;
-  margin: 4px;
-}
-header {
-  position: relative;
-  background-color: #fff;
-  padding: 2px 24px;
-}
-#brand {
+  font-size: 18px;
+  padding-top: 2px;
+  text-transform: uppercase;
+  font-weight: 800;
   display: inline-block;
 }
-nav > * {
-  padding-left: 16px;
+header {
+  margin: 4px auto;
+  background-color: #fff;
 }
-#errors, #alerts {
+nav {
+  margin: 4px auto;
+  max-width: 500px;
+  text-align: left;
+  position: relative;
+  height: 24px;
+  white-space: nowrap;
+}
+#brand { /* Hide text if screen is damn small. */
+  display: inline-block;
+  padding: 0 8px;
+}
+#links {
+  display: inline-block;
+  text-align: right;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 100%;
+}
+#links > * {
+  margin-left: 16px;
+  display: inline-block;
+  vertical-align: bottom;
+}
+#user {
+  display: inline-block;
+  max-width: 40%;
+  color: #960;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#number {
+  font-size: 14px;
+  color: #fff;
+  background-color: #f66;
+  padding: 2px 8px;
+  border-radius: 8px;  
+}
+#errors, #alerts, #requests {
   padding: 0;
   text-align: center;
 }
+.message {
+  display: block;
+  padding: 4px 8px;
+  background-color: #ffc;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 8px;
+  margin: 2px auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;  
+}
 #errors .message {
   color: #f66;
-  display: block;
-  padding: 4px;
 }
 #alerts .message {
   color: #c93;
-  display: block;
-  padding: 4px;
+}
+#requests .message {
+  color: #6c6;
 }
 #content {
   margin: auto auto;
@@ -136,6 +177,7 @@ div.tableWrapper {
 }
 #calendar .slot {
   position: relative;
+  cursor: pointer;
 }
 #calendar th div {
   text-align: left;
@@ -184,6 +226,7 @@ div.tableWrapper {
   left: 0;
   width: 100%;
   height: 100%;
+  background-color: rgba(128, 128, 128, 0.4);
 }
 #popup {
   top: 10%;
@@ -253,7 +296,9 @@ input {
 }
 
 #info_controls {
-  margin-top: 8px;
+  margin: auto auto;
+  max-width: 540px;
+  position: relative;
 }
 #info {
   min-width: 50%;
@@ -265,10 +310,10 @@ input#nusmods_addr {
   width: 200px;
 }
 div.control-block {
-  padding: 8px;
+  max-width: 90%;
+  margin: auto auto;
   line-height: 30px;
   min-height: 30px;
-  margin: 8px;
   background-color: #eee;
 }
 
