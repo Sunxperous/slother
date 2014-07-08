@@ -13,42 +13,31 @@ var moment = require('moment');
 //  Output format : <VarName>[]
 //  Array includes: dateStart,dateEnd,description,
 //                  summary,exclude,location,rrule
-//  Example link  : http://nusmods.com/2013-2014/sem2/
-//                  v1/#IS1103=63&ST2334=2SL1&ST2334=
-//                  8T9&ST2334=2SL1
 //
 //  Manual enter of semStart date 
+/*
+  http://nusmods.com/timetable/
+  [{"ModuleCode":"CS2010",
+  "selectedLessons":[{"ClassNo":"1","LessonType":"Lecture"},
+                    {"ClassNo":"4","LessonType":"Tutorial"},
+                    {"ClassNo":"5","LessonType":"Laboratory"}]},
+  {"ModuleCode":"CS2101",
+  "selectedLessons":[{"ClassNo":"1","LessonType":"Sectional Teaching"}]},
+
+
+*/
 function extract(addr, userId, callback) {
   
-  var year = addr.substring(19,28),
-      sem = addr.substring(32,33),
-      modDetailInfo = {};
-  addr = addr.substring(38);
-  mod = addr.split("&");
-  mod.sort();
-  var tempMod = mod.pop().split("=");
-  while(tempMod !== undefined) {
-    var tempOb = {
-      codeNo: tempMod[0],
-      lect: [], lab: [], sect: [], tut: [], reci: [],
-      tut2: [], tut3: []
-    };
-    
-    while(tempMod[0] == tempOb.codeNo) {
-        tempOb[noToLessonType(tempMod[1])].
-          push(tempMod[1].substring(1));  
-        tempMod = mod.pop();
-        if(tempMod == undefined) { break; }
-        else 
-          tempMod = tempMod.split("="); 
-    }
-    modDetailInfo[tempOb.codeNo] = tempOb;
-  }
+  var year = "2014-2015",
+      sem = "1",
+      modInfo = eval(addr.trim().replace("http://","").
+                replace("nusmods.com/timetable/",""));
+
   var semStart = moment(semesterStart(year,sem));
   //Manual key calender and Monday as start day
   var tempURL = "http://api.nusmods.com/"+year+"/"
-                +sem+'/modules/FE5218.json',
-      tempModCode = "FE5218",
+                +sem+'/modules/CS1010.json',
+      tempModCode = "CS1010",
       eventInfo = [],
       isDone = {};
       tempSem = semStart.toDate();
@@ -63,10 +52,10 @@ function extract(addr, userId, callback) {
         events: []
       }, function (err,calendar) {
         if(err) { console.log(err); res.send(null); }
-        for(var x in modDetailInfo) {
+        for(var x in modInfo) {
           isDone[x] = false;
-          tempURL = tempURL.replace(tempModCode,x); 
-          tempModCode = x;
+          tempURL = tempURL.replace(tempModCode,modInfo[x].ModuleCode); 
+          tempModCode = modInfo[x].ModuleCode;
           request({ url: tempURL, json: true}, 
             function (error, res, body) {
               var modJSON = res.body,
@@ -75,9 +64,8 @@ function extract(addr, userId, callback) {
                 semStart = moment(tempSem);
                 //Go through and copy each element.
                 //First, handle normal lesson timetable.
-                var timetable = modJSON.Timetable[y],
-                    lessonType = checkLessonTaken(timetable,
-                              modDetailInfo[modJSON.ModuleCode]);
+                var lessonType = checkLessonTaken(modJSON.Timetable[y],
+                              modInfo[x].selectedLessons);
                 if(lessonType == false)
                   continue;
                 else
@@ -119,64 +107,13 @@ function extract(addr, userId, callback) {
   });
 }
 
-//Return class type string
-//Input: class no. from nusMods 
-//        eg. "8T04" of "MA2213=8T04"
-function noToLessonType(lesson) {
-  switch(lesson.substring(0,1)) {
-  case '1': return "lab"; //Laboratory
-  case '2': return "lect"; //Lecture
-  case '5': return "reci"; //Recitation Group
-  case '6': return "sect"; //Sectional Teaching
-  case '8': return "tut"; //Tutorial
-  case '9': return "tut2"; //Tutorial 2
-  case 'A': return "tut3"; //Tutorial 3
-  default: console.log("Unknown type: '"+lesson.substring(0,1)+"'");
-  }
-}
-
-
 //Return boolean whether lesson is in user timetable
-//Input:  timetable class from nusmods
-//        lessonNo class grouped by lect,lab,tut,sect
-function checkLessonTaken(timetable, lessonNo) {
-  switch(timetable.LessonType) {
-      case "Lecture": 
-        for(var x in lessonNo.lect) 
-          {return (timetable.ClassNo == 
-                      lessonNo.lect[x])?true:false;}
-      case "Laboratory": 
-        for(var x in lessonNo.lab)
-          {return (timetable.ClassNo == 
-                      lessonNo.lab[x])?true:false;}
-      case "Tutorial": 
-        for(var x in lessonNo.tut)
-          {return (timetable.ClassNo == 
-                      lessonNo.tut[x])?true:false;}
-      case "Tutorial Type 2":
-        for(var x in lessonNo.tut2)
-          {return (timetable.ClassNo == 
-                      lessonNo.tut2[x])?true:false;}
-      case "Tutorial Type 3":
-        for(var x in lessonNo.tut3)
-          {return (timetable.ClassNo == 
-                      lessonNo.tut3[x])?true:false;}
-      case "Sectional Teaching": 
-        for(var x in lessonNo.sect)
-          {return (timetable.ClassNo == 
-                      lessonNo.sect[x])?true:false;}
-      case "Recitation":
-        for(var x in lessonNo.reci)
-          {return (timetable.ClassNo == 
-                      lessonNo.reci[x])?true:false;}
-
-      default: 
-        console.log("Non-defined lesson-type")
-        return false;
-        //For error checking
-  }
+//Input:  timetable from nusmods
+//        lesson class from nusmods url
+function checkLessonTaken(timetable, lessons) {
+  return (lessons.indexOf({ClassNo:timetable.ClassNo,
+            LessonType:timetable.LessonType})>-1);
 }
-
 
 //Build an event class for NUS module
 //Output: An ics event class of NUS module lesson
