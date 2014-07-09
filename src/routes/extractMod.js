@@ -32,7 +32,6 @@ function extract(addr, userId, callback) {
       sem = "1",
       modInfo = eval(decodeURIComponent(addr.trim().replace("http://","").
                 replace("nusmods.com/timetable/","")));
-
   var semStart = moment(semesterStart(year,sem));
   //Manual key calendar and Monday as start day
   var tempURL = "http://api.nusmods.com/"+year+"/"
@@ -58,20 +57,18 @@ function extract(addr, userId, callback) {
           request({ url: tempURL, json: true}, 
             function (error, res, body) {
               if(err) { console.log(err); res.send(null); }
+
               var modJSON = res.body,
                   exam = false;
               for(var y in modJSON.Timetable) {
                 semStart = moment(tempSem);
                 //Go through and copy each element.
                 //First, handle normal lesson timetable.
-                var lessonType = checkLessonTaken(modJSON.Timetable[y],
-                              modInfo[x].selectedLessons);
+                var lessonType = checkLessonTaken(modJSON.Timetable[y], modInfo, modJSON.ModuleCode);
                 if(lessonType == false)
                   continue;
                 else{
-                  //console.log(buildNUSEvent(modJSON,semStart,y))
                   calendar.events.push(buildNUSEvent(modJSON,semStart,y));
-                
                 }
                 //Next, exam info
                 if(modJSON.ExamDate !== undefined && exam == false) {
@@ -87,7 +84,7 @@ function extract(addr, userId, callback) {
                 }
               }
               if(allDone) {
-                calendar.save(function (err,calendarss) {
+                calendar.save(function (err,calendar) {
                   if(err) { console.log(err); res.send(null); }
                   var oldExist = false;
                   if(oldCalendar !== null) {
@@ -113,13 +110,20 @@ function extract(addr, userId, callback) {
 //Return boolean whether lesson is in user timetable
 //Input:  timetable from nusmods
 //        lesson class from nusmods url
-function checkLessonTaken(timetable, lessons) {
-  for(var x in lessons) {
-    if(lessons[x].ClassNo == timetable.ClassNo && 
-        lessons[x].LessonType == timetable.LessonType)
-      return true;
-  }
-  return false;
+function checkLessonTaken(timetable, lessons, code) {
+  //console.log(code);
+  for(var w in lessons)
+    if(lessons[w].ModuleCode !== code)
+      continue;
+    else {
+      for(var x in lessons[w].selectedLessons) {
+        if(lessons[w].selectedLessons[x].ClassNo == timetable.ClassNo && 
+            lessons[w].selectedLessons[x].LessonType == timetable.LessonType)
+          return true;
+      }
+      return false;
+    }
+    return false;
 }
 
 //Build an event class for NUS module
