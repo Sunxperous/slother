@@ -70,11 +70,17 @@ router.post('/createCalendar', loggedIn, function (req, res) {
       });
   });
 });
+
+router.post('/modifyEvent', function (req, res) {
+  console.log(req.body);
+  res.send("In modify event");
+})
 /*
 //Input type: 1 - create event
 //            2 - modify event
 //            3 - remove all repeated event
 //            4 - exclude certain day of events
+//            5 - end early
 router.post('/event', loggedIn, function (req, res) {
   switch(req.type) {
     case 1: {
@@ -137,6 +143,13 @@ router.post('/event', loggedIn, function (req, res) {
               res.send({success:"Event removed."});
             }
       });
+    } break;
+    case 5: {
+      Calendar.findOne({name:req.body.calendar})
+      .exec(function (err, calendar) {
+        calendar.update({ calendar.events._id: req.body._id},
+        {$set:{.$}})
+      })
     } break;
   }
 });
