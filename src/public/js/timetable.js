@@ -5,6 +5,8 @@
   var CELL_WIDTH      = 76; // Cell width.
   var CELL_HEIGHT     = 14; // Cell height.
   var RIGHT_DIV_TRIM  = 2;  // Pixels to trim at the right of each item div.
+  var DATEPICKER_DATE_FORMAT = "d/m/Y"; 
+  var MOMENT_DATE_FORMAT = "DD/MM/YYYY";
 
   var mock = JSON.parse('[{"summary":"CS2100 (LAB)","description":"Computer Organisation - ClassNo: 14","location":"COM1-0114","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T08:00:00.000Z","2014-01-16T08:00:00.000Z","2014-01-23T08:00:00.000Z"],"dateStart":"2014-01-16T08:00:00.000Z","dateEnd":"2014-01-16T09:00:00.000Z"},{"summary":"CS2100 (LECT)","description":"Computer Organisation - ClassNo: 1","location":"i3-Aud","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-26T04:00:00.000Z"],"dateStart":"2014-01-15T04:00:00.000Z","dateEnd":"2014-01-15T06:00:00.000Z"},{"summary":"CS2100 (LECT)","description":"Computer Organisation - ClassNo: 1","location":"i3-Aud","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T06:00:00.000Z"],"dateStart":"2014-01-16T06:00:00.000Z","dateEnd":"2014-01-16T07:00:00.000Z"},{"summary":"CS2100 (TUT)","description":"Computer Organisation - ClassNo: 13","location":"COM1-0208","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-25T05:00:00.000Z","2014-01-14T05:00:00.000Z","2014-01-21T05:00:00.000Z"],"dateStart":"2014-01-14T05:00:00.000Z","dateEnd":"2014-01-14T06:00:00.000Z"},{"summary":"CS2100 (EXAM)","description":"Computer Organisation","rrule":{"freq":"ONCE"},"dateStart":"2014-04-29T01:00:00.000Z","dateEnd":"2014-04-29T04:00:00.000Z"},{"summary":"HY2242 (LECT)","description":"Singapore\'s Military History - ClassNo: 1","location":"AS4-0206","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T02:00:00.000Z"],"dateStart":"2014-01-13T02:00:00.000Z","dateEnd":"2014-01-13T04:00:00.000Z"},{"summary":"HY2242 (LECT)","description":"Singapore\'s Military History - ClassNo: 1","location":"AS4-0206","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T04:00:00.000Z"],"dateStart":"2014-01-16T04:00:00.000Z","dateEnd":"2014-01-16T06:00:00.000Z"},{"summary":"HY2242 (TUT)","description":"Singapore\'s Military History - ClassNo: W1","location":"AS1-0204","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T02:00:00.000Z","2014-01-13T02:00:00.000Z","2014-01-20T02:00:00.000Z"],"dateStart":"2014-01-13T02:00:00.000Z","dateEnd":"2014-01-13T04:00:00.000Z"},{"summary":"HY2242 (EXAM)","description":"Singapore\'s Military History","rrule":{"freq":"ONCE"},"dateStart":"2014-05-07T01:00:00.000Z","dateEnd":"2014-05-07T04:00:00.000Z"},{"summary":"GEK1008 (LECT)","description":"Southeast Asia: A Changing Region - ClassNo: 1","location":"UT-AUD1","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-28T06:00:00.000Z"],"dateStart":"2014-01-17T06:00:00.000Z","dateEnd":"2014-01-17T08:00:00.000Z"},{"summary":"GEK1008 (TUT)","description":"Southeast Asia: A Changing Region - ClassNo: D18","location":"ERC-SR11","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-04-11T08:00:00.000Z","2014-02-07T08:00:00.000Z","2014-02-21T08:00:00.000Z","2014-02-28T08:00:00.000Z","2014-01-17T08:00:00.000Z","2014-01-24T08:00:00.000Z","2014-03-14T08:00:00.000Z","2014-03-28T08:00:00.000Z"],"dateStart":"2014-01-17T08:00:00.000Z","dateEnd":"2014-01-17T10:00:00.000Z"},{"summary":"GEK1008 (EXAM)","description":"Southeast Asia: A Changing Region","rrule":{"freq":"ONCE"},"dateStart":"2014-04-28T05:00:00.000Z","dateEnd":"2014-04-28T08:00:00.000Z"},{"summary":"SSA1201 (LECT)","description":"Singapore Society - ClassNo: 1","location":"LT11","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T08:00:00.000Z"],"dateStart":"2014-01-13T08:00:00.000Z","dateEnd":"2014-01-13T10:00:00.000Z"},{"summary":"SSA1201 (TUT)","description":"Singapore Society - ClassNo: E1","location":"AS1-0204","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-04-02T08:00:00.000Z","2014-04-16T08:00:00.000Z","2014-02-12T08:00:00.000Z","2014-02-26T08:00:00.000Z","2014-01-15T08:00:00.000Z","2014-01-22T08:00:00.000Z","2014-01-29T08:00:00.000Z","2014-03-05T08:00:00.000Z","2014-03-19T08:00:00.000Z"],"dateStart":"2014-01-15T08:00:00.000Z","dateEnd":"2014-01-15T10:00:00.000Z"},{"summary":"SSA1201 (EXAM)","description":"Singapore Society","rrule":{"freq":"ONCE"},"dateStart":"2014-04-30T01:00:00.000Z","dateEnd":"2014-04-30T04:00:00.000Z"},{"summary":"CS1010 (SEC)","description":"Programming Methodology - ClassNo: 1","location":"i3-0345","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-25T02:00:00.000Z"],"dateStart":"2014-01-14T02:00:00.000Z","dateEnd":"2014-01-14T05:00:00.000Z"},{"summary":"CS1010 (TUT)","description":"Programming Methodology - ClassNo: 2","location":"COM1-B108","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-28T04:00:00.000Z","2014-01-17T04:00:00.000Z","2014-01-24T04:00:00.000Z"],"dateStart":"2014-01-17T04:00:00.000Z","dateEnd":"2014-01-17T06:00:00.000Z"},{"summary":"CS1010 (EXAM)","description":"Programming Methodology","rrule":{"freq":"ONCE"},"dateStart":"2014-04-30T09:00:00.000Z","dateEnd":"2014-04-30T12:00:00.000Z"}]');
   var mock2 = JSON.parse('[{"summary":"MA1101R (LECT)","description":"Linear Algebra I - ClassNo: SL1","location":"LT25","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T08:00:00.000Z"],"dateStart":"2014-01-13T08:00:00.000Z","dateEnd":"2014-01-13T10:00:00.000Z"},{"summary":"MA1101R (LECT)","description":"Linear Algebra I - ClassNo: SL1","location":"LT25","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T08:00:00.000Z"],"dateStart":"2014-01-16T08:00:00.000Z","dateEnd":"2014-01-16T10:00:00.000Z"},{"summary":"MA1101R (TUT)","description":"Linear Algebra I - ClassNo: T03","location":"S16-0433","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-26T01:00:00.000Z","2014-01-15T01:00:00.000Z","2014-01-22T01:00:00.000Z"],"dateStart":"2014-01-15T01:00:00.000Z","dateEnd":"2014-01-15T02:00:00.000Z"},{"summary":"MA1101R (EXAM)","description":"Linear Algebra I","rrule":{"freq":"ONCE"},"dateStart":"2014-05-05T05:00:00.000Z","dateEnd":"2014-05-05T08:00:00.000Z"},{"summary":"IS1103 (SEC)","description":"Computing and Society - ClassNo: 3","location":"COM1-B103","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T01:00:00.000Z"],"dateStart":"2014-01-13T01:00:00.000Z","dateEnd":"2014-01-13T04:00:00.000Z"},{"summary":"IS1103 (EXAM)","description":"Computing and Society","rrule":{"freq":"ONCE"},"dateStart":"2014-05-02T06:00:00.000Z","dateEnd":"2014-05-02T09:00:00.000Z"},{"summary":"CS2105 (LECT)","description":"Introduction to Computer Networks - ClassNo: 1","location":"LT15","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-24T06:00:00.000Z"],"dateStart":"2014-01-13T06:00:00.000Z","dateEnd":"2014-01-13T08:00:00.000Z"},{"summary":"CS2105 (TUT)","description":"Introduction to Computer Networks - ClassNo: 4","location":"COM1-0207","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-25T05:00:00.000Z","2014-01-14T05:00:00.000Z","2014-01-21T05:00:00.000Z"],"dateStart":"2014-01-14T05:00:00.000Z","dateEnd":"2014-01-14T06:00:00.000Z"},{"summary":"CS2105 (EXAM)","description":"Introduction to Computer Networks","rrule":{"freq":"ONCE"},"dateStart":"2014-04-30T01:00:00.000Z","dateEnd":"2014-04-30T04:00:00.000Z"},{"summary":"CS2100 (LAB)","description":"Computer Organisation - ClassNo: 13","location":"COM1-0114","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T04:00:00.000Z","2014-01-16T04:00:00.000Z","2014-01-23T04:00:00.000Z"],"dateStart":"2014-01-16T04:00:00.000Z","dateEnd":"2014-01-16T05:00:00.000Z"},{"summary":"CS2100 (LECT)","description":"Computer Organisation - ClassNo: 1","location":"i3-Aud","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-26T04:00:00.000Z"],"dateStart":"2014-01-15T04:00:00.000Z","dateEnd":"2014-01-15T06:00:00.000Z"},{"summary":"CS2100 (LECT)","description":"Computer Organisation - ClassNo: 1","location":"i3-Aud","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T06:00:00.000Z"],"dateStart":"2014-01-16T06:00:00.000Z","dateEnd":"2014-01-16T07:00:00.000Z"},{"summary":"CS2100 (TUT)","description":"Computer Organisation - ClassNo: 14","location":"COM1-0203","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-25T04:00:00.000Z","2014-01-14T04:00:00.000Z","2014-01-21T04:00:00.000Z"],"dateStart":"2014-01-14T04:00:00.000Z","dateEnd":"2014-01-14T05:00:00.000Z"},{"summary":"CS2100 (EXAM)","description":"Computer Organisation","rrule":{"freq":"ONCE"},"dateStart":"2014-04-29T01:00:00.000Z","dateEnd":"2014-04-29T04:00:00.000Z"},{"summary":"CS2010 (LAB)","description":"Data Structures and Algorithms II - ClassNo: 2","location":"COM1-B109","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-25T07:00:00.000Z","2014-01-14T07:00:00.000Z","2014-01-21T07:00:00.000Z"],"dateStart":"2014-01-14T07:00:00.000Z","dateEnd":"2014-01-14T08:00:00.000Z"},{"summary":"CS2010 (LECT)","description":"Data Structures and Algorithms II - ClassNo: 1","location":"LT19","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-27T02:00:00.000Z"],"dateStart":"2014-01-16T02:00:00.000Z","dateEnd":"2014-01-16T04:00:00.000Z"},{"summary":"CS2010 (TUT)","description":"Data Structures and Algorithms II - ClassNo: 3","location":"COM1-0208","rrule":{"freq":"WEEKLY","count":14},"exclude":["2014-02-26T03:00:00.000Z","2014-01-15T03:00:00.000Z","2014-01-22T03:00:00.000Z"],"dateStart":"2014-01-15T03:00:00.000Z","dateEnd":"2014-01-15T04:00:00.000Z"},{"summary":"CS2010 (EXAM)","description":"Data Structures and Algorithms II","rrule":{"freq":"ONCE"},"dateStart":"2014-04-28T09:00:00.000Z","dateEnd":"2014-04-28T12:00:00.000Z"}]');
@@ -96,6 +98,7 @@
     popupStatus = popupStatuses.READ_ONLY;
 
     var item = $(event.target).data('item');
+    var calendar_id = $(event.target).data('calendar_id');
     var exactDateStart = $(event.target).data('exactDate');
     var duration = $(event.target).data('duration');
 
@@ -140,11 +143,13 @@
     $('#edit_event').click(function editEvent(event) {
       displayEditablePopup({
         popup_title: 'Edit event',
+        event_id: item._id,
+        calendar_id: calendar_id,
         summary: item.summary,
         description: item.description,
         location: item.location,
-        date_start: exactDateStart.format("YYYY-MM-DD"),
-        date_end: exactDateEnd.format("YYYY-MM-DD"),
+        date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
+        date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
         time_start: exactDateStart.format("HH:mm"),
         time_end: exactDateEnd.add(1, 'hour').format("HH:mm"),
         rrule_freq: item.rrule.freq.toLowerCase(),
@@ -209,11 +214,12 @@
 
     displayEditablePopup({
       popup_title: 'Add event',
+      event_id: '',
       summary: '',
       description: '',
       location: '',
-      date_start: date.format("YYYY-MM-DD"),
-      date_end: date.format("YYYY-MM-DD"),
+      date_start: date.format(MOMENT_DATE_FORMAT),
+      date_end: date.format(MOMENT_DATE_FORMAT),
       time_start: date.format("HH:mm"),
       time_end: date.add(1, 'hour').format("HH:mm"),
       rrule_freq: 'once',
@@ -221,14 +227,51 @@
     })
   });
 
+  // Sending event to server.
+  $('#event_details').submit(function(event) {
+    event.preventDefault();
+    var dateStart = moment(
+      $('#date_start').val() + $('#time_start').val(),
+      MOMENT_DATE_FORMAT + "HH:mm");
+    var dateEnd = moment(
+      $('#date_end').val() + $('#time_end').val(),
+      MOMENT_DATE_FORMAT + "HH:mm");
+    var sending = {};
+    var directCopies = ['event_id', 'calendar_id', 'summary', 'description', 'location', 'rrule_freq', 'rrule_count'];
+    directCopies.forEach(function(field) {
+      var element = $('#' + field);
+      if (element[0].tagName !== 'TEXTAREA' && element.val()) {
+        sending[field] = element.val();
+      }
+      else { // TEXTAREA: just send description even if empty.
+        sending[field] = element.text();
+      }
+    });
+    sending['date_start'] = dateStart.format();
+    sending['date_end'] = dateEnd.format();
+
+    // Validate here.
+    
+    $.post('/calendar/event', sending, function(response) {
+      console.log(repsonse);
+    });
+  });
+
 
   var Calendar = (function() {
 
-    function Calendar(owner, items) {
-      this.items = items;
+    function Calendar(owner, calendar) {
+      this._id = calendar._id;
+      this.name = calendar.name || "NUSMods";
+      this.items = calendar.events;
       this.owner = owner;
       this.onDisplay = [];
       this.display();
+
+      // Append to popup select#calendar.
+      var option = $('<option>');
+      option.val(this._id).html(this.name);
+      $('#calendar_id').append(option);
     }
 
     Calendar.prototype.replaceItems = function(items) {
@@ -241,7 +284,7 @@
         this.items.forEach(function(item, index) {
           var date = duringDisplayedWeek(item);
           if (date) {
-            _this.onDisplay.push(insertEvent(item, _this.owner, date));
+            _this.onDisplay.push(insertEvent(item, _this.owner, _this._id, date));
           }
         });
       }
@@ -296,7 +339,7 @@
     };
 
     // Adds an item to be shown on the timetable.
-    var insertEvent = function(item, owner, exactDate) {
+    var insertEvent = function(item, owner, calendar_id, exactDate) {
       var dateStart = moment(item.dateStart);
       var day = dateStart.day();
       var durationInMilli = moment(item.dateEnd).diff(dateStart);
@@ -310,9 +353,10 @@
         .addClass('item')
         .text(item.summary)
         .data({
-          'item': item,
-          'duration': durationInMilli,
-          'exactDate': exactDate
+          calendar_id: calendar_id,
+          item: item,
+          duration: durationInMilli,
+          exactDate: exactDate
         });
 
       var dayTr = $('tr.' + days[day]);
@@ -365,10 +409,11 @@
   })();
 
   var User = (function() {
-    function User(name, nusmods, color, control) {
+    // Currently only 1 calendar.
+    function User(name, calendar, color, control) {
       this.name = name;
       this.color = color;
-      this.nusmods = new Calendar(this, nusmods);
+      this.calendars = [new Calendar(this, calendar)];
 
       if (control) {
         this.applyFormTriggers();
@@ -379,25 +424,25 @@
     User.prototype.getColor = function() { return this.color; };
 
     User.prototype.clear = function() {
-      this.nusmods.clear();
+      this.calendars[0].clear();
     };
     User.prototype.refresh = function() {
-      this.nusmods.display();
+      this.calendars[0].display();
     };
 
-    //User.prototype.applyFormTriggers = function() {
+    User.prototype.applyFormTriggers = function() {
       var _this = this;
       // Add NUSMods address.
       $('#add_nusmods').click(function(event) {
         $.getJSON('/extract',
           { addr: encodeURIComponent($('#nusmods_addr').val()) },
           function(res) {
-            _this.nusmods.replaceItems(res);
+            _this.calendars[0].replaceItems(res);
             update();
           }
         );
       });
-    //}
+    }
 
     return User;
   })();

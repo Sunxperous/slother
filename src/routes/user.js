@@ -29,8 +29,8 @@ router.get('/calendar', function(req, res) {
         console.log(err);
       }
       if (user) {
-        if (user.calendars.length > 0 && user.calendars[0].events) {
-          res.send(user.calendars[0].events);
+        if (user.calendars.length > 0) {
+          res.send(user.calendars[0]);
         }
         else { res.send(null); }
       }

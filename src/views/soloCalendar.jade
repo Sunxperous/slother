@@ -1,0 +1,22 @@
+extends layout
+
+block headScript
+
+block content
+  include calendar
+
+  #info_controls
+    .info-block
+      ul#calendars
+        | abc
+    .info-block
+      form#add_calendar
+        h3.info-block-title Add a calendar
+        label(for='type') Type
+        select#type(name='type')
+          option(value='NUSMods') NUSMods.com
+        label(for='url') URL
+        input#url(name='url')
+        input#submit(type='submit' value='Add calendar')
+
+block footScripts
