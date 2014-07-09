@@ -5,7 +5,6 @@ var eventSchema = require('./eventSchema');
 
 var calendarSchema = Schema({
   name: String,
-  //semester: String, //Only for NUS Event 
   events:[eventSchema],
   user:{ type: Schema.Types.ObjectId, ref: 'User' }
 });

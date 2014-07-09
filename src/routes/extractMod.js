@@ -45,7 +45,6 @@ function extract(addr, userId, callback) {
     function (err,oldCalendar) {
     if(err) { console.log(err); res.send(null); }
     else {
-      console.log("Check 2");
       Calendar.create({
         name: "NUS "+year+"/"+sem,
         user: userId,
@@ -88,7 +87,6 @@ function extract(addr, userId, callback) {
                 }
               }
               if(allDone) {
-                console.log("AllDone");
                 calendar.save(function (err,calendarss) {
                   if(err) { console.log(err); res.send(null); }
                   var oldExist = false;
