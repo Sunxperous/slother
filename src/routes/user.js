@@ -2,8 +2,23 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('../schema/userSchema');
-
+var Calendar = require('../schema/calendarSchema');
 // /user/calendar
+
+function loggedIn(req, res, next) {
+  if (req.user) { 
+    req.attach.myself = req.user;
+    next();  
+  }
+  else { 
+    res.redirect('/login'); 
+    res.send({error: "Please log in"});
+  }
+}
+
+
+
+
 router.get('/calendar', function(req, res) {
   if (req.user) {
     User
@@ -29,99 +44,101 @@ router.get('/calendar', function(req, res) {
   }
 });
 
-router.get('/request', function (req, res) {
-  if(req.user) {
-    User.findOne({username:req.user.username}, function (err, user) {
+router.get('/request', loggedIn, function (req, res) {
+  User.findOne({username:req.user.username}, 
+    function (err, user) {
       if(err) 
         res.send("err '"+err+"'.");
       else 
         res.send(user.requests);
-    })
-  }
+  });
 });
 
-// //Compulsory info: name,freq,dateStart,dateEnd
-// //Optional info: description,repeat,location,exclude array
-// router.post('/addEvent', function (req, res) {
-//   if(req.user) {
-//     var tempEvent = {
-//       summary: req.body.name,
-//       rrule: {
-//           freq: req.body.freq,
-//         },
-//       dateStart: req.body.dateStart,
-//       dateEnd: req.body.dateEnd
-//     };
-//     if(req.body.exclude) tempEvent.exclude = req.body.exclude;
-//     if(req.body.repeat) tempEvent.rrule.count = req.body.repeat;
-//     if(req.body.location) tempEvent.location = req.body.location;
-//     if(req.body.description) tempEvent.rrule.description = req.body.description;
-//     User.findOneAndUpdate({username: req.user.username},
-//       {$push:{events:tempEvent}}, function (err, user) {
-//         res.send("Event added.");
-//       })
-//   }
-// });
+router.post('/createCalendar', loggedIn, function (req, res) {
+  Calendar.create({
+    name: req.body.name,
+    events:[]
+  }, function (err, calendar) {
+    User.findOneAndUpdate({username:req.user.username},
+      {$push:{calendar:calendar._id}}, function (err, user) {
+        if(err) { console.log(err); res.send(null); }
+        calendar.user = user._id;
+        calendar.save( function (err, calendar) {
+          if(err) { console.log(err); res.send(null); }
+          else res.send({success:"New calendar is created."});
+        });
+      });
+  });
+});
+/*
+//Input type: 1 - create event
+//            2 - modify event
+//            3 - remove all repeated event
+//            4 - exclude certain day of events
+router.post('/event', loggedIn, function (req, res) {
+  switch(req.type) {
+    case 1: {
+      Calendar.findOneAndUpdate({name:req.body.calendar},
+        {$push:{ events:{
+            summary: req.body.summary,
+            dateStart: req.body.date_start,
+            date_end: req.body.date_end,
+            rrule:{
+              freq: req.body.rrule_freq,
+              count: req.body.rrule_count
+            }
+          }}}, function (err, calendar) {
+            if(err) { console.log(err); res.send(null); }
+            else res.send({success:"Event added."});
+      });
+    } break;
+    case 2: {
 
-// //Compulsory info: name,freq,dateStart,dateEnd
-// //Optional info: description,repeat,location,exclude[]
-// // If is partial remove, info: excludeDate
-// //                       boolean check: partial
-// // If is edit          , boolean check: edit
-// // As accurate as possible to prevent similar event from being remoed
-// router.post('/removeEvent', function (req, res) {
-//   if(req.user) {
-//     var originalEvent = {
-//       summary: req.body.name,
-//       rrule: {
-//           freq: req.body.freq,
-//         },
-//       dateStart: req.body.dateStart,
-//       dateEnd: req.body.dateEnd
-//     };
-//     if(req.body.exclude) originalEvent.exclude = req.body.exclude;
-//     if(req.body.repeat) originalEvent.rrule.count = req.body.repeat;
-//     if(req.body.location) originalEvent.location = req.body.location;
-//     if(req.body.description) originalEvent.rrule.description = req.body.description;
-    
-//     if(!req.body.partial) {
-//       User.findOneAndUpdate({username: req.user.username, events:{$in:[tempEvent]}},
-//         {$pull:{events:{$in:[tempEvent]}}}, function (err,user) {
-//           if(err) 
-//             res.send("err '"+err+"'.");
-//           else if(user == null)
-//             res.send("Event not found.");
-//           else if(req.body.partial) {
-//             originalEvent.exclude.push(excludeDate);
-//             User.findOneAndUpdate({username: req.user.username, events:{$in:[tempEvent]}},
-//               {$pull:{events:{$in:[tempEvent]}}}, function (err, user) {
-//                 if(err)
-//                   res.send("err '"+err+"'.");
-//                 else if(user !== null) 
-//                   res.send("Event removed");
-//                 else
-//                   res.send("Event not found.");
-//             });
-//           }
-//           else  
-//             res.send("Event removed");
-
-//       });
-//     }
-//     else {
-//       User.findOneAndUpdate({username: req.user.username, events:{$in:[tempEvent]}},
-//         {$push:{events:{$in:[]}}}, function (err,user) {
-//           if(err) 
-//             res.send("err '"+err+"'.");
-//           else if(user !== null) 
-//             res.send("Event removed");
-//           else
-//             res.send("Event not found.");
-//         });
-//     }
-//   }
-//   else
-//     res.send(null);
-// });
-
+    } break;
+    case 3: {
+      Calendar.findOneAndUpdate({name:req.body.calendar},
+        {$pull:{ events: {
+            summary: req.body.summary,
+            dateStart: req.body.date_start,
+            date_end: req.body.date_end,
+            rrule:{
+              freq: req.body.rrule_freq,
+              count: req.body.rrule_count
+            }
+          }}}, function (err, calendar) {
+            if(err) { console.log(err); res.send(null); }
+            else res.send({success:"Event removed."});
+      });
+    } break;
+    case 4: {
+      Calendar.findOneAndUpdate({name:req.body.calendar},
+        {$pull:{ events: {
+            summary: req.body.summary,
+            dateStart: req.body.date_start,
+            date_end: req.body.date_end,
+            rrule:{
+              freq: req.body.rrule_freq,
+              count: req.body.rrule_count
+            }
+          }
+        }, $push:{ events: {
+            summary: req.body.summary,
+            dateStart: req.body.date_start,
+            date_end: req.body.date_end,
+            rrule:{
+              freq: req.body.rrule_freq,
+              count: req.body.rrule_count
+            }
+            exclude:[req.body.exlclude]
+        }}}, function (err, calendar) {
+            if(err) { console.log(err); res.send(null); }
+            else {
+              
+              res.send({success:"Event removed."});
+            }
+      });
+    } break;
+  }
+});
+*/
 module.exports = router;

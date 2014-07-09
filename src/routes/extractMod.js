@@ -41,14 +41,13 @@ function extract(addr, userId, callback) {
       eventInfo = [],
       isDone = {};
       tempSem = semStart.toDate();
-  Calendar.findOneAndRemove({semester:year+"/"+sem,user:userId},
+  Calendar.findOneAndRemove({name:"NUS "+year+"/"+sem,user:userId},
     function (err,oldCalendar) {
     if(err) { console.log(err); res.send(null); }
     else {
       console.log("Check 2");
       Calendar.create({
-        type: "NUS",
-        semester: year+"/"+sem,
+        name: "NUS "+year+"/"+sem,
         user: userId,
         events: []
       }, function (err,calendar) {
@@ -59,6 +58,7 @@ function extract(addr, userId, callback) {
           tempModCode = modInfo[x].ModuleCode;
           request({ url: tempURL, json: true}, 
             function (error, res, body) {
+              if(err) { console.log(err); res.send(null); }
               var modJSON = res.body,
                   exam = false;
               for(var y in modJSON.Timetable) {
@@ -90,6 +90,7 @@ function extract(addr, userId, callback) {
               if(allDone) {
                 console.log("AllDone");
                 calendar.save(function (err,calendarss) {
+                  if(err) { console.log(err); res.send(null); }
                   var oldExist = false;
                   if(oldCalendar !== null) {
                     oldExist = true;
