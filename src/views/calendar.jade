@@ -1,156 +1,110 @@
-extends layout
-
-block headScript
-
-block content
-  - var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
-  .tableWrapper
-    table#calendar
-      thead
-        tr
-          th.time
+- var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+.tableWrapper
+  table#calendar
+    thead
+      tr
+        th.time
+        - for (var i = 0; i < 24; i++)
+          th
+            div= i + ':00'
+            
+    tbody
+      div
+      - for (var daysI = 0; daysI < 7; daysI++)
+        tr(class= days[daysI])
+          td.day
+            .dateDisplay
+              span.dayDay= days[daysI] + ', '
+              span.dayDate
           - for (var i = 0; i < 24; i++)
-            th
-              div= i + ':00'
-              
-      tbody
-        div
-        - for (var daysI = 0; daysI < 7; daysI++)
-          tr(class= days[daysI])
-            td.day
-              .dateDisplay
-                span.dayDay= days[daysI] + ', '
-                span.dayDate
-            - for (var i = 0; i < 24; i++)
-              td.slot(class= i)
-      tfoot
-        tr
-          th.time
-          - for (var i = 0; i < 24; i++)
-            th
-              div= i + ':00'
+            td.slot(class= i)
+    tfoot
+      tr
+        th.time
+        - for (var i = 0; i < 24; i++)
+          th
+            div= i + ':00'
 
-  #popup_wrapper.hidden
-    #popup
-      #popup_header
-        #popup_title
-        #popup_close &#215;
-      #existing.hidden
+#popup_wrapper.hidden
+  #popup
+    #popup_header
+      #popup_title
+      #popup_close &#215;
+    #existing.hidden
+      div
+        span.label Summary
+        span.summary
+      div
+        span.label Description
+        span.description
+      div
+        span.label Location
+        span.location
+      div
+        span.label From
+        span.exactDateStart
+        span.label to
+        span.exactDateEnd
+      div
+        span.label Repeat
+        span.rruleFreq
+        span.rruleInfo
+          |  for 
+          span.rruleCount
+          |  times from 
+          span.dateStart
+      div
+        span.label Exclude
+        ul.exclude
+      div
+        button#edit_event Edit event
+    #new.hidden
+      form#event_details(method='post')
+        input#event_id(type='hidden' name='event_id')
         div
-          span.label Summary
-          span.summary
+          label(for='calendar_id') Calendar
+          select#calendar_id(name='calendar_id')
         div
-          span.label Description
-          span.description
+          label(for='summary') Summary
+          input#summary.fullLength(name='summary')
         div
-          span.label Location
-          span.location
+          label(for='description') Description
+          textarea#description(rows='2' name='description')
         div
-          span.label From
-          span.exactDateStart
-          span.label to
-          span.exactDateEnd
+          label(for='location') Location
+          input#location.fullLength(name='location')
         div
-          span.label Repeat
-          span.rruleFreq
+          label(for='date_start') From (DD/MM/YYYY HH:mm)
+          input#date_start.shortLength(type='text' name='dateStart')
+          input#time_start.shortLength(type='text' name='timeStart')
+          label(for='date_end') to (DD/MM/YYYY HH:mm)
+          input#date_end.shortLength(type='text' name='dateEnd')
+          input#time_end.shortLength(type='text' name='timeEnd')
+        div
+          label(for='rrule_freq') Repeat
+          select#rrule_freq(name='rrule_freq')
+            option(value='once' selected) No repeat
+            option(value='daily') Daily
+            option(value='weekly') Weekly
+            option(value='monthly') Monthly
+            option(value='yearly') Yearly
           span.rruleInfo
             |  for 
-            span.rruleCount
-            |  times from 
-            span.dateStart
+            input#rrule_count(type='number' value='1' min='1' max='1024' name='rrule_count')
+            |  times
         div
-          span.label Exclude
-          ul.exclude
-        div
-          button#edit_event Edit event
-      #new.hidden
-        form#event_details(method='post')
-          input#event_id(type='hidden' name='event_id')
-          div
-            label(for='summary') Summary
-            input#summary.fullLength(name='summary')
-          div
-            label(for='description') Description
-            textarea#description(rows='2' name='description')
-          div
-            label(for='location') Location
-            input#location.fullLength(name='location')
-          div
-            label(for='date_start') From
-            input#date_start.shortLength(type='date' name='dateStart')
-            input#time_start.shortLength(type='time' name='timeStart')
-            label(for='date_end') to
-            input#date_end.shortLength(type='date' name='dateEnd')
-            input#time_end.shortLength(type='time' name='timeEnd')
-          div
-            label(for='rrule_freq') Repeat
-            select#rrule_freq(name='rrule_freq')
-              option(value='once' selected) No repeat
-              option(value='daily') Daily
-              option(value='weekly') Weekly
-              option(value='monthly') Monthly
-              option(value='yearly') Yearly
-            span.rruleInfo
-              |  for 
-              input#rrule_count(type='number' value='1' min='1' max='1024' name='rrule_count')
-              |  times
-          div
-            input(type='submit')
+          input#submit_new(type='submit')
 
-
-  div#info_controls
-    | TEMPORARY
-    if (groups)
-      div.control-block
-        span Your groups:
-        ul#groups
-          - each group in groups
-            li
-              a(href='/calendar/group/' + group.groupName)= group.groupName
-
-    div.control-block
-      label(for='link') Add your NUSMods: 
-      input#nusmods_addr(type='text', placeholder='http://nusmods.com/2014-2015/sem1/v1/', name='link')
-      input#add_nusmods(type='submit' value='Add')
-
-    div.control-block
-      label(for='createG') Create new Group: 
-      input#groupName(type='text', placeholder='New Name', name='createG')
-      input#create_group(type='submit' value='Create')
-
-    div.control-block
-      label(for='addPerson') Add person: 
-      input#user(type='text', placeholder='Person Name', name='createG')
-      input#group(type='text', placeholder='Group Name', 
-      name='createG')
-      input#add_person(type='submit' value='Add Person')
-      input#remove_person(type='submit' value='Remove Person')
-
-    if (requests)
-      div.control-block
-        span Your Request:
-        ul#requests
-          - each request in requests
-            li
-              = request.groupName + " "
-              input#request_group(value=request.groupName type='hidden')
-              input#accept_request(type='submit' value='Join')
-              input#reject_request(type='submit' value='Reject')
-
-    div.control-block
-      span.message#response
-
-  div#calendar_controls_wrapper
-    div#calendar_controls
-      button#before &#9664;
-      div#date_info
-        p
-          span#sun_day
-          span  - 
-          span#sat_day
-        p#year_display
-      button#after &#9654;
-      
+div#calendar_controls_wrapper
+  div#calendar_controls
+    button#before &#9664;
+    div#date_info
+      p
+        span#sun_day
+        span  - 
+        span#sat_day
+      p#year_display
+    button#after &#9654;
+    
 block footScripts
   script(src='/js/timetable.js')
-  script(src='/js/group.js')
