@@ -3,7 +3,7 @@ html(lang='en')
   head
     - var title = title || "Slother"
     title= title
-    meta(name='viewport' content='width=device-width, initial-scale=0.8, maximum-scale=1.5')
+    meta(name='viewport' content='width=device-width, initial-scale=0.8, maximum-scale=0.8')
     script(src='/vendor/jquery-2.1.1.min.js')
     script(src='/vendor/moment.min.js')
 
@@ -13,17 +13,22 @@ html(lang='en')
   body
     header
       nav
-        #brand
-          a(href='/')
-            h1 Slother
+        a(href='/')
+          #brand
+            h1 - Slother -
         #links
           if (user)
             div
               a#groups(href='#') Groups
-            #user
+            span#user
+              //- a#username(href='#') MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
               a#username(href='#')= user.username
             #notification
               span#number 1
+          else
+            a(href='/login') Login
+            a(href='/register') Register
+
       if (messages)
         if (messages.requests.length > 0)
           #requests

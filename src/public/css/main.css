@@ -63,6 +63,7 @@ body {
 input, select, textarea {
   font-family: 'Telex', sans-serif;
   margin-left: 0;
+  color: #333;
 }
 h1 {
   font-size: 18px;
@@ -70,6 +71,11 @@ h1 {
   text-transform: uppercase;
   font-weight: 800;
   display: inline-block;
+}
+h2 {
+  font-size: 24px;
+  padding: 16px;
+  font-weight: 600;
 }
 header {
   margin: 4px auto;
@@ -86,6 +92,8 @@ nav {
 #brand { /* Hide text if screen is damn small. */
   display: inline-block;
   padding: 0 8px;
+  position: relative;
+  z-index: 20;
 }
 #links {
   display: inline-block;
@@ -94,6 +102,7 @@ nav {
   top: 4px;
   right: 4px;
   width: 100%;
+  z-index: 0;
 }
 #links > * {
   margin-left: 16px;
@@ -106,6 +115,8 @@ nav {
   color: #960;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
+  z-index: 0;
 }
 #number {
   font-size: 14px;
@@ -149,9 +160,55 @@ nav {
 .fade {
   opacity: 0.2;
 }
+.empty-space {
+  margin: 16px;
+}
+label, span.label {
+  display: block;
+  color: #999;
+  text-transform: uppercase;
+  font-size: 12px;  
+}
+input[type='submit'] {
+  padding: 4px 16px;
+  background-color: #e5fbbf;
+  border-left: 2px solid #ccc;
+  border-right: 2px solid #ccc;
+  border-bottom: 2px solid #ccc;
+  border-top: 2px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+input[type='submit']:active {
+  background-color: #e0f6ba;
+  border-left: 3px solid #c7c7c7;
+  border-right: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
+  border-top: 3px solid #c7c7c7;
+  border-radius: 4px;
+  outline: none;
+}
 /*^ layout.jade ^*/
 
-/*v timetable.jade v*/
+/*v login.jade v*/
+#login_forms {
+  margin: auto auto;
+}
+#login_forms label {
+  text-align: right;
+  margin-left: auto;
+  margin-right: auto;
+}
+#login_forms div {
+  margin-bottom: 8px;
+}
+#login_forms input, #login_forms label {
+  width: 90%;
+  max-width: 192px;
+}
+/*^ login.jade ^*/
+
+/*v calendar.jade v*/
 div.tableWrapper {
   margin: 0 12px;
   overflow-x: scroll;
@@ -226,7 +283,9 @@ div.tableWrapper {
   box-sizing: border-box;
   cursor: pointer;
 }
+/*^ calendar.jade ^*/
 
+/*v #popup v*/
 #popup_wrapper {
   z-index: 20;
   position: fixed;
@@ -283,12 +342,6 @@ p ol {
 span.rruleFreq {
   text-transform: capitalize;
 }
-#popup span.label, #popup label {
-  display: block;
-  color: #999;
-  text-transform: uppercase;
-  font-size: 11px;
-}
 #popup input.shortLength {
   width: 40%;
   margin-right: 8px;
@@ -302,24 +355,19 @@ span.rruleFreq {
   padding: 1px;
   font-family: 'Telex', sans-serif;
 }
+/*^ #popup ^*/
 
+/*v #info_controls v*/
 h3.info-block-title {
   font-size: 16px;
   font-weight: 600;
   margin: 4px 0;
 }
 #info_controls {
-  position: absolute;
   margin: auto auto;
   width: 95%;
   max-width: 480px;
   position: relative;
-}
-.info-block label {
-  display: block;
-  color: #999;
-  text-transform: uppercase;
-  font-size: 12px;  
 }
 #add_calendar > div {
   margin-bottom: 8px;
@@ -336,7 +384,7 @@ h3.info-block-title {
 .info-block {
   text-align: left;
   margin: 4px 0;
-  padding: 20px;
+  padding: 5%;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -347,12 +395,18 @@ h3.info-block-title {
   margin-left: 8px;
 }
 
+#calendars li {
+  margin-top: 5px;
+}
+/*^ #info_controls ^*/
+
+/*v #calendar_controls v*/
 #calendar_controls_wrapper {
   z-index: 25;
   width: 100%;
   display: block;
   height: 30px;
-  background-color: #ccb;
+  background-color: #ffefc0;
   position: fixed;
   bottom: 0;
   text-align: center;
@@ -370,8 +424,12 @@ h3.info-block-title {
   text-align: center;
   border-radius: 8px;
   border: 0;
-  top: -4px;
+  top: -2px;
   cursor: pointer;
+  background-color: #b86;
+  color: #eee;
+  outline: none;
+  z-index: 25;
 }
 #before {
   display: inline-block;
@@ -393,4 +451,4 @@ h3.info-block-title {
 #groups li {
   margin: 2px;
 }
-/*^ timetable.jade ^*/
+/*^ #calendar_controls ^*/
