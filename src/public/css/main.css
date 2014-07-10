@@ -58,6 +58,7 @@ body {
   overflow-x: hidden;
   font-size: 14px;
   margin-bottom: 60px;
+  color: #333;
 }
 h1 {
   font-size: 18px;
@@ -140,6 +141,9 @@ nav {
 }
 .hidden {
   display: none;
+}
+.fade {
+  opacity: 0.2;
 }
 /*^ layout.jade ^*/
 
@@ -285,6 +289,8 @@ input, select {
   margin-left: 0;
 }
 #popup input.shortLength {
+  width: 40%;
+  margin-right: 8px;
 }
 #popup input.fullLength {
   width: 100%;
@@ -302,15 +308,26 @@ h3.info-block-title {
   margin: 4px 0;
 }
 #info_controls {
+  position: absolute;
   margin: auto auto;
+  width: 100%;
   max-width: 540px;
   position: relative;
+}
+.info-block label {
+  display: block;
+  color: #999;
+  text-transform: uppercase;
+  font-size: 12px;  
+}
+#add_calendar > div {
+  margin-bottom: 8px;
 }
 .info-block input#nusmods_addr {
   width: 200px;
 }
 .info-block input[type='text'] {
-
+  width: 100%;
 }
 .info-block input[type='submit'] {
   display: block;
@@ -319,7 +336,14 @@ h3.info-block-title {
   text-align: left;
   margin: 4px 0;
   padding: 20px;
-  border: 1px solid #000;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.toggle-view {
+  font-size: 10px;
+  color: #666;
+  cursor: pointer;
+  margin-left: 8px;
 }
 
 #calendar_controls_wrapper {

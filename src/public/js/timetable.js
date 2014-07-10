@@ -262,21 +262,52 @@
 
     function Calendar(owner, calendar) {
       this._id = calendar._id;
-      this.name = calendar.name || "NUSMods";
+      this.name = calendar.name || "NUSMods"; // Temporary.
       this.items = calendar.events;
       this.owner = owner;
+      this.show = true;
+      this.color = Please.make_color({
+        golden: true,
+        saturation: .2,
+        value: 1
+      });
       this.onDisplay = [];
       this.display();
+      this.appendToLists(); // Append to popup select and calendars display.
+    }
 
+    Calendar.prototype.appendToLists = function() {
       // Append to popup select#calendar.
-      var option = $('<option>');
-      option.val(this._id).html(this.name);
-      $('#calendar_id').append(option);
+      this.option = $('<option>');
+      this.option.val(this._id).text(this.name);
+      $('#calendar_id').append(this.option);
+
+      this.li = $('#calendars .hidden').clone();
+      this.li.removeClass('hidden')
+        .children('.calendar-name')
+          .text(this.name)
+          .css('color', this.color);
+      this.li.children('.toggle-view').click(this, toggleView);
+      $('#calendars').append(this.li);
+    };
+
+    Calendar.prototype.toggleView = function() {
+      var _this = this;
+      this.onDisplay.forEach(function(item, index) {
+        item.toggleClass('fade', _this.show); // If currently showing, then fade.
+      });
+      _this.show = !_this.show;
+      return _this.show;
+    };
+
+    function toggleView(event) {
+      var status = event.data.toggleView();
+      $(this).text(status ? 'hide' : 'show');
     }
 
     Calendar.prototype.replaceItems = function(items) {
       this.items = items;
-    }
+    };
 
     Calendar.prototype.display = function() {
       var _this = this;
@@ -284,7 +315,7 @@
         this.items.forEach(function(item, index) {
           var date = duringDisplayedWeek(item);
           if (date) {
-            _this.onDisplay.push(insertEvent(item, _this.owner, _this._id, date));
+            _this.onDisplay.push(insertEvent(item, _this, date));
           }
         });
       }
@@ -296,6 +327,12 @@
         item.remove();
       });
       this.onDisplay = [];
+    };
+
+    Calendar.prototype.destroy = function() {
+      this.clear();
+      this.li.remove();
+      this.option.remove();
     };
 
     var duringDisplayedWeek = function(item) {
@@ -339,7 +376,7 @@
     };
 
     // Adds an item to be shown on the timetable.
-    var insertEvent = function(item, owner, calendar_id, exactDate) {
+    var insertEvent = function(item, calendar, exactDate) {
       var dateStart = moment(item.dateStart);
       var day = dateStart.day();
       var durationInMilli = moment(item.dateEnd).diff(dateStart);
@@ -349,11 +386,11 @@
       var div = $('<div>');
       var width = durationInHours * CELL_WIDTH;
       div.width(width - RIGHT_DIV_TRIM)
-        .css('background-color', owner.getColor())
+        .css('background-color', calendar.color)
         .addClass('item')
         .text(item.summary)
         .data({
-          calendar_id: calendar_id,
+          calendar_id: calendar._id,
           item: item,
           duration: durationInMilli,
           exactDate: exactDate
@@ -410,10 +447,14 @@
 
   var User = (function() {
     // Currently only 1 calendar.
-    function User(name, calendar, color, control) {
+    function User(name, calendars, control) {
+      var _this = this;
       this.name = name;
-      this.color = color;
-      this.calendars = [new Calendar(this, calendar)];
+      this.calendars = {};
+
+      calendars.forEach(function(calendar) {
+        _this.calendars[calendar._id] = new Calendar(this, calendar);
+      });
 
       if (control) {
         this.applyFormTriggers();
@@ -421,13 +462,16 @@
     }
 
     User.prototype.getName = function() { return this.name; };
-    User.prototype.getColor = function() { return this.color; };
 
     User.prototype.clear = function() {
-      this.calendars[0].clear();
+      Object.keys(this.calendars).foreach(function(calendar) {
+        calendar.clear();
+      });
     };
     User.prototype.refresh = function() {
-      this.calendars[0].display();
+      Object.keys(this.calendars).foreach(function(calendar) {
+        calendar.display();
+      });
     };
 
     User.prototype.applyFormTriggers = function() {
@@ -437,8 +481,11 @@
         event.preventDefault();
         $.getJSON('/extract',
           { addr: encodeURIComponent($('#url').val()) },
-          function(res) {
-            _this.calendars[0].replaceItems(res);
+          function(calendar) {
+            if (_this.calendars.hasOwnProperty(calendar._id)) {
+              _this.calendars[calendar._id].destroy();
+            }
+            _this.calendars[calendar._id] = new Calendar(this, calendar); // Check if calendar._id already exists.
             update();
           }
         );
@@ -471,8 +518,8 @@
   }
   else { // If not group timetable...
     // Adds logged in user (via greeting message).
-    $.getJSON('/user/calendar', function(res) {
-      users.push(new User($('#username').text(), res, '#ffcccc', true));
+    $.getJSON('/user/calendar', function(calendars) {
+      users.push(new User($('#username').text(), calendars, true));
     });
   }
 
