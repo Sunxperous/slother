@@ -28,8 +28,8 @@ var moment = require('moment');
 */
 function extract(addr, userId, callback) {
   
-  var addr = eval(decodeURIComponent(addr.trim().replace("http://","").
-                replace("nusmods.com/timetable/","")));
+  var addr = decodeURIComponent(addr.trim().replace("http://","").
+                replace("nusmods.com/timetable/",""));
   var year = addr.substring(0,9),
       sem = addr.substring(13,14);
       addr = addr.substring(15);
@@ -42,11 +42,12 @@ function extract(addr, userId, callback) {
       isDone = {};
       tempSem = semStart.toDate();
   var modInfo = convert(addr.split("&"));
-
+  console.log("here");
   Calendar.findOneAndRemove({name:"NUS "+year+"/"+sem,user:userId},
     function (err,oldCalendar) {
     if(err) { console.log(err); res.send(null); }
     else {
+      console.log("there");
       Calendar.create({
         name: "NUS "+year+"/"+sem,
         user: userId,
@@ -120,7 +121,7 @@ function convert(lesson) {
     var head = lesson[x].indexOf("[");
     var tail = lesson[x].indexOf("]");
     var code = lesson[x].substring(0,head);
-    var classNo = lesson[x].substring(tail+1);
+    var classNo = lesson[x].substring(tail+2);
     var type = lesson[x].substring(head+1,tail);
     switch(type) {
       case "SEC": type = "Sectional Teaching"; break;
@@ -296,6 +297,7 @@ function loggedIn(req, res, next) {
 
 router.get('/', loggedIn, function (req,res) {
   var addr = req.query.addr;
+  console.log("Start");
   extract(decodeURIComponent(addr),req.user._id, function (err, calendar) {
     if(err) {console.log("err :'"+err+"'.");}
     else {
