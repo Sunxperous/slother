@@ -434,6 +434,7 @@
       var _this = this;
       // Add NUSMods address.
       $('#add_calendar').submit(function(event) {
+        event.preventDefault();
         $.getJSON('/extract',
           { addr: encodeURIComponent($('#url').val()) },
           function(res) {
