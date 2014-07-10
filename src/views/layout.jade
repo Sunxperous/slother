@@ -3,13 +3,13 @@ html(lang='en')
   head
     - var title = title || "Slother"
     title= title
-    meta(name='viewport', content='width=device-width, initial-scale=0.8, maximum-scale=1.5')
+    meta(name='viewport' content='width=device-width, initial-scale=0.8, maximum-scale=1.5')
     script(src='/vendor/jquery-2.1.1.min.js')
     script(src='/vendor/moment.min.js')
 
     block headScripts
-    //-link(rel='stylesheet', href='/vendor/bootstrap.css')
-    link(rel='stylesheet', href='/css/main.css')
+    link(rel='stylesheet' href='/css/main.css')
+    link(href='http://fonts.googleapis.com/css?family=Telex' rel='stylesheet' type='text/css')
   body
     header
       nav

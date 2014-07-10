@@ -54,11 +54,15 @@ a:link, a:active, a:visited, a:hover {
 
 /*v layout.jade v*/
 body {
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'Telex', sans-serif;
   overflow-x: hidden;
   font-size: 14px;
   margin-bottom: 60px;
   color: #333;
+}
+input, select, textarea {
+  font-family: 'Telex', sans-serif;
+  margin-left: 0;
 }
 h1 {
   font-size: 18px;
@@ -285,9 +289,6 @@ span.rruleFreq {
   text-transform: uppercase;
   font-size: 11px;
 }
-input, select {
-  margin-left: 0;
-}
 #popup input.shortLength {
   width: 40%;
   margin-right: 8px;
@@ -299,7 +300,7 @@ input, select {
   width: 100%;
   resize: vertical;
   padding: 1px;
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'Telex', sans-serif;
 }
 
 h3.info-block-title {
@@ -310,8 +311,8 @@ h3.info-block-title {
 #info_controls {
   position: absolute;
   margin: auto auto;
-  width: 100%;
-  max-width: 540px;
+  width: 95%;
+  max-width: 480px;
   position: relative;
 }
 .info-block label {
