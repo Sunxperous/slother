@@ -433,9 +433,9 @@
     User.prototype.applyFormTriggers = function() {
       var _this = this;
       // Add NUSMods address.
-      $('#add_nusmods').click(function(event) {
+      $('#add_calendar').submit(function(event) {
         $.getJSON('/extract',
-          { addr: encodeURIComponent($('#nusmods_addr').val()) },
+          { addr: encodeURIComponent($('#url').val()) },
           function(res) {
             _this.calendars[0].replaceItems(res);
             update();
