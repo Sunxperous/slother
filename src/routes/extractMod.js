@@ -28,10 +28,11 @@ var moment = require('moment');
 */
 function extract(addr, userId, callback) {
   
-  var year = "2014-2015",
-      sem = "1",
-      modInfo = eval(decodeURIComponent(addr.trim().replace("http://","").
+  var addr = eval(decodeURIComponent(addr.trim().replace("http://","").
                 replace("nusmods.com/timetable/","")));
+  var year = addr.substring(0,9),
+      sem = addr.substring(13,14);
+      addr = addr.substring(15);
   var semStart = moment(semesterStart(year,sem));
   //Manual key calendar and Monday as start day
   var tempURL = "http://api.nusmods.com/"+year+"/"
@@ -40,6 +41,8 @@ function extract(addr, userId, callback) {
       eventInfo = [],
       isDone = {};
       tempSem = semStart.toDate();
+  var modInfo = convert(addr.split("&"));
+
   Calendar.findOneAndRemove({name:"NUS "+year+"/"+sem,user:userId},
     function (err,oldCalendar) {
     if(err) { console.log(err); res.send(null); }
@@ -106,6 +109,37 @@ function extract(addr, userId, callback) {
     }
   });
 }
+
+
+//Return class type string
+//Input: class no. from nusMods 
+//        eg. "8T04" of "MA2213=8T04"
+function convert(lesson) {
+  var temp = {};
+  for(var x in lesson) {
+    var head = lesson[x].indexOf("[");
+    var tail = lesson[x].indexOf("]");
+    var code = lesson[x].substring(0,head);
+    var classNo = lesson[x].substring(tail+1);
+    var type = lesson[x].substring(head+1,tail);
+    switch(type) {
+      case "SEC": type = "Sectional Teaching"; break;
+      case "LEC": type = "Lecture"; break;
+      case "TUT": type = "Tutorial"; break;
+      case "TUT2": type = "Tutorial Type 2"; break;
+      case "TUT3": type = "Tutorial Type 3"; break;
+      case "LAB": type = "Laboratory"; break;
+      case "DLEC": type = "Design Lecture"; break;
+      case "REC": type = "Recitation"; break;
+    }
+    if(temp[code] == null) 
+      temp[code]= [];
+    temp[code].push({ClassNo: classNo, LessonType: type})
+  }
+  console.log(temp);
+  return temp;
+}
+
 
 //Return boolean whether lesson is in user timetable
 //Input:  timetable from nusmods
