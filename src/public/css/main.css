@@ -74,7 +74,7 @@ h1 {
 }
 h2 {
   font-size: 24px;
-  padding: 16px;
+  padding: 16px 0;
   font-weight: 600;
 }
 header {
@@ -190,6 +190,9 @@ input.green {
 input.red {
   background-color: #fbcfc5;
 }
+form > div {
+  margin-bottom: 8px;
+}
 /*^ layout.jade ^*/
 
 /*v login.jade v*/
@@ -221,7 +224,7 @@ div.tableWrapper {
   text-align: left;
 }
 #calendar {
-  margin-bottom: 8px;
+  margin: 12px 0;
   border-collapse: collapse;
   border-spacing: 0;
   box-sizing: border-box;
@@ -336,12 +339,6 @@ div.tableWrapper {
   height: 24px;
   width: 24px;
 }
-#existing > div {
-  margin-bottom: 8px;
-}
-#event_details > div {
-  margin-bottom: 8px;
-}
 p ol {
   display: inline-block;
 }
@@ -364,6 +361,9 @@ span.rruleFreq {
 #popup input[type='submit'] {
   margin-right: 8px;
 }
+#existing > div {
+  margin-bottom: 8px;
+}
 /*^ #popup ^*/
 
 /*v #info_controls v*/
@@ -377,9 +377,6 @@ h3.info-block-title {
   width: 95%;
   max-width: 480px;
   position: relative;
-}
-#add_calendar > div {
-  margin-bottom: 8px;
 }
 .info-block input#nusmods_addr {
   width: 200px;

@@ -2,16 +2,16 @@
 
   'use strict';
 
-  var CELL_WIDTH      = 76; // Cell width.
-  var CELL_HEIGHT     = 14; // Cell height.
-  var RIGHT_DIV_TRIM  = 2;  // Pixels to trim at the right of each item div.
+  var CELL_WIDTH             = 76; // Cell width.
+  var CELL_HEIGHT            = 14; // Cell height.
+  var RIGHT_DIV_TRIM         = 2;  // Pixels to trim at the right of each item div.
   var DATEPICKER_DATE_FORMAT = "d/m/Y"; // Not in use at the moment.
-  var MOMENT_DATE_FORMAT = "DD/MM/YYYY"; // For input elements.
-  var MOMENT_TIME_FORMAT = "HH:mm"; // For input elements.
-  var START_VIEWING_AT = 7; // Scrolls to hour on page load.
+  var MOMENT_DATE_FORMAT     = "DD/MM/YYYY"; // For input elements.
+  var MOMENT_TIME_FORMAT     = "HH:mm"; // For input elements.
+  var START_VIEWING_AT       = 7; // Scrolls to hour on page load.
 
   var now = moment();
-  now = moment("2014-08-11").add(15, 'weeks'); // For testing purpose, set to 3rd week.
+  now = moment("2014-08-11").add(2, 'weeks'); // For testing purpose, set to 3rd week.
 
   var sunOfWeek = now.startOf('week');
   var satOfWeek = moment(sunOfWeek).add(7, 'days'); // Next Sunday 00:00.
@@ -491,7 +491,7 @@
       $('#add_calendar').submit(function(event) {
         event.preventDefault();
         
-        if ($('#type').val() == 'nusmods') {
+        if ($('#type').val() === 'nusmods') {
           if (validateNUSModsLink($('#url').val())) {
             $.getJSON('/extract',
               { addr: encodeURIComponent($('#url').val()) },
@@ -519,9 +519,9 @@
   $('.tableWrapper').scrollLeft(START_VIEWING_AT * CELL_WIDTH + 1);
   
   var pathname = window.location.pathname;
-  if (pathname !== '/calendar') { // If group timetable...
+  if (pathname !== '/calendar/user') { // If group timetable...
     var groupName = pathname.substr(pathname.lastIndexOf('/') + 1, pathname.length);
-    $.getJSON('/group/calendar',
+    $.getJSON('/calendar/group',
       { groupName: groupName },
       function(res) {
         // Array of objects { username, events }. 
@@ -534,7 +534,7 @@
   }
   else { // If not group timetable...
     // Adds logged in user (via greeting message).
-    $.getJSON('/user/calendar', function(calendars) {
+    $.getJSON('/calendar/user', function(calendars) {
       users.push(new User($('#username').text(), calendars, true));
     });
   }
