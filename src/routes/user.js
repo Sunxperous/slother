@@ -32,7 +32,7 @@ router.get('/calendar', function(req, res) {
         if (user.calendars.length > 0) {
           res.send(user.calendars);
         }
-        else { res.send({}); }
+        else { res.send([]); }
       }
       else {
         res.send(null);
