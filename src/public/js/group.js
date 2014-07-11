@@ -40,16 +40,14 @@
   });
 
   // Send request to join
-  $('#add_person').click(function(event) {
+  $('#add_friend').submit(function(event) {
+    event.preventDefault();
     $.post('/group/sendRequest',
-      { user: $('#user').val(),
-        groupName: $('#group').val()
+      { username: $('#friend_name').val(),
+        groupName: $('#group_name').text()
       },
       function(res) {
         console.log(res);
-        if (typeof res == 'string') {
-          $('#response').text(res);
-        }
       }
     );
   });

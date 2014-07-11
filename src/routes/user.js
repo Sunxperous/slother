@@ -16,34 +16,6 @@ function loggedIn(req, res, next) {
   }
 }
 
-
-
-
-router.get('/calendar', function(req, res) {
-  if (req.user) {
-    User
-    .findOne({username: req.user.username})
-    .populate('calendars')
-    .exec(function(err, user) {
-      if (err) {
-        console.log(err);
-      }
-      if (user) {
-        if (user.calendars.length > 0) {
-          res.send(user.calendars);
-        }
-        else { res.send([]); }
-      }
-      else {
-        res.send(null);
-      }
-    });
-  }
-  else {
-    res.send(null);
-  }
-});
-
 router.get('/request', loggedIn, function (req, res) {
   User.findOne({username:req.user.username}, 
     function (err, user) {
