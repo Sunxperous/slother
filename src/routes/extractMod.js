@@ -43,64 +43,55 @@ function extract(addr, userId, callback) {
   Calendar.findOneAndRemove({name:"NUS "+year+"/"+sem,user:userId},
     function (err,oldCalendar) {
     if(err) { console.log(err); res.send(null); }
-    else {
-      Calendar.create({
-        name: "NUS "+year+"/"+sem,
-        user: userId,
-        events: []
-      }, function (err,calendar) {
-        if(err) { console.log(err); res.send(null); }
-        async.each(modInfos, 
-          function (modInfo, callback){
-            tempURL = tempURL.replace(tempModCode,modInfo.ModuleCode); 
-            tempModCode = modInfo.ModuleCode;
-            request({ url: tempURL, json: true}, 
-              function (error, res, body) {
+    Calendar.create({
+      name: "NUS "+year+"/"+sem,
+      user: userId,
+      events: []
+    }, function (err,calendar) {
+      if(err) { console.log(err); res.send(null); }
+      async.each(modInfos, function (modInfo, callback){
+        tempURL = tempURL.replace(tempModCode,modInfo.ModuleCode); 
+        tempModCode = modInfo.ModuleCode;
+        request({ url: tempURL, json: true}, function (error, res, body) {
+          if(err) { console.log(err); res.send(null); }
+          var modJSON = res.body,
+              exam = false;
+          for(var y in modJSON.Timetable) {
+            semStart = moment(tempSem);
+            var lessonType = checkLessonTaken(modJSON.Timetable[y], 
+                              modInfo, modJSON.ModuleCode);
+            if(!lessonType)
+              continue;
+            else{
+              calendar.events.push(buildNUSEvent(modJSON,semStart,y));
+            }
+            if(modJSON.ExamDate !== undefined && exam == false) {
+              calendar.events.push(buildNUSExam(modJSON,semStart));
+              exam = true;
+            }
+          }
+          callback();
+        });
+      }, function(err) {
+        calendar.save(function (err,calendar) {
+          if(err) { console.log(err); res.send(null); }
+          var oldExist = false;
+          if(oldCalendar !== null) {
+            oldExist = true;
+            User.findOneAndUpdate({_id:userId},
+              {$pull:{calendars:{$in:[oldCalendar._id]}}},
+              function (err,user) {
                 if(err) { console.log(err); res.send(null); }
-
-                var modJSON = res.body,
-                    exam = false;
-                for(var y in modJSON.Timetable) {
-                  semStart = moment(tempSem);
-                  //Go through and copy each element.
-                  //First, handle normal lesson timetable.
-                  var lessonType = checkLessonTaken(modJSON.Timetable[y], modInfo, modJSON.ModuleCode);
-                  if(!lessonType)
-                    continue;
-                  else{
-                    calendar.events.push(buildNUSEvent(modJSON,semStart,y));
-                  }
-                  //Next, exam info
-                  if(modJSON.ExamDate !== undefined && exam == false) {
-                    calendar.events.push(buildNUSExam(modJSON,semStart));
-                    exam = true;
-                  }
-
+                else {
+                  callback(null, calendar);
                 }
-                callback();
             });
-          }, 
-          function(err) {
-            calendar.save(function (err,calendar) {
-              if(err) { console.log(err); res.send(null); }
-              var oldExist = false;
-              if(oldCalendar !== null) {
-                oldExist = true;
-                User.findOneAndUpdate({_id:userId},
-                  {$pull:{calendars:{$in:[oldCalendar._id]}}},
-                  function (err,user) {
-                    if(err) { console.log(err); res.send(null); }
-                    else {
-                      callback(null, calendar);
-                    }
-                });
-              } 
-              else if(!oldExist) 
-                { callback(null, calendar); }
-            });
+          } 
+          else if(!oldExist) 
+            { callback(null, calendar); }
         });
       });
-    }
+    });
   });
 }
 
@@ -113,7 +104,6 @@ function convert(lesson) {
   var module = [];
   var oldCode = "";
   for(var x in lesson) {
-    console.log(lesson[x]);
     var head = lesson[x].indexOf("[");
     var tail = lesson[x].indexOf("]");
     var code = lesson[x].substring(0,head);
@@ -137,11 +127,11 @@ function convert(lesson) {
         ModuleCode: code
       };
     }
-    module.selectedLessons.push({ClassNo: classNo, LessonType: type});
+    module.selectedLessons.push({ClassNo: classNo, 
+                                  LessonType: type});
     oldCode = code;
   }
   temp.push(module);
-  temp.splice(0,0);
   return temp;
 }
 
@@ -193,7 +183,8 @@ function buildNUSEvent(data, semStart, classNo) {
     case "Tuesday" : semStart.add('day',1); break;
     case "Monday" : semStart; break;
   }
-  var tempTime = semStart.clone().hour(parseInt(data.Timetable[classNo].StartTime.substring(0,2)));
+  var tempTime = semStart.clone().hour(parseInt(
+              data.Timetable[classNo].StartTime.substring(0,2)));
   //Correct to UTC timezone
   tempTime.subtract('hour',8);
   switch(data.Timetable[classNo].WeekText) {
