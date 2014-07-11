@@ -40,56 +40,39 @@ function extract(addr, userId, callback) {
       eventInfo = [],
       tempSem = semStart.toDate(); 
       modInfos = convert(addr.substring(15).split("&"));
-  Calendar.findOneAndRemove({name:"NUS "+year+"/"+sem,user:userId},
-    function (err,oldCalendar) {
+  Calendar.create({
+    name: "NUS "+year+"/"+sem,
+    user: userId,
+    events: []
+  }, function (err,calendar) {
     if(err) { console.log(err); res.send(null); }
-    Calendar.create({
-      name: "NUS "+year+"/"+sem,
-      user: userId,
-      events: []
-    }, function (err,calendar) {
-      if(err) { console.log(err); res.send(null); }
-      async.each(modInfos, function (modInfo, callback){
-        tempURL = tempURL.replace(tempModCode,modInfo.ModuleCode); 
-        tempModCode = modInfo.ModuleCode;
-        request({ url: tempURL, json: true}, function (error, res, body) {
-          if(err) { console.log(err); res.send(null); }
-          var modJSON = res.body,
-              exam = false;
-          for(var y in modJSON.Timetable) {
-            semStart = moment(tempSem);
-            var lessonType = checkLessonTaken(modJSON.Timetable[y], 
-                              modInfo, modJSON.ModuleCode);
-            if(!lessonType)
-              continue;
-            else{
-              calendar.events.push(buildNUSEvent(modJSON,semStart,y));
-            }
-            if(modJSON.ExamDate !== undefined && exam == false) {
-              calendar.events.push(buildNUSExam(modJSON,semStart));
-              exam = true;
-            }
+    async.each(modInfos, function (modInfo, callback){
+      tempURL = tempURL.replace(tempModCode,modInfo.ModuleCode); 
+      tempModCode = modInfo.ModuleCode;
+      request({ url: tempURL, json: true}, function (error, res, body) {
+        if(err) { console.log(err); res.send(null); }
+        var modJSON = res.body,
+            exam = false;
+        for(var y in modJSON.Timetable) {
+          semStart = moment(tempSem);
+          var lessonType = checkLessonTaken(modJSON.Timetable[y], 
+                            modInfo, modJSON.ModuleCode);
+          if(!lessonType)
+            continue;
+          else{
+            calendar.events.push(buildNUSEvent(modJSON,semStart,y));
           }
-          callback();
-        });
-      }, function(err) {
-        calendar.save(function (err,calendar) {
-          if(err) { console.log(err); res.send(null); }
-          var oldExist = false;
-          if(oldCalendar !== null) {
-            oldExist = true;
-            User.findOneAndUpdate({_id:userId},
-              {$pull:{calendars:{$in:[oldCalendar._id]}}},
-              function (err,user) {
-                if(err) { console.log(err); res.send(null); }
-                else {
-                  callback(null, calendar);
-                }
-            });
-          } 
-          else if(!oldExist) 
-            { callback(null, calendar); }
-        });
+          if(modJSON.ExamDate !== undefined && exam == false) {
+            calendar.events.push(buildNUSExam(modJSON,semStart));
+            exam = true;
+          }
+        }
+        callback();
+      });
+    }, function(err) {
+      calendar.save(function (err,calendar) {
+        if(err) { console.log(err); res.send(null); }
+        else callback(null, calendar); 
       });
     });
   });
@@ -208,7 +191,7 @@ function buildNUSEvent(data, semStart, classNo) {
       temp.exclude.push(tempTime.clone().add('week',13).toDate()); //week 14
     } break;
     case "Every Week":
-      temp.exclude.push(tempTime.clone().add('week',6).toDate()); //recess week 7
+      temp.exclude.push(tempTime.clone().add('week',6).toDate());
       break;
   }
   temp.rrule.freq = "WEEKLY";
@@ -222,7 +205,7 @@ function buildNUSEvent(data, semStart, classNo) {
         temp.exclude.push(tempTime.clone().add('week',1).toDate());
     }
   temp.dateStart = tempTime.clone().toDate();
-  tempTime.hour(parseInt(data.Timetable[classNo].EndTime.substring(0,2))-8); //To UTC
+  tempTime.hour(parseInt(data.Timetable[classNo].EndTime.substring(0,2))-8);
   temp.dateEnd = tempTime.clone().toDate();
 
   return temp;
@@ -286,12 +269,13 @@ function loggedIn(req, res, next) {
 router.get('/', loggedIn, function (req,res) {
   var addr = req.query.addr;
   extract(decodeURIComponent(addr), req.user._id, function (err, calendar) {
-    if(err) {console.log("err :'"+err+"'.");}
+    if(err) { console.log(err); res.send(null); }
     else {
       User.findOneAndUpdate({username: req.user.username},
         {$push:{calendars:calendar._id}}, function (err, user) {
           if(err) { console.log(err); res.send(null); }
           else {
+<<<<<<< HEAD
             calendar.user = user._id;
             calendar.save(function (err,calendar) {
               if(err) { console.log(err); res.send(null); }
@@ -300,6 +284,11 @@ router.get('/', loggedIn, function (req,res) {
                 res.send(calendar);
               }
             });
+=======
+            console.log("calendar id is"+calendar.user);
+            console.log("calendar "+calendar.events.length);
+            res.send(calendar.events);
+>>>>>>> Change replace calendar to add calendar. Allow multiple
           }
       });
     }
