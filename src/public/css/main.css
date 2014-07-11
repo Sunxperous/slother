@@ -169,24 +169,26 @@ label, span.label {
   text-transform: uppercase;
   font-size: 12px;  
 }
-input[type='submit'] {
+input[type='submit'], input[type='button'] {
   padding: 4px 16px;
-  background-color: #e5fbbf;
-  border-left: 2px solid #ccc;
-  border-right: 2px solid #ccc;
-  border-bottom: 2px solid #ccc;
-  border-top: 2px solid #ccc;
+  border: 2px solid #ccc;
   border-radius: 4px;
+  outline: none;
+  color: #444;
+}
+input[type='submit']:hover, input[type='button']:hover {
+  border: 2px solid #ddd;
+  outline: none;  
+}
+input[type='submit']:active, input[type='button']:active {
+  border: 2px solid #eee;
   outline: none;
 }
-input[type='submit']:active {
-  background-color: #e0f6ba;
-  border-left: 3px solid #c7c7c7;
-  border-right: 1px solid #aaa;
-  border-bottom: 1px solid #aaa;
-  border-top: 3px solid #c7c7c7;
-  border-radius: 4px;
-  outline: none;
+input.green {
+  background-color: #e5fbbf;
+}
+input.red {
+  background-color: #fbcfc5;
 }
 /*^ layout.jade ^*/
 
@@ -359,6 +361,9 @@ span.rruleFreq {
   padding: 1px;
   font-family: 'Telex', sans-serif;
 }
+#popup input[type='submit'] {
+  margin-right: 8px;
+}
 /*^ #popup ^*/
 
 /*v #info_controls v*/
@@ -384,6 +389,7 @@ h3.info-block-title {
 }
 .info-block input[type='submit'] {
   display: block;
+  margin: auto auto;
 }
 .info-block {
   text-align: left;

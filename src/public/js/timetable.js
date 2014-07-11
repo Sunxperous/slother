@@ -72,7 +72,7 @@
   var popupStatuses = {
     HIDDEN: 0,
     READ_ONLY: 1,
-    EDITABLE: 2
+    EDITED: 2
   }
   var popupStatus = popupStatuses.HIDDEN;
   // Close popup when outside is clicked.
@@ -82,11 +82,17 @@
     $('#popup_wrapper').addClass('hidden');
     popupStatus = popupStatuses.HIDDEN;
   });
-  // Close popup when X is clicked.
-  $('#popup_close').click(function closePopup(event) {
+  // Close popup when X is clicked, or when cancel is clicked.
+  function closePopup(event) {
     if (popupStatus === popupStatuses.HIDDEN) { return; }
     $('#popup_wrapper').addClass('hidden');
     popupStatus = popupStatuses.HIDDEN;
+  };
+  $('#popup_close').click(closePopup);
+  $('#cancel').click(closePopup);
+  // Disable clicking outside when fields are edited.
+  $('#event_details :input').change(function(event) {
+    popupStatus = popupStatuses.EDITED;
   });
 
   // Popup for existing event when clicked.
@@ -159,7 +165,7 @@
   // Display editable popup.
   //   Input: event object with the following parameters:
   function displayEditablePopup(item) {
-    popupStatus = popupStatuses.EDITABLE;
+    popupStatus = popupStatuses.READ_ONLY;
     Object.keys(item).forEach(function(key) {
       var element = $('#' + key);
       if (element[0].tagName === 'INPUT') {
@@ -480,6 +486,7 @@
       // Add NUSMods address.
       $('#add_calendar').submit(function(event) {
         event.preventDefault();
+        // If type == NUSMods.com, then...
         $.getJSON('/extract',
           { addr: encodeURIComponent($('#url').val()) },
           function(calendar) {
@@ -522,3 +529,7 @@
   }
 
 })();
+
+/* Sample timetables:
+http://nusmods.com/timetable/2014-2015/sem1?CS2103T[TUT]=T6&CS2101[SEC]=6&ST2334[LEC]=SL1&ST2334[TUT]=T2&CS3230[LEC]=1&CS3230[TUT]=4&CS2102[LEC]=1&CS2102[TUT]=10
+*/
