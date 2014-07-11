@@ -11,10 +11,10 @@
   var START_VIEWING_AT = 7; // Scrolls to hour on page load.
 
   var now = moment();
-  now = moment("2014-08-11").add(2, 'weeks'); // For testing purpose, set to 3rd week.
+  now = moment("2014-08-11").add(15, 'weeks'); // For testing purpose, set to 3rd week.
 
   var sunOfWeek = now.startOf('week');
-  var satOfWeek = moment(sunOfWeek).add(6, 'days');
+  var satOfWeek = moment(sunOfWeek).add(7, 'days'); // Next Sunday 00:00.
 
   var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   var users = [];
@@ -48,7 +48,7 @@
   var update = function() {
     // Change the dates.
     sunOfWeek = now.subtract(now.day(), 'days');
-    satOfWeek = moment(sunOfWeek).add(6, 'days');
+    satOfWeek = moment(sunOfWeek).add(7, 'days');
     updateDates();
 
     // Reset <td> rows.
@@ -343,11 +343,6 @@
     var duringDisplayedWeek = function(item) {
       var date = moment(item.dateStart);
 
-      // If start event date is after Saturday, it hasn't started.
-      if (date.isAfter(satOfWeek)) {
-        return null;
-      }
-
       switch (item.rrule.freq) {
         case 'ONCE':
           // Simple.
@@ -356,6 +351,10 @@
           }
           break;
         case 'WEEKLY':
+          // If start event date is after Saturday, it hasn't started.
+          if (date.isAfter(satOfWeek)) {
+            return null;
+          }
           // If end event date is before Sunday, it is over.
           // var endDate = date.clone().add(item.rrule.count - 1, 'weeks');
           // if (endDate.isBefore(sunOfWeek)) { return null; }
@@ -482,21 +481,33 @@
     };
 
     User.prototype.applyFormTriggers = function() {
+      function validateNUSModsLink(url) {
+        var regexp = /http\:\/\/nusmods\.com\/timetable\/20[\d]{2}-20[\d]{2}\/sem(1|2)\?(.{6,8}?\[.{3,4}\]=.{2,5}?)+/g;
+        return url.match(regexp);
+      }
+
       var _this = this;
       // Add NUSMods address.
       $('#add_calendar').submit(function(event) {
         event.preventDefault();
-        // If type == NUSMods.com, then...
-        $.getJSON('/extract',
-          { addr: encodeURIComponent($('#url').val()) },
-          function(calendar) {
-            if (_this.calendars.hasOwnProperty(calendar._id)) {
-              _this.calendars[calendar._id].destroy();
-            }
-            _this.calendars[calendar._id] = new Calendar(this, calendar); // Check if calendar._id already exists.
-            update();
+        
+        if ($('#type').val() == 'nusmods') {
+          if (validateNUSModsLink($('#url').val())) {
+            $.getJSON('/extract',
+              { addr: encodeURIComponent($('#url').val()) },
+              function(calendar) {
+                if (_this.calendars.hasOwnProperty(calendar._id)) {
+                  _this.calendars[calendar._id].destroy();
+                }
+                _this.calendars[calendar._id] = new Calendar(this, calendar); // Check if calendar._id already exists.
+                update();
+              }
+            );
           }
-        );
+          else {
+          }
+        }
+        return false;
       });
     }
 
