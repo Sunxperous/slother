@@ -9,6 +9,8 @@ var express = require('express');
 var path = require('path');
 var http = require('http');
 var config = require('./config');
+var Hashids = require('hashids');
+  var hashids = new Hashids(config.hashid.salt);
 
 // Mongoose and Express.
 mongoose.connect(config.db.uri);
@@ -17,6 +19,7 @@ var app = express();
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.set('port', config.app.port);
+app.set('hashids', hashids);
 
 // Routing.
 var routes = require('./routes/index');
@@ -70,6 +73,8 @@ function applyLocals() {
     app.locals.messages = flashMessages;
 
     req.attach = {};
+
+    app.locals.hashids = hashids;
     next();
   }
 }

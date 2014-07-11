@@ -1,0 +1,24 @@
+extends layout
+
+block headScript
+
+block content
+  h2.empty-space Groups
+
+  #info_controls
+    .info-block
+      h3.info-block-title Your groups
+      ul#groups
+        for group in groups
+          li
+            a(href=group.url)= group.groupName
+    .info-block
+      form#create_group(action='/group/createGroup' method='post')
+        h3.info-block-title Create a group
+        div
+          label(for='group_name') Name
+          input#group_name(name='group_name' type='text')
+        div
+          input#create.green(type='submit' value='Create group')
+
+block footScripts

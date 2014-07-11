@@ -2,6 +2,9 @@
 
 var config = {};
 
+config.hashid = {};
+config.hashid.salt = 'this is my salt';
+
 config.app = {};
 config.app.port = process.env.PORT || 8000;
 config.app.sessionSecret = 'keyboard cat';

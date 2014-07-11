@@ -23,13 +23,15 @@ function loggedIn(req, res, next) {
 //Check for user existance
 //Attach: user - user info
 function searchUser(req, res, next) {
-  User.findOne({username: req.body.user}, function (err, user) {
-    if(err) { console.log(err); res.send(null); }
-    else if(user !== null) {
+  User.findOne({username: req.body.username}, function (err, user) {
+    if (err) { console.log(err); res.send(null); }
+    else if (user) {
       req.attach.user = user;
       next();
     }
-    else res.send({error:"User not found in database"});
+    else {
+      res.send({ error: 'User does not exist.' });
+    }
   });
 }
 
@@ -39,16 +41,19 @@ function searchGroup(positive) {
   return function (req, res, next) {
     Group.findOne({groupName: req.body.groupName}, function (err,group) {
       if(err) { console.log(err); res.send(null); }
-      else if(positive){
-        if(group !== null) {
+      else if(positive){ // We want the group to exist...
+        if (group) { // ...it exists!
           req.attach.group = group;
           next();
         }
-        else res.send({error:"Group not found in database"}); 
+        else res.send({error:"Group not found in database"}); // ...but it doesn't.
       }
-      else {
-        if(group !== null) res.send({error:"Same group name exist."});
-        else next();
+      else { // We don't want the group to exist...
+        if(group) res.send({error:"Same group name exist."}); // ...but it does.
+        else { // ...and it doesn't!
+          req.attach.group = group;
+          next();
+        }
       }
     });
   };
@@ -62,39 +67,25 @@ function searchGroup(positive) {
 function searchGroupAndRequest(positive) {
   return function (req, res, next) {
     var sent = false;
-    Group.findOne({groupName:req.body.groupName})
-    .populate("requested","username _id")
-    .exec( function (err, group) {
-      if(err) { console.log(err); res.send(null); }
-      req.attach.group = group;
-      if (group == null) 
-        res.send({error:"Group does not exist."});
-      else {
-        group.requested.forEach(function (request) {
-          if(request.username == req.user.username && positive) {
-            req.attach.requested = request;
-            sent = true;
-            next();
-          }
-          else if(request.username == req.body.user && !positive) {
-            sent = true;
-            res.send({error:"Request has been sent previously."});
-          }
-          else if(request.username == req.body.user && positive) {
-            req.attach.requested = request;
-            sent = true;
-            next();
-          }
-        });
-        if(positive && !sent)
-          res.send({error:"Group request has not been sent to you."});
-        else if(!positive && !sent) {
-          next();
+    var group = req.attach.group;
+    var requested = req.attach.user;
+    if (group && requested) { // Compulsory to have.
+      var hasUser = group.hasUser(requested, 'requested'); // Search in .requested.
+      if (positive) { // We want user in group...
+        if (hasUser) { next(); } // ...yay!
+        else { // ...nope, user is not in group.
+          res.send({ error: requested.username + ' is not invited to join group ' + group.groupName + '.' });
         }
       }
-    });
+      else { // We don't want user in group...
+        if (hasUser) { // ...nope, user is in group.
+          res.send({ error: requested.username + ' is already invited to join group ' + group.groupName + '.' });
+        }
+        else { next(); } // ...yay!
+      }
+    }
   }
-}
+};
 
 //Check for group admin existance
 //attach: admin - admin info
@@ -127,39 +118,23 @@ function isAdmin(req, res, next) {
 function searchUserInGroup(positive) {
   return function (req, res, next) {
     var sent = false;
-    Group.findOne({groupName: req.body.groupName})
-    .populate('members',"username _id")
-    .exec(function (err, group) {
-      if(err) { console.log(err); res.send(null); }
-      else if(group == null) {
-         sent = true;
-         res.send({error:"Group not found in database."});
-      }
-      else {
-        req.attach.group = group;
-        group.members.forEach(function (member) {
-          if(member.username == req.body.user) {
-            if(positive) {
-              req.attach.member = member;
-              sent = true;
-              next();
-            }
-            else {
-              sent = true;
-              res.send({error:"User is already in the group."});
-            }
-          }
-        });
-        if(positive && !sent) {
-          console.log(req.body)
-          sent = true;
-          res.send({error:"User "+req.body.user+
-                      " is not in the group."});
+    var group = req.attach.group;
+    var requested = req.attach.user;
+    if (group && requested) { // Compulsory to have.
+      var hasUser = group.hasUser(requested);
+      if (positive) { // We want user in group...
+        if (hasUser) { next(); } // ...yay!
+        else { // ...nope, user is not in group.
+          res.send({ error: requested.username + ' is not in the group ' + group.groupName + '.' });
         }
-        else if(!positive && !sent) 
-          next();
       }
-    });
+      else { // We don't want user in group...
+        if (hasUser) { // ...nope, user is in group.
+          res.send({ error: requested.username + ' is already in group ' + group.groupName + '.' });
+        }
+        else { next(); } // ...yay!
+      }
+    }
   }
 }
 //*****************POST REQUEST*************************************//
@@ -169,7 +144,7 @@ router.post('/createGroup', loggedIn,
     User.findOne({username:req.user.username}).
     exec(function (err, user) {
       Group.create({
-        groupName: req.body.groupName,
+        groupName: req.body.group_name,
         members: [user._id],
         admins: [user._id],
         requested: []
@@ -180,8 +155,9 @@ router.post('/createGroup', loggedIn,
           user.save(function (err, user) {
             if(err) { console.log(err); res.send(null); }
             else { 
-              res.send({success:"New group '"+
-                req.body.groupName+"' is created."});
+              // res.send({success:"New group '"+
+              //   req.body.groupName+"' is created."});
+              res.redirect('/group');
             }
           });
         }
@@ -190,25 +166,26 @@ router.post('/createGroup', loggedIn,
 });
 
 //Post request to send invitation to person
-router.post('/sendRequest', loggedIn, isAdmin, searchUser, 
+router.post('/sendRequest', loggedIn, searchGroup(true), isAdmin, searchUser, 
   searchUserInGroup(false), searchGroupAndRequest(false), 
   function (req,res) {
-    console.log("reach the end")
-    User.findOne({username:req.body.user})
-    .exec(function (err,user) {
-      if(err) { console.log(err); res.send(null); }
-        Group.findOneAndUpdate({groupName:req.body.groupName},
-          {$push:{requested:user._id}}, function (err, group) {
-            if(err) { console.log(err); res.send(null); }
-              user.requests.push(group._id);
-              user.save(function(err) {
-                if(err) { console.log(err); res.send(null); }
-                res.send({success:"Request has been sent to "
-                          +req.body.user});   
-              });       
-        });
+    var requested = req.attach.user;
+    var group = req.attach.group;
+    requested.requests.push(group._id);
+    group.requested.push(requested._id);
+    requested.save(function(err) {
+      if (err) { console.log(err); }
+      else {
+        group.save(function(err) {
+          if (err) { console.log(err); }
+          else { // Successfully added request.
+            res.send({ success: 'Request has been sent to ' + requested.username + '.' });
+          }
+        })
+      }
     });
-});
+  }
+);
 
 //Post request to accept request
 router.post('/acceptInvitation', loggedIn, searchGroupAndRequest(true), 
@@ -291,6 +268,26 @@ router.get('/calendar', function(req, res) {
       });
     };
   });
+});
+
+router.get('/', loggedIn, function(req, res) {
+  User
+  .findOne({ username: req.user.username })
+  .populate('groups', 'groupName')
+  .exec(function(err, user) {
+    if (err) { console.log(err); }
+    else if (user) {
+      var hashids = req.app.settings.hashids;
+      user.groups.forEach(function(group) {
+        var base64_id = hashids.encryptHex(group._id), friendly_url;
+        if (group.groupName) { // Because I entered an 'undefined' name previously...
+          friendly_url = group.groupName.replace(/\s+/g, '-').toLowerCase();
+        }
+        group.url = '/calendar/group/' + base64_id + '/' + friendly_url;
+      });
+      res.render('groups', { groups: user.groups });
+    }
+  })
 });
 
 module.exports = router;
