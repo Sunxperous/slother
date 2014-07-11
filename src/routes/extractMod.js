@@ -7,6 +7,7 @@ var Schema = mongoose.Schema;
 var User = require('../schema/userSchema');
 var Calendar = require('../schema/calendarSchema');
 var moment = require('moment');
+var async = require('async');
 //  extract module info from nusmods address.
 //  Input         : address of nusmods 
 //  Output        : Array Events info by callback
@@ -30,82 +31,74 @@ function extract(addr, userId, callback) {
   
   var addr = decodeURIComponent(addr.trim().replace("http://","").
                 replace("nusmods.com/timetable/",""));
-  var year = addr.substring(0,9),
+      year = addr.substring(0,9),
       sem = addr.substring(13,14);
-      addr = addr.substring(15);
-  var semStart = moment(semesterStart(year,sem));
-  //Manual key calendar and Monday as start day
-  var tempURL = "http://api.nusmods.com/"+year+"/"
+      semStart = moment(semesterStart(year,sem)),
+      tempURL = "http://api.nusmods.com/"+year+"/"
                 +sem+'/modules/CS1010.json',
       tempModCode = "CS1010",
       eventInfo = [],
-      isDone = {};
-      tempSem = semStart.toDate();
-  var modInfo = convert(addr.split("&"));
-  console.log("here");
+      tempSem = semStart.toDate(); 
+      modInfos = convert(addr.substring(15).split("&"));
   Calendar.findOneAndRemove({name:"NUS "+year+"/"+sem,user:userId},
     function (err,oldCalendar) {
     if(err) { console.log(err); res.send(null); }
     else {
-      console.log("there");
       Calendar.create({
         name: "NUS "+year+"/"+sem,
         user: userId,
         events: []
       }, function (err,calendar) {
         if(err) { console.log(err); res.send(null); }
-        for(var x in modInfo) {
-          isDone[modInfo[x].ModuleCode] = false;
-          tempURL = tempURL.replace(tempModCode,modInfo[x].ModuleCode); 
-          tempModCode = modInfo[x].ModuleCode;
-          request({ url: tempURL, json: true}, 
-            function (error, res, body) {
-              if(err) { console.log(err); res.send(null); }
+        async.each(modInfos, 
+          function (modInfo, callback){
+            tempURL = tempURL.replace(tempModCode,modInfo.ModuleCode); 
+            tempModCode = modInfo.ModuleCode;
+            request({ url: tempURL, json: true}, 
+              function (error, res, body) {
+                if(err) { console.log(err); res.send(null); }
 
-              var modJSON = res.body,
-                  exam = false;
-              for(var y in modJSON.Timetable) {
-                semStart = moment(tempSem);
-                //Go through and copy each element.
-                //First, handle normal lesson timetable.
-                var lessonType = checkLessonTaken(modJSON.Timetable[y], modInfo, modJSON.ModuleCode);
-                if(lessonType == false)
-                  continue;
-                else{
-                  calendar.events.push(buildNUSEvent(modJSON,semStart,y));
+                var modJSON = res.body,
+                    exam = false;
+                for(var y in modJSON.Timetable) {
+                  semStart = moment(tempSem);
+                  //Go through and copy each element.
+                  //First, handle normal lesson timetable.
+                  var lessonType = checkLessonTaken(modJSON.Timetable[y], modInfo, modJSON.ModuleCode);
+                  if(!lessonType)
+                    continue;
+                  else{
+                    calendar.events.push(buildNUSEvent(modJSON,semStart,y));
+                  }
+                  //Next, exam info
+                  if(modJSON.ExamDate !== undefined && exam == false) {
+                    calendar.events.push(buildNUSExam(modJSON,semStart));
+                    exam = true;
+                  }
+
                 }
-                //Next, exam info
-                if(modJSON.ExamDate !== undefined && exam == false) {
-                  calendar.events.push(buildNUSExam(modJSON,semStart));
-                  exam = true;
-                }
-              }
-              isDone[modJSON.ModuleCode] = true;
-              var allDone = true;
-              for(var z in isDone) {
-                if(!isDone[z]) {
-                  allDone = false;
-                }
-              }
-              if(allDone) {
-                calendar.save(function (err,calendar) {
-                  if(err) { console.log(err); res.send(null); }
-                  var oldExist = false;
-                  if(oldCalendar !== null) {
-                    oldExist = true;
-                    User.findOneAndUpdate({_id:userId},
-                      {$pull:{calendars:{$in:[oldCalendar._id]}}},
-                      function (err,user) {
-                        if(err) { console.log(err); res.send(null); }
-                        callback(null, calendar);
-                      });
-                  } 
-                    if(!oldExist)
-                    callback(null, calendar);
+                callback();
+            });
+          }, 
+          function(err) {
+            calendar.save(function (err,calendar) {
+              if(err) { console.log(err); res.send(null); }
+              var oldExist = false;
+              if(oldCalendar !== null) {
+                oldExist = true;
+                User.findOneAndUpdate({_id:userId},
+                  {$pull:{calendars:{$in:[oldCalendar._id]}}},
+                  function (err,user) {
+                    if(err) { console.log(err); res.send(null); }
+                    else {
+                      callback(null, calendar);
+                    }
                 });
-              }
-          });
-        }
+              } 
+              else if(!oldExist) 
+                { callback(null, calendar); }
+            });
+        });
       });
     }
   });
@@ -116,8 +109,11 @@ function extract(addr, userId, callback) {
 //Input: class no. from nusMods 
 //        eg. "8T04" of "MA2213=8T04"
 function convert(lesson) {
-  var temp = {};
+  var temp = [];
+  var module = [];
+  var oldCode = "";
   for(var x in lesson) {
+    console.log(lesson[x]);
     var head = lesson[x].indexOf("[");
     var tail = lesson[x].indexOf("]");
     var code = lesson[x].substring(0,head);
@@ -133,11 +129,19 @@ function convert(lesson) {
       case "DLEC": type = "Design Lecture"; break;
       case "REC": type = "Recitation"; break;
     }
-    if(temp[code] == null) 
-      temp[code]= [];
-    temp[code].push({ClassNo: classNo, LessonType: type})
+    if(oldCode !== code) { 
+      if(oldCode !== "")
+        temp.push(module);
+      module = {
+        selectedLessons:[],
+        ModuleCode: code
+      };
+    }
+    module.selectedLessons.push({ClassNo: classNo, LessonType: type});
+    oldCode = code;
   }
-  console.log(temp);
+  temp.push(module);
+  temp.splice(0,0);
   return temp;
 }
 
@@ -146,18 +150,11 @@ function convert(lesson) {
 //Input:  timetable from nusmods
 //        lesson class from nusmods url
 function checkLessonTaken(timetable, lessons, code) {
-  //console.log(code);
-  for(var w in lessons)
-    if(lessons[w].ModuleCode !== code)
-      continue;
-    else {
-      for(var x in lessons[w].selectedLessons) {
-        if(lessons[w].selectedLessons[x].ClassNo == timetable.ClassNo && 
-            lessons[w].selectedLessons[x].LessonType == timetable.LessonType)
-          return true;
-      }
-      return false;
-    }
+  for(var x in lessons.selectedLessons) {
+    if(lessons.selectedLessons[x].ClassNo == timetable.ClassNo && 
+        lessons.selectedLessons[x].LessonType == timetable.LessonType)
+      return true;    
+  }
     return false;
 }
 
@@ -297,8 +294,7 @@ function loggedIn(req, res, next) {
 
 router.get('/', loggedIn, function (req,res) {
   var addr = req.query.addr;
-  console.log("Start");
-  extract(decodeURIComponent(addr),req.user._id, function (err, calendar) {
+  extract(decodeURIComponent(addr), req.user._id, function (err, calendar) {
     if(err) {console.log("err :'"+err+"'.");}
     else {
       User.findOneAndUpdate({username: req.user.username},
@@ -308,7 +304,10 @@ router.get('/', loggedIn, function (req,res) {
             calendar.user = user._id;
             calendar.save(function (err,calendar) {
               if(err) { console.log(err); res.send(null); }
-              res.send(calendar.events);
+              else {
+                console.log("calendar "+calendar.events.length);
+                res.send(calendar.events);
+              }
             });
           }
       });
