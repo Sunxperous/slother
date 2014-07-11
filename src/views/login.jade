@@ -4,14 +4,14 @@ block headScript
 
 block content
   h2.empty-space Login
-  div#login_forms
+  div.forms-wrapper
     form#login_default.form-horizontal(method='post', action='/login/default')
       div
         label(for='username') Username
-        input#username(type='text', placeholder='username', name='username')
+          input#username(type='text', placeholder='username', name='username')
       div
         label(for='password') Password
-        input#password(type='password', placeholder='password', name='password')
+          input#password(type='password', placeholder='password', name='password')
       div
         input(type='submit' value='Login')
 
@@ -19,7 +19,5 @@ block content
       form#login_nus(method='get', action='/login/nus')
         input(type='hidden', name='openid_identifier', value='https://openid.nus.edu.sg')
         input(type='submit' value='Login with NUS OpenID')
-    div
-      a(href='/register') Register
 
 block footScripts

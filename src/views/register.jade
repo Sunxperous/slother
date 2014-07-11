@@ -3,14 +3,20 @@ extends layout
 block headScript
 
 block content
-  h2 Register
-  form(method='post', action='/register')
-    input(type='text', placeholder='username', name='username')
-    input(type='password', placeholder='password', name='password')
-    input(type='submit')
-
-  form(method='get', action='/login/nus')
-    input(type='hidden', name='openid_identifier', value='https://openid.nus.edu.sg')
-    input(type='submit' value='Register with NUS OpenID')
+  h2.empty-space Register
+  div.forms-wrapper
+    form#register_default(method='post', action='/register')
+      div
+        label(for='username') Username
+          input#username(type='text', placeholder='username', name='username')
+      div
+        label(for='password') password
+          input#password(type='password', placeholder='password', name='password')
+      div
+        input(type='submit' value='Register')
+    div
+      form#register_nus(method='get', action='/login/nus')
+        input(type='hidden', name='openid_identifier', value='https://openid.nus.edu.sg')
+        input(type='submit' value='Register with NUS OpenID')
 
 block footScripts

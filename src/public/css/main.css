@@ -191,20 +191,24 @@ input[type='submit']:active {
 /*^ layout.jade ^*/
 
 /*v login.jade v*/
-#login_forms {
+.forms-wrapper {
   margin: auto auto;
 }
-#login_forms label {
+.forms-wrapper label {
   text-align: right;
   margin-left: auto;
   margin-right: auto;
 }
-#login_forms div {
-  margin-bottom: 8px;
+.forms-wrapper div {
+  margin-bottom: 12px;
 }
-#login_forms input, #login_forms label {
+.forms-wrapper input, .forms-wrapper label {
   width: 90%;
   max-width: 192px;
+}
+.forms-wrapper input[type='text'], .forms-wrapper input[type='password'] {
+  width: 100%;
+  max-width: 188px;
 }
 /*^ login.jade ^*/
 
