@@ -18,7 +18,7 @@ router.get('/group/:hash/:name', loggedIn, function(req, res) {
 
     'text/html': function() { // If html page is requested...
       var group_id = req.app.settings.hashids.decryptHex(req.params.hash);
-      Group.findOne({ _id: group_id }, function(err, group) {
+      Group.findById(group_id, function(err, group) {
         if (err) { // Due to invalid hash that decrypts to empty...
           console.log(err);
           req.flash('error', 'There is no such group.');
@@ -29,12 +29,32 @@ router.get('/group/:hash/:name', loggedIn, function(req, res) {
           res.redirect('/group');
         }
         else { // Group found!
+          group.hash = req.app.settings.hashids.encryptHex(group._id);
           res.render('groupCalendar', { group: group });
         }
       });
     },
 
     'application/json': function() { // If JSON is requested...
+      var userEvents = [];
+      Group
+      .findOne({ groupName: req.query.groupName })
+      .populate('members', 'username events')
+      .exec(function(err, group) {
+        if (err) { console.log(err); }
+        else if (group) {
+          group.members.forEach(function (member, index) {
+            userEvents.push({
+              username: member.username,
+              events: member.events
+            });
+
+            if (index >= group.members.length - 1) {
+              res.send(userEvents);
+            }
+          });
+        };
+      });
     }
   });
 });

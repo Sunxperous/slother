@@ -42,10 +42,8 @@
   // Send request to join
   $('#add_friend').submit(function(event) {
     event.preventDefault();
-    $.post('/group/sendRequest',
-      { username: $('#friend_name').val(),
-        groupName: $('#group_name').text()
-      },
+    $.post($('#add_friend').attr('action'),
+      { username: $('#friend_name').val() },
       function(res) {
         console.log(res);
       }

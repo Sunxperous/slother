@@ -14,7 +14,7 @@ block content
           span.member-name
           span.toggle-view hide
     .info-block
-      form#add_friend
+      form#add_friend(action='/group/' + group.hash + '/invite')
         h3.info-block-title Invite a friend
         div
           label(for='friend_name') Username

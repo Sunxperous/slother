@@ -7,6 +7,7 @@ var groupSchema = new Schema({
   members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   requested: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   admins: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  created_by: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 // Specify type for array to search in, defaults to 'members'.
@@ -15,6 +16,30 @@ groupSchema.methods.hasUser = function(user, type) {
   return this[type].some(function(member) { // .some returns true prematurely.
     return (member.toString() === user._id.toString())
   });
+};
+
+// Searches for a group by hashed id, and attach group.
+groupSchema.statics.ensureExistsByHash = function(positive) {
+  var _this = this;
+  return function(req, res, next) {
+    var group_id = req.app.settings.hashids.decryptHex(req.params.hash);
+    _this.findById(group_id, function(err, group) {
+      if (err) { console.log(err); }
+      else if (group) { // Group found...
+        if (positive) { // ...and we want it to exist!
+          req.attach.group = group;
+          next();
+        }
+        else { res.send({ error: 'Group already exists.' }); } // ...but it does not exist.
+      }
+      else { // Group not found...
+        if (positive) { // ...but we want it to exist.
+          res.send({ error: 'Group does not exist.' });
+        }
+        else { next(); } // ...and it does not exist!
+      }
+    });
+  };
 };
 
 groupSchema.plugin(timestamps);
