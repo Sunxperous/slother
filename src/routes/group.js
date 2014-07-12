@@ -67,7 +67,7 @@ function userInGroup(positive, type) {
 // Post request to create new Group.
 //  body
 //    group_name: String
-router.post('/createGroup', 
+router.post('/', 
   User.attachLoggedIn(),
   function (req, res) {
     var user = req.attach.user;
@@ -105,7 +105,8 @@ router.post('/:hash/invite',
     var group = req.attach.group;
     var target = req.attach.target;
     target.requests.push(group._id);
-    group.requested.push(target._id);
+    //group.requested.push(target._id);
+    group.members.push(target._id); // Temporary.
     group.save(function(err) {
       if (err) { console.log(err); }
       target.save(function(err) {

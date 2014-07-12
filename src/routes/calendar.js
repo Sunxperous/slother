@@ -37,21 +37,34 @@ router.get('/group/:hash/:name', loggedIn, function(req, res) {
 
     'application/json': function() { // If JSON is requested...
       var userEvents = [];
-      Group
-      .findOne({ groupName: req.query.groupName })
-      .populate('members', 'username events')
+      var group_id = req.app.settings.hashids.decryptHex(req.params.hash);
+      Group.findById(group_id)
+      .select('groupName members requested')
+      .populate('members', 'calendars username')
+      .lean()
       .exec(function(err, group) {
         if (err) { console.log(err); }
         else if (group) {
-          group.members.forEach(function (member, index) {
-            userEvents.push({
-              username: member.username,
-              events: member.events
-            });
+          var numUserQueried = 0;
+          group.members.forEach(function(member, index) {
+            User
+            .findById(member._id)
+            .populate('calendars')
+            .lean()
+            .exec(function(err, user) {
+              if (err) { console.log(err); }
+              else {
+                group.members[index].events = [];
+                user.calendars.forEach(function(calendar) {
+                  group.members[index].events.push.apply(group.members[index].events, calendar.events);
+                });
 
-            if (index >= group.members.length - 1) {
-              res.send(userEvents);
-            }
+                numUserQueried++;
+                if (numUserQueried >= group.members.length) {
+                  res.send(group);
+                }
+              }
+            });
           });
         };
       });

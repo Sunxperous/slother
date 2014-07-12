@@ -18,6 +18,8 @@
 
   var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   var users = [];
+  var displayType = { SOLO: 0, GROUP: 1 }
+  var displayingFor;
 
   // Update week number.
   //   Probably divide between NUS-style or default-style.
@@ -67,6 +69,11 @@
     });
   };
   update();
+
+  function toggleView(event) {
+    var status = event.data.toggleView();
+    $(this).text(status ? 'hide' : 'show');
+  }
 
   // popupStatus status
   var popupStatuses = {
@@ -271,14 +278,20 @@
       this.items = calendar.events;
       this.owner = owner;
       this.show = true;
-      this.color = Please.make_color({
-        golden: false,
-        saturation: .2,
-        value: 1
-      });
       this.onDisplay = [];
+
+      if (displayingFor === displayType.SOLO) {
+        this.color = Please.make_color({
+          golden: false,
+          saturation: .2,
+          value: 1
+        });
+        this.appendToLists(); // Append to popup select and calendars display.
+      }
+      else {
+        this.color = this.owner.color;
+      }
       this.display();
-      this.appendToLists(); // Append to popup select and calendars display.
     }
 
     Calendar.prototype.appendToLists = function() {
@@ -305,11 +318,6 @@
       return _this.show;
     };
 
-    function toggleView(event) {
-      var status = event.data.toggleView();
-      $(this).text(status ? 'hide' : 'show');
-    }
-
     Calendar.prototype.replaceItems = function(items) {
       this.items = items;
     };
@@ -322,6 +330,11 @@
           if (date) {
             _this.onDisplay.push(insertEvent(item, _this, date));
           }
+        });
+      }
+      if (!this.show) {
+        this.onDisplay.forEach(function(item) {
+          item.toggleClass('fade', !_this.show);
         });
       }
     };
@@ -455,15 +468,44 @@
       var _this = this;
       this.name = name;
       this.calendars = {};
+      this.color = Please.make_color({
+        golden: false,
+        saturation: .2,
+        value: 1
+      });
+      this.show = true;
 
       calendars.forEach(function(calendar) {
-        _this.calendars[calendar._id] = new Calendar(this, calendar);
+        _this.calendars[calendar._id] = new Calendar(_this, calendar);
       });
 
       if (control) {
         this.applyFormTriggers();
       }
+      
+      if (displayingFor === displayType.GROUP) {
+        this.appendToLists(); // Append to popup select and calendars display.
+      }
     }
+
+    User.prototype.appendToLists = function() {
+      this.li = $('#members .hidden').clone();
+      this.li.removeClass('hidden')
+        .children('.member-name')
+          .text(this.name)
+          .css('background-color', this.color);
+      this.li.children('.toggle-view').click(this, toggleView);
+      $('#members').append(this.li);      
+    }
+
+    User.prototype.toggleView = function() {
+      var _this = this;
+      Object.keys(this.calendars).forEach(function(key) {
+        _this.calendars[key].toggleView();
+      });
+      _this.show = !_this.show;
+      return _this.show;
+    };
 
     User.prototype.getName = function() { return this.name; };
 
@@ -517,17 +559,16 @@
   // Scrolls immediately to 7:00am.
   //   Limit the scrolling for screens with large width.
   $('.tableWrapper').scrollLeft(START_VIEWING_AT * CELL_WIDTH + 1);
-  
   var pathname = window.location.pathname;
   if (pathname !== '/calendar/user') { // If group timetable...
-    var groupName = pathname.substr(pathname.lastIndexOf('/') + 1, pathname.length);
-    $.getJSON('/calendar/group',
-      { groupName: groupName },
-      function(res) {
-        // Array of objects { username, events }. 
-        var rand = Math.floor(Math.random() * 7);
-        res.forEach(function(user, index) {
-          users.push(new User(user.username, user.events, false));
+    $.getJSON(pathname,
+      function(response) {
+        displayingFor = displayType.GROUP;
+        response.members.forEach(function(member, index) {
+          var genericCalendar = [{
+            _id: '', name: member.username, events: member.events
+          }];
+          users.push(new User(member.username, genericCalendar, false));
         })
       }
     );
@@ -535,6 +576,7 @@
   else { // If not group timetable...
     // Adds logged in user (via greeting message).
     $.getJSON('/calendar/user', function(calendars) {
+      displayingFor = displayType.SOLO;
       users.push(new User($('#username').text(), calendars, true));
     });
   }
