@@ -51,16 +51,18 @@
   });
 
   // Remove a member
-  $('#remove_person').click(function(event) {
-    $.post('/group/removeMember',
-      { user: $('#user').val(),
-        groupName: $('#group').val()
-      },
-      function(res) {
-        console.log(res);
-        if (typeof res == 'string') {
-          $('#response').text(res);
-        }
-      }
-    );
+  $('.delete').click(function(event) {
+    var username = $(this).siblings('.member-name').text();
+    console.log(username);
+    // $.ajax('/group/removeMember',
+    //   { user: $('#user').val(),
+    //     groupName: $('#group').val()
+    //   },
+    //   function(res) {
+    //     console.log(res);
+    //     if (typeof res == 'string') {
+    //       $('#response').text(res);
+    //     }
+    //   }
+    // );
   });

@@ -546,6 +546,16 @@
           .text(this.name)
           .css('background-color', this.color);
       this.li.children('.toggle-view').click(this, toggleView);
+
+      // Move to group.js after modularization of timetable.js
+      this.li.children('.delete').click(function deleteMember(event) {
+        var username = $(this).siblings('.member-name').text();
+        var url = window.location.pathname.match(/\/group\/.+\//g)[0] + 'member/' + username;
+        $.ajax(url, { type: 'DELETE' }).done(function(response) {
+          console.log(response);
+        });
+      });
+
       $('#members').append(this.li);      
     }
 

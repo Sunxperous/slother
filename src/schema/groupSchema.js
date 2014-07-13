@@ -1,6 +1,9 @@
 var mongoose = require('mongoose');
 var timestamps = require('mongoose-timestamp');
 var Schema = mongoose.Schema;
+var config = require('../config');
+var Hashids = require('hashids');
+  var hashids = new Hashids(config.hashid.salt);
 
 var groupSchema = new Schema({
   groupName: String,
@@ -14,15 +17,23 @@ var groupSchema = new Schema({
 groupSchema.methods.hasUser = function(user, type) {
   type = type || 'members';
   return this[type].some(function(member) { // .some returns true prematurely.
-    return (member.toString() === user._id.toString())
+    return (member.toString() === user._id.toString());
   });
 };
+
+groupSchema.methods.getHash = function() {
+  return hashids.encryptHex(this._id);
+};
+
+groupSchema.statics.decryptHash = function(hash) {
+  return hashids.decryptHex(hash);
+}
 
 // Searches for a group by hashed id, and attach group.
 groupSchema.statics.ensureExistsByHash = function(positive) {
   var _this = this;
   return function(req, res, next) {
-    var group_id = req.app.settings.hashids.decryptHex(req.params.hash);
+    var group_id = _this.decryptHash(req.params.hash);
     _this.findById(group_id, function(err, group) {
       if (err) { console.log(err); }
       else if (group) { // Group found...

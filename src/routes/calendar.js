@@ -15,11 +15,13 @@ function loggedIn(req, res, next) {
   }
 }
 
-router.get('/group/:hash/:name', loggedIn, function(req, res) {
+router.get('/group/:hash/:name', loggedIn,
+  User.attachLoggedIn(), // Attaches user.
+  function(req, res) {
   res.format({
 
     'text/html': function() { // If html page is requested...
-      var group_id = req.app.settings.hashids.decryptHex(req.params.hash);
+      var group_id = Group.decryptHash(req.params.hash);
       Group.findById(group_id, function(err, group) {
         if (err) { // Due to invalid hash that decrypts to empty...
           console.log(err);
@@ -31,15 +33,15 @@ router.get('/group/:hash/:name', loggedIn, function(req, res) {
           res.redirect('/group');
         }
         else { // Group found!
-          group.hash = req.app.settings.hashids.encryptHex(group._id);
-          res.render('groupCalendar', { group: group });
+          var isAdmin = group.hasUser(req.attach.user, 'admins');
+          res.render('groupCalendar', { group: group, isAdmin: isAdmin });
         }
       });
     },
 
     'application/json': function() { // If JSON is requested...
       var userEvents = [];
-      var group_id = req.app.settings.hashids.decryptHex(req.params.hash);
+      var group_id = Group.decryptHash(req.params.hash);
       Group.findById(group_id)
       .select('groupName members requested')
       .populate('members', 'calendars username')
@@ -271,5 +273,9 @@ router.post('/event', loggedIn, function (req, res) {
 //     } break;
 //   }
 // });
+
+router.get('/', function(req, res) {
+  res.redirect('/calendar/user');
+});
 
 module.exports = router;

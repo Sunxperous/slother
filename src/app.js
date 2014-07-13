@@ -74,7 +74,6 @@ function applyLocals() {
 
     req.attach = {};
 
-    app.locals.hashids = hashids;
     next();
   }
 }

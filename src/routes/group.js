@@ -19,32 +19,11 @@ function loggedIn(req, res, next) {
 }
 router.use(loggedIn);
 
-function targetInGroup(positive, type) {
+// Searches given _user in group[type], depending on positive.
+function userInGroup(_user, positive, type) {
   return function(req, res, next) {
     var group = req.attach.group;
-    var target = req.attach.target;
-    if (group && target) { // Compulsory to have.
-      var hasUser = group.hasUser(target, type);
-      if (positive) { // We want user in group list...
-        if (hasUser) { next(); } // ...yay!
-        else { // ...nope, user is not in group list.
-          res.send({ error: target.username+' is not part of '+type+' of the group '+group.groupName+'.' });
-        }
-      }
-      else { // We don't want user in group list...
-        if (hasUser) { // ...nope, user is in group list.
-          res.send({ error: target.username+' is already part of '+type+' of the group '+group.groupName+'.' });
-        }
-        else { next(); } // ...yay!
-      }
-    }
-  }
-}
-
-function userInGroup(positive, type) {
-  return function(req, res, next) {
-    var group = req.attach.group;
-    var user = req.attach.user;
+    var user = req.attach[_user];
     if (group && user) { // Compulsory to have.
       var hasUser = group.hasUser(user, type);
       if (positive) { // We want user in group list...
@@ -92,32 +71,71 @@ router.post('/',
 });
 
 // Post request to send invitation to user.
+//  params
+//    hash: Group.ObjectId.hashed
 //  body
 //    username: String
 router.post('/:hash/invite',
   Group.ensureExistsByHash(true), // Attaches group.
   User.ensureExistsByUsername(true, ['body', 'username']), // Attaches target.
   User.attachLoggedIn(), // Attaches user.
-  userInGroup(true, 'admins'),
-  targetInGroup(false, 'members'),
-  targetInGroup(false, 'requested'),
+  userInGroup('user', true, 'admins'),
+  userInGroup('target', false, 'members'),
+  userInGroup('target', false, 'requested'),
   function (req,res) {
     var group = req.attach.group;
     var target = req.attach.target;
+
     target.requests.push(group._id);
     //group.requested.push(target._id);
     group.members.push(target._id); // Temporary.
+
     group.save(function(err) {
       if (err) { console.log(err); }
-      target.save(function(err) {
-        if (err) { console.log(err); }
-        else { // Success.
-          res.send({ success: 'Request has been sent to ' + target.username + '.' })
-        }
-      });
+      else {
+        target.save(function(err) {
+          if (err) { console.log(err); }
+          else { // Success.
+            res.send({ success: 'Request has been sent to ' + target.username + '.' })
+          }
+        });
+      }
     });
   }
 );
+   
+// Post request to remove user in a group.
+//  params
+//    hash: Group.ObjectId.hashed
+//    username: String
+router.delete('/:hash/member/:username',
+  Group.ensureExistsByHash(true), // Attaches group.
+  User.ensureExistsByUsername(true, ['params', 'username']), // Attaches target.
+  User.attachLoggedIn(), // Attaches user.
+  userInGroup('target', true, 'members'),
+  userInGroup('user', true, 'admins'),
+  function (req,res) {
+    var group = req.attach.group;
+    var target = req.attach.target;
+
+    console.log(group, target);
+
+    group.members.pull(target._id);
+    target.groups.pull(group._id);
+
+    group.save(function(err) {
+      if (err) { console.log(err); }
+      else {
+        target.save(function(err) {
+          if (err) { console.log(err); }
+          else { // Success.
+            res.send({ success: 'User ' + target.username + ' is removed from the group.' })
+          }
+        });
+      }
+    });
+});
+
 
 // //Post request to accept request
 // router.post('/acceptInvitation', searchGroupAndRequest(true), 
@@ -152,33 +170,6 @@ router.post('/:hash/invite',
 //         }); 
 //     }); 
 // });
-   
-// //Post request to remove person to a group
-// router.post('/removeMember', searchGroup(true), 
-//   searchUserInGroup(true), function (req,res) {
-//     var sent = false;
-//     Group.findOneAndUpdate({groupName:req.body.groupName},
-//       {$pull:{members:req.attach.member._id}}, 
-//       function (err, group) {
-//         if(err) { console.log(err); res.send(null); }
-//         User.findOneAndUpdate({username:req.body.user},
-//         {$pull:{groups:group._id}}, function (err, user) {
-//           if(err) { console.log(err); res.send(null); }
-//           if(group.members.length == 0 && !sent) {
-//             sent = true;
-//             group.remove(function (err, deleted) {
-//               console.log("deleted");
-//               res.send({success:"User "+req.body.user+
-//                     " is removed from group, group deleted."});
-//             });
-//           }
-//           else if(!sent) {
-//             res.send({success:"User "+req.body.user+
-//                     " is removed from group."});
-//           }
-//         });
-//     });
-// });
 
 // Get request for list of groups of logged in user.
 router.get('/', function(req, res) {
@@ -190,11 +181,11 @@ router.get('/', function(req, res) {
     else if (user) {
       var hashids = req.app.settings.hashids;
       user.groups.forEach(function(group) {
-        var base64_id = hashids.encryptHex(group._id), friendly_url;
+        var friendly_url;
         if (group.groupName) { // Because I entered an 'undefined' name previously...
           friendly_url = group.groupName.replace(/\s+/g, '-').toLowerCase();
         }
-        group.url = '/calendar/group/' + base64_id + '/' + friendly_url;
+        group.url = '/calendar/group/' + group.getHash() + '/' + friendly_url;
       });
       res.render('groups', { groups: user.groups });
     }

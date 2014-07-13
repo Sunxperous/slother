@@ -395,9 +395,9 @@ h3.info-block-title {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-.toggle-view {
-  font-size: 10px;
+.small-text {
   color: #666;
+  font-size: 10px;
   cursor: pointer;
   margin-left: 8px;
 }
