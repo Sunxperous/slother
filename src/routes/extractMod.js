@@ -275,20 +275,14 @@ router.get('/', loggedIn, function (req,res) {
         {$push:{calendars:calendar._id}}, function (err, user) {
           if(err) { console.log(err); res.send(null); }
           else {
-<<<<<<< HEAD
             calendar.user = user._id;
             calendar.save(function (err,calendar) {
               if(err) { console.log(err); res.send(null); }
               else {
                 console.log("calendar "+calendar.events.length);
-                res.send(calendar);
+                res.send(calendar.events);
               }
             });
-=======
-            console.log("calendar id is"+calendar.user);
-            console.log("calendar "+calendar.events.length);
-            res.send(calendar.events);
->>>>>>> Change replace calendar to add calendar. Allow multiple
           }
       });
     }

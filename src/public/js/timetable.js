@@ -164,7 +164,8 @@
         time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
         time_end: exactDateEnd.add(1, 'hour').format(MOMENT_TIME_FORMAT),
         rrule_freq: item.rrule.freq.toLowerCase(),
-        rrule_count: item.rrule.count ? item.rrule.count : 1
+        rrule_count: item.rrule.count ? item.rrule.count : 1,
+        modify_type: 2 //by default for modify event
       })
     });
   }
@@ -235,7 +236,8 @@
       time_start: date.format(MOMENT_TIME_FORMAT),
       time_end: date.add(1, 'hour').format(MOMENT_TIME_FORMAT),
       rrule_freq: 'once',
-      rrule_count: 1
+      rrule_count: 1,
+
     })
   });
 
@@ -261,13 +263,62 @@
     });
     sending['date_start'] = dateStart.format();
     sending['date_end'] = dateEnd.format();
-
+    if($('#submit').val()=="Edit event")
+      sending['type'] = $('#modify_type').val();
+    else
+      sending['type'] = 1;
     // Validate here.
     
     $.post('/calendar/event', sending, function(response) {
-      console.log(repsonse);
+      console.log(response);
     });
   });
+
+  // $('#delete_all').submit(function(event) {
+  //   event.preventDefault();
+  //   var sending = {};
+  //   var directCopies = ['event_id', 'calendar_id'];
+  //   directCopies.forEach(function(field) {
+  //     var element = $('#' + field);
+  //     if (element[0].tagName !== 'TEXTAREA' && element.val()) {
+  //       sending[field] = element.val();
+  //     }
+  //     else { // TEXTAREA: just send description even if empty.
+  //       sending[field] = element.text();
+  //     }
+  //   });
+  //   sending['type'] = 3;
+  //   // Validate here.
+    
+  //   $.post('/calendar/event', sending, function(response) {
+  //     console.log(response);
+  //   });
+  // });
+
+  // $('#delete_one').submit(function(event) {
+  //   event.preventDefault();
+  //   var sending = {};
+  //   var directCopies = ['event_id', 'calendar_id'];
+  //   directCopies.forEach(function(field) {
+  //     var element = $('#' + field);
+  //     if (element[0].tagName !== 'TEXTAREA' && element.val()) {
+  //       sending[field] = element.val();
+  //     }
+  //     else { // TEXTAREA: just send description even if empty.
+  //       sending[field] = element.text();
+  //     }
+  //   });
+  //   var dateStart = moment(
+  //     $('#date_start').val() + $('#time_start').val(),
+  //     MOMENT_DATE_FORMAT + MOMENT_TIME_FORMAT);
+  //   sending['date_start'] = dateStart.format();
+  //   sending['type'] = 4;
+  //   // Validate here.
+    
+  //   $.post('/calendar/event', sending, function(response) {
+  //     console.log(response);
+  //   });
+  // });
 
 
   var Calendar = (function() {
