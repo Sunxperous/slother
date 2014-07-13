@@ -5,13 +5,19 @@ var calendarSchema = require('../schema/calendarSchema');
 var Schema = mongoose.Schema;
 
 var userSchema = Schema({
-  username: String,
+  username: { type: String, required: true, unique: true },
+  email: String,
+  display_name: String,
   password: String,
   nusId: String,
   calendars: [{ type: Schema.Types.ObjectId, ref: 'Calendar' }],
   groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
   requests: [{ type: Schema.Types.ObjectId, ref: 'Group' }]
 });
+
+userSchema.path('username').validate(function(value) {
+  return /^[a-zA-Z]\w{2,}$/g.test(value)
+}, 'Invalid username.');
 
 userSchema.methods.authPassword = function(password, callback) {
   bcrypt.compare(password, this.password, function(err, res) {

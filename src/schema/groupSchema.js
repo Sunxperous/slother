@@ -6,7 +6,7 @@ var Hashids = require('hashids');
   var hashids = new Hashids(config.hashid.salt);
 
 var groupSchema = new Schema({
-  groupName: String,
+  groupName: { type: String, required: true },
   members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   requested: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   admins: [{ type: Schema.Types.ObjectId, ref: 'User' }],

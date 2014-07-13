@@ -102,23 +102,44 @@ router.get('/register', redirectIfAuthenticated,
   }
 );
 
-router.post('/register', function(req, res) {
+router.post('/register',
+  User.ensureExistsByUsername(false, ['body', 'username']),
+  function(req, res) {
   // Assuming valid, non-existing user...
-  bcrypt.hash(req.body.password, null, null, function(err, hash) {
-    User.create({
-      username: req.body.username,
-      password: hash
-    }, function(err, user) {
-      if (err) { res.redirect('/register'); }
-      if (user) {
-        req.login(user, function(err_login) {
-          if (err) { res.redirect('/register'); }        
-          return res.redirect('/');
-        });
-      }
-    });  
-  });  
-});
+    if (req.body.username.length < 3 || req.body.username.length > 20) {
+      req.flash('error', 'Username should be between 3 and 20 characters.');
+      res.redirect('/register');
+    }
+    else if (req.body.password.length < 4 || req.body.password.length > 128) {
+      req.flash('error', 'Password should be between 4 and 128 characters.');
+      res.redirect('/register');
+    }
+    else {
+      bcrypt.hash(req.body.password, null, null, function(err, hash) {
+        User.create({
+          username: req.body.username,
+          password: hash
+        }, function(err, user) {
+          if (err) {
+            if (err.name === 'ValidationError') {
+              req.flash('error', err.message);
+              res.redirect('/register');
+            }
+            else {
+              console.log(err);
+            }
+          }
+          else if (user) {
+            req.login(user, function(err_login) {
+              if (err) { res.redirect('/register'); }        
+              return res.redirect('/');
+            });
+          }
+        });  
+      });  
+    }
+  }
+);
 
 
 // Logout

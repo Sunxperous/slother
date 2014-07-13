@@ -4,9 +4,9 @@ var Schema = mongoose.Schema;
 var eventSchema = require('./eventSchema');
 
 var calendarSchema = Schema({
-  name: String,
-  events:[eventSchema],
-  user:{ type: Schema.Types.ObjectId, ref: 'User' }
+  name: { type: String, required: true },
+  events: [eventSchema],
+  user: { type: Schema.Types.ObjectId, ref: 'User', required: true }
 });
 
 

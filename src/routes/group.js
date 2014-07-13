@@ -1,7 +1,5 @@
-var mongoose = require('mongoose');
 var express = require('express');
 var router = express.Router();
-var Schema = mongoose.Schema;
 var User = require('../schema/userSchema');
 var Group = require('../schema/groupSchema');
 
@@ -57,7 +55,15 @@ router.post('/',
       requested: [],
       created_by: user._id
     }, function (err, group) {
-      if(err) { console.log(err); res.send(null); }
+      if (err) {
+        if (err.name === 'ValidationError') {
+          req.flash('error', err.message);
+          res.redirect('/group');
+        }
+        else {
+          console.log(err);
+        }
+      }
       else {
         user.groups.push(group._id);
         user.save(function (err, user) {
