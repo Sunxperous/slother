@@ -130,7 +130,7 @@
     }
     else {
       $('#existing .rruleInfo').removeClass('hidden');
-      $('#existing .rruleFreq').text(item.rrule.freq.toLowerCase());
+      $('#existing .rruleFreq').text(item.rrule.freq);
       $('#existing .rruleCount').text(item.rrule.count);
       $('#existing .dateStart').text(
         moment(item.dateStart).format("dddd DD MMM 'YY, HH:mm"));
@@ -150,24 +150,29 @@
     $('#popup_wrapper').removeClass('hidden');
 
     $('#edit_event').unbind('click');
-    $('#edit_event').click(function editEvent(event) {
-      displayEditablePopup({
-        submit: 'Edit event',
-        popup_title: 'Edit event',
-        event_id: item._id,
-        calendar_id: calendar_id,
-        summary: item.summary,
-        description: item.description,
-        location: item.location,
-        date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
-        date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
-        time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
-        time_end: exactDateEnd.add(1, 'hour').format(MOMENT_TIME_FORMAT),
-        rrule_freq: item.rrule.freq.toLowerCase(),
-        rrule_count: item.rrule.count ? item.rrule.count : 1,
-        modify_type: 2 //by default for modify event
-      })
-    });
+    if (displayingFor === displayType.SOLO) { // Only allow the group's calendar for edit.
+      $('#edit_event').click(function editEvent(event) {
+        displayEditablePopup({
+          submit: 'Edit event',
+          popup_title: 'Edit event',
+          event_id: item._id,
+          calendar_id: calendar_id,
+          summary: item.summary,
+          description: item.description,
+          location: item.location,
+          date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
+          date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
+          time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
+          time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
+          rrule_freq: item.rrule.freq,
+          rrule_count: item.rrule.count ? item.rrule.count : 1,
+          modify_type: 2 //by default for modify event
+        });
+      });
+    }
+    else {
+      $('#edit_event').attr('disabled', true).hide();
+    }
   }
 
   // Display editable popup.
@@ -176,18 +181,10 @@
     popupStatus = popupStatuses.READ_ONLY;
     Object.keys(item).forEach(function(key) {
       var element = $('#' + key);
-      if (element[0].tagName === 'INPUT') {
-        element.val(item[key]);
-      }
-      else if (element[0].tagName === 'SELECT') {
-        element.val(item[key]);
-      }
-      else {
-        element.text(item[key]);
-      }
+      element.val(item[key]);
     });
 
-    if ($('#rrule_freq').val() === 'once') {
+    if ($('#rrule_freq').val() === 'ONCE') {
       $('#rrule_count').prop('disabled', true);
     }
     else { $('#rrule_count').removeAttr('disabled'); }
@@ -199,7 +196,7 @@
 
   // Rrule count toggler.
   $('#rrule_freq').change(function(event) {
-    if ($('#rrule_freq').val() === 'once') {
+    if ($('#rrule_freq').val() === 'ONCE') {
       $('#rrule_count').prop('disabled', true);
     }
     else { $('#rrule_count').removeAttr('disabled'); }    
@@ -235,7 +232,7 @@
       date_end: date.format(MOMENT_DATE_FORMAT),
       time_start: date.format(MOMENT_TIME_FORMAT),
       time_end: date.add(1, 'hour').format(MOMENT_TIME_FORMAT),
-      rrule_freq: 'once',
+      rrule_freq: 'ONCE',
       rrule_count: 1,
 
     })
@@ -254,12 +251,7 @@
     var directCopies = ['event_id', 'calendar_id', 'summary', 'description', 'location', 'rrule_freq', 'rrule_count'];
     directCopies.forEach(function(field) {
       var element = $('#' + field);
-      if (element[0].tagName !== 'TEXTAREA' && element.val()) {
-        sending[field] = element.val();
-      }
-      else { // TEXTAREA: just send description even if empty.
-        sending[field] = element.text();
-      }
+      sending[field] = element.val();
     });
     sending['date_start'] = dateStart.format();
     sending['date_end'] = dateEnd.format();
@@ -271,6 +263,11 @@
     
     $.post('/calendar/event', sending, function(response) {
       console.log(response);
+      // Expecting response.data to contain event details and calendar_id.
+      // Since only SOLO calendars can add/edit event for now, assume this is done in SOLO.
+      if (displayingFor === displayType.SOLO) {
+        users[0].calendars[response.calendar_id].replaceItem(response);
+      }
     });
   });
 
@@ -373,6 +370,15 @@
       this.items = items;
     };
 
+    Calendar.prototype.replaceItem = function(event) {
+      this.items.forEach(function(item, index, items) {
+        if (item._id === event._id) {
+          items[index] = event;
+        }
+      });
+      update();
+    };
+
     Calendar.prototype.display = function() {
       var _this = this;
       if (this.items) {
@@ -420,8 +426,6 @@
             return null;
           }
           // If end event date is before Sunday, it is over.
-          // var endDate = date.clone().add(item.rrule.count - 1, 'weeks');
-          // if (endDate.isBefore(sunOfWeek)) { return null; }
           if (sunOfWeek.diff(date, 'week') >= item.rrule.count - 1) { return null;}
 
           // Assume day is valid, then check for exclusion.
@@ -449,12 +453,13 @@
       var day = dateStart.day();
       var durationInMilli = moment(item.dateEnd).diff(dateStart);
       var durationInHours = durationInMilli / 3600000;
-      //var durationInHours = dateEnd.diff(dateStart, 'h');
+      var dateStartMinutes = dateStart.minutes();
 
       var div = $('<div>');
       var width = durationInHours * CELL_WIDTH;
       div.width(width - RIGHT_DIV_TRIM)
         .css('background-color', calendar.color)
+        .css('left', dateStartMinutes / 60 * CELL_WIDTH)
         .addClass('item')
         .text(item.summary)
         .data({
@@ -646,4 +651,5 @@
 
 /* Sample timetables:
 http://nusmods.com/timetable/2014-2015/sem1?CS2103T[TUT]=T6&CS2101[SEC]=6&ST2334[LEC]=SL1&ST2334[TUT]=T2&CS3230[LEC]=1&CS3230[TUT]=4&CS2102[LEC]=1&CS2102[TUT]=10
+http://nusmods.com/timetable/2014-2015/sem1?CS1020[SEC]=1&CS1020[TUT]=3&CS1020[LAB]=4&CS1231[SEC]=1&CS1231[TUT]=10&LSM1301[LEC]=SL2&LSM1301[LAB]=F04&MA1521[LEC]=SL1&MA1521[TUT]=T06
 */

@@ -280,7 +280,7 @@ router.get('/', loggedIn, function (req,res) {
               if(err) { console.log(err); res.send(null); }
               else {
                 console.log("calendar "+calendar.events.length);
-                res.send(calendar.events);
+                res.send(calendar);
               }
             });
           }
