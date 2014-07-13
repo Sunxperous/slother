@@ -110,8 +110,8 @@ router.post('/register',
       req.flash('error', 'Username should be between 3 and 20 characters.');
       res.redirect('/register');
     }
-    else if (req.body.password.length < 4 || req.body.password.length > 128) {
-      req.flash('error', 'Password should be between 4 and 128 characters.');
+    else if (req.body.password.length < 3 || req.body.password.length > 128) {
+      req.flash('error', 'Password should be between 3 and 128 characters.');
       res.redirect('/register');
     }
     else {
