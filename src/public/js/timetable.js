@@ -194,9 +194,15 @@
         });    
       });
 
-      // $('#delete_all').click(function(event) {
-
-      // });
+      $('#delete_all').unbind('click');
+      $('#delete_all').click(function(event) {
+        $.ajax('/calendar/' + calendar_id + '/event/' + item._id, {
+          type: 'DELETE'
+        })
+        .done(function(response) {
+          console.log(response);
+        });
+      });
     }
     else {
       $('#edit_event').attr('disabled', true).hide();
@@ -211,7 +217,16 @@
     Object.keys(item).forEach(function(key) {
       if (key !== 'exclude') {
         var element = $('#' + key);
-        element.val(item[key]);
+        switch (element[0].tagName) {
+          case 'INPUT':
+          case 'TEXTAREA':
+          case 'SELECT':
+            element.val(item[key]);
+            break;
+          default:
+            element.text(item[key]);
+            break;
+        }
       }
       else { // key === 'exclude'
         $('#exclude').html('<label>Exclude</label>')
@@ -277,6 +292,7 @@
       time_end: date.add(1, 'hour').format(MOMENT_TIME_FORMAT),
       rrule_freq: 'ONCE',
       rrule_count: 1,
+      exclude: [],
     })
   });
 
@@ -290,7 +306,7 @@
       $('#date_end').val() + $('#time_end').val(),
       MOMENT_DATE_FORMAT + MOMENT_TIME_FORMAT);
     var sending = {};
-    var directCopies = ['event_id', 'calendar_id', 'summary', 'description', 'location', 'rrule_freq', 'rrule_count'];
+    var directCopies = ['summary', 'description', 'location', 'rrule_freq', 'rrule_count'];
     directCopies.forEach(function(field) {
       var element = $('#' + field);
       sending[field] = element.val();
@@ -303,14 +319,18 @@
       sending['exclude'].push(checkedExcludes.eq(index).val());
     });
 
-    $.post('/calendar/event', sending, function(response) {
-      console.log(response);
-      // Expecting response.data to contain event details and calendar_id.
-      // Since only SOLO calendars can add/edit event for now, assume this is done in SOLO.
-      if (displayingFor === displayType.SOLO) {
-        users[0].calendars[response.calendar_id].replaceItem(response);
-      }
-    });
+    var requestType = $('#popup_title').text() === 'Add event' ? 'POST' : 'PUT';
+
+    $.ajax('/calendar/' + $('#calendar_id').val() + '/event/' + $('#event_id').val(),
+      { data: sending, type: requestType })
+      .done(function(response) {
+        console.log(response);
+        // Expecting response.data to contain event details and calendar_id.
+        // Since only SOLO calendars can add/edit event for now, assume this is done in SOLO.
+        if (displayingFor === displayType.SOLO) {
+          users[0].calendars[response.calendar_id].replaceItem(response);
+        }
+      });
   });
 
   var Calendar = (function() {
@@ -424,8 +444,7 @@
           if (sunOfWeek.diff(date, 'week') >= item.rrule.count - 1) { return null;}
 
           // Assume day is valid, then check for exclusion.
-          var day = date.day();
-          var exactDate = sunOfWeek.clone().day(day);
+          var exactDate = sunOfWeek.clone().day(date.day()).hour(date.hour()).minutes(date.minutes());
           var excludeDate;
           if (item.exclude && item.exclude.length > 0) {
             for (var i = 0; i < item.exclude.length; i++) {

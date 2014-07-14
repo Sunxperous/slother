@@ -169,18 +169,18 @@ label, span.label {
   text-transform: uppercase;
   font-size: 12px;  
 }
-input[type='submit'], input[type='button'] {
+input[type='submit'], input[type='button'], button {
   padding: 4px 16px;
   border: 2px solid #ccc;
   border-radius: 4px;
   outline: none;
   color: #444;
 }
-input[type='submit']:hover, input[type='button']:hover {
+input[type='submit']:hover, input[type='button']:hover, button:hover {
   border: 2px solid #ddd;
   outline: none;  
 }
-input[type='submit']:active, input[type='button']:active {
+input[type='submit']:active, input[type='button']:active, button:active {
   border: 2px solid #eee;
   outline: none;
 }
@@ -446,11 +446,13 @@ ul li {
 #before {
   display: inline-block;
   position: relative;
+  padding: 0;
   left: 0;
 }
 #after {
   display: inline-block;
   position: relative;
+  padding: 0;
   right: 0;
 }
 #date_info {
