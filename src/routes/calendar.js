@@ -150,6 +150,16 @@ router.delete('/:calendar_id', loggedIn, function (req, res) {
   });
 });
 
+router.put('/:calendar_id/privacy', function (req, res) {
+  Calendar.findOne({_id:req.body.calendar_id})
+  .exec( function (err, calendar) {
+    calendar.hidden = req.body.hidden;
+    calendar.save( function (err, calendar) {
+      res.send({success:"{Privacy setting changed."});
+    });
+  });
+});
+
 router.put('/:calendar_id/events/:event_id', loggedIn, 
   function (req, res) {
   Calendar.findOne({_id:req.body.calendar_id})
@@ -162,6 +172,7 @@ router.put('/:calendar_id/events/:event_id', loggedIn,
                       count:req.body.rrule_count};
     myEvent.dateStart = req.body.date_start;
     myEvent.dateEnd = req.body.date_end;
+    myEvent.exlude = req.body.exclude;
     calendar.save( function (err, calendar) {
       console.log(calendar);
       res.send({success:"Added new event"});
