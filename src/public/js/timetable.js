@@ -149,8 +149,9 @@
     $('#new').addClass('hidden');
     $('#popup_wrapper').removeClass('hidden');
 
-    $('#edit_event').unbind('click');
     if (displayingFor === displayType.SOLO) { // Only allow the group's calendar for edit.
+      // Edit event.
+      $('#edit_event').unbind('click');
       $('#edit_event').click(function editEvent(event) {
         displayEditablePopup({
           submit: 'Edit event',
@@ -169,9 +170,37 @@
           exclude: item.exclude,
         });
       });
+
+      // Delete this event instance.
+      $('#delete_this').unbind('click');
+      $('#delete_this').click(function(event) {
+        var excludes = item.exclude.map(function(exclude) { return exclude; }); // Cloning.
+        excludes.push(exactDateStart);
+        displayEditablePopup({
+          submit: 'Edit event',
+          popup_title: 'Edit event',
+          event_id: item._id,
+          calendar_id: calendar_id,
+          summary: item.summary,
+          description: item.description,
+          location: item.location,
+          date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
+          date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
+          time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
+          time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
+          rrule_freq: item.rrule.freq,
+          rrule_count: item.rrule.count ? item.rrule.count : 1,
+          exclude: excludes,
+        });    
+      });
+
+      // $('#delete_all').click(function(event) {
+
+      // });
     }
     else {
       $('#edit_event').attr('disabled', true).hide();
+      $('#delete_this').attr('disabled', true).hide();
     }
   }
 
@@ -185,6 +214,7 @@
         element.val(item[key]);
       }
       else { // key === 'exclude'
+        $('#exclude').html('<label>Exclude</label>')
         var appending = '';
         item[key].forEach(function(excludeDate) {
           var excludeDateMoment = moment(excludeDate);
@@ -282,13 +312,6 @@
       }
     });
   });
-
-  // $('#delete_all').click(function(event) {
-  // });
-
-  // $('#delete_one').click(function(event) {
-  // });
-
 
   var Calendar = (function() {
 
@@ -412,7 +435,7 @@
               }
             }
           }
-          return date;
+          return exactDate;
           break;
         default: break;
       }
