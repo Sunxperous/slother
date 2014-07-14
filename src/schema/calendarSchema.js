@@ -6,7 +6,8 @@ var eventSchema = require('./eventSchema');
 var calendarSchema = Schema({
   name: { type: String, required: true },
   events: [eventSchema],
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true }
+  group: { type: Schema.Types.ObjectId, ref: 'Group' }
+  user: { type: Schema.Types.ObjectId, ref: 'User' }
   hidden: { type:Boolean, default: false}
 });
 

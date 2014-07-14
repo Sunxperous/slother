@@ -138,7 +138,7 @@ router.post('/', loggedIn, function (req, res) {
   });
 });
 
-router.delete('/deleteCalendar', loggedIn, function (req, res) {
+router.delete('/:calendar_id', loggedIn, function (req, res) {
   Calendar.findOneAndRemove({_id:req.body.calendar_id},
     function (err, calendar) {
       User.findOneAndUpdate({username:req.user.username},
