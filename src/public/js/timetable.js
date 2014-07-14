@@ -166,7 +166,7 @@
           time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
           rrule_freq: item.rrule.freq,
           rrule_count: item.rrule.count ? item.rrule.count : 1,
-          modify_type: 2 //by default for modify event
+          exclude: item.exclude,
         });
       });
     }
@@ -180,8 +180,21 @@
   function displayEditablePopup(item) {
     popupStatus = popupStatuses.READ_ONLY;
     Object.keys(item).forEach(function(key) {
-      var element = $('#' + key);
-      element.val(item[key]);
+      if (key !== 'exclude') {
+        var element = $('#' + key);
+        element.val(item[key]);
+      }
+      else { // key === 'exclude'
+        var appending = '';
+        item[key].forEach(function(excludeDate) {
+          var excludeDateMoment = moment(excludeDate);
+          var element = '<label class="exclude"><input type="checkbox" name="exclude" value="'
+            + excludeDateMoment.format() + '" checked>'
+            + excludeDateMoment.format("DD MMM 'YY, HH:mm") + '</input></label>';
+          appending += element;
+        });
+        $('#exclude').append(appending);
+      }
     });
 
     if ($('#rrule_freq').val() === 'ONCE') {
@@ -234,7 +247,6 @@
       time_end: date.add(1, 'hour').format(MOMENT_TIME_FORMAT),
       rrule_freq: 'ONCE',
       rrule_count: 1,
-
     })
   });
 
@@ -255,12 +267,12 @@
     });
     sending['date_start'] = dateStart.format();
     sending['date_end'] = dateEnd.format();
-    if($('#submit').val()=="Edit event")
-      sending['type'] = $('#modify_type').val();
-    else
-      sending['type'] = 1;
-    // Validate here.
-    
+    var checkedExcludes = $('input[name="exclude"]:checked');
+    sending['exclude'] = [];
+    checkedExcludes.each(function(index) {
+      sending['exclude'].push(checkedExcludes.eq(index).val());
+    });
+
     $.post('/calendar/event', sending, function(response) {
       console.log(response);
       // Expecting response.data to contain event details and calendar_id.
@@ -271,50 +283,10 @@
     });
   });
 
-  // $('#delete_all').submit(function(event) {
-  //   event.preventDefault();
-  //   var sending = {};
-  //   var directCopies = ['event_id', 'calendar_id'];
-  //   directCopies.forEach(function(field) {
-  //     var element = $('#' + field);
-  //     if (element[0].tagName !== 'TEXTAREA' && element.val()) {
-  //       sending[field] = element.val();
-  //     }
-  //     else { // TEXTAREA: just send description even if empty.
-  //       sending[field] = element.text();
-  //     }
-  //   });
-  //   sending['type'] = 3;
-  //   // Validate here.
-    
-  //   $.post('/calendar/event', sending, function(response) {
-  //     console.log(response);
-  //   });
+  // $('#delete_all').click(function(event) {
   // });
 
-  // $('#delete_one').submit(function(event) {
-  //   event.preventDefault();
-  //   var sending = {};
-  //   var directCopies = ['event_id', 'calendar_id'];
-  //   directCopies.forEach(function(field) {
-  //     var element = $('#' + field);
-  //     if (element[0].tagName !== 'TEXTAREA' && element.val()) {
-  //       sending[field] = element.val();
-  //     }
-  //     else { // TEXTAREA: just send description even if empty.
-  //       sending[field] = element.text();
-  //     }
-  //   });
-  //   var dateStart = moment(
-  //     $('#date_start').val() + $('#time_start').val(),
-  //     MOMENT_DATE_FORMAT + MOMENT_TIME_FORMAT);
-  //   sending['date_start'] = dateStart.format();
-  //   sending['type'] = 4;
-  //   // Validate here.
-    
-  //   $.post('/calendar/event', sending, function(response) {
-  //     console.log(response);
-  //   });
+  // $('#delete_one').click(function(event) {
   // });
 
 

@@ -364,6 +364,11 @@ span.rruleFreq {
 #existing > div {
   margin-bottom: 8px;
 }
+#exclude > label.exclude {
+  font-size: inherit;
+  color: inherit;
+  text-transform: inherit;
+}
 /*^ #popup ^*/
 
 /*v #info_controls v*/
