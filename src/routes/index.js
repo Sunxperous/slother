@@ -6,7 +6,8 @@ router.get('/', function(req, res) {
     res.redirect('/calendar/user');
   }
   else {
-    res.render('index', { title: 'Slother by Sloth'});
+    res.redirect('/login'); // For faster testing.
+    //res.render('index', { title: 'Slother by Sloth'});
   }
 });
 

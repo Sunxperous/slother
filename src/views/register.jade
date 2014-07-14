@@ -5,18 +5,18 @@ block headScript
 block content
   h2.empty-space Register
   div.forms-wrapper
-    form#register_default(method='post', action='/register')
+    form#register_default(method='post' action='/register')
       div
         label(for='username') Username
-          input#username(type='text', placeholder='username', name='username')
+          input#username(type='text' placeholder='username' name='username' autofocus)
       div
         label(for='password') password
-          input#password(type='password', placeholder='password', name='password')
+          input#password(type='password' placeholder='password' name='password')
       div
         input.green(type='submit' value='Register')
     div
-      form#register_nus(method='get', action='/login/nus')
-        input(type='hidden', name='openid_identifier', value='https://openid.nus.edu.sg')
+      form#register_nus(method='get' action='/login/nus')
+        input(type='hidden' name='openid_identifier' value='https://openid.nus.edu.sg')
         input(type='submit' value='Register with NUS OpenID')
 
 block footScripts
