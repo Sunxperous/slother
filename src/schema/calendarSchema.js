@@ -7,6 +7,7 @@ var calendarSchema = Schema({
   name: { type: String, required: true },
   events: [eventSchema],
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true }
+  hidden: { type:Boolean, default: false}
 });
 
 
