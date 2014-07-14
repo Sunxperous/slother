@@ -121,7 +121,7 @@ router.get('/user', loggedIn, function(req, res) {
   });
 });
 
-router.post('/createCalendar', loggedIn, function (req, res) {
+router.post('/', loggedIn, function (req, res) {
   Calendar.create({
     name: req.body.name,
     events:[]
@@ -165,9 +165,6 @@ router.put('/:calendar_id/events/:event_id', loggedIn,
     calendar.save( function (err, calendar) {
       console.log(calendar);
       res.send({success:"Added new event"});
-    });
-  });
-});
 
 router.delete('/:calendar_id/events/:event_id', loggedIn, 
   function (req, res) {
