@@ -58,18 +58,18 @@
         ul.exclude
       div
         button#edit_event Edit event
+        button#end_early End early
         button#delete_this Remove this
         button#delete_all Remove all
-        button#end_early End Early
     #new.hidden
       form#event_details(method='post')
         input#event_id(type='hidden' name='event_id')
         div
           label(for='calendar_id') Calendar
-          select#calendar_id(name='calendar_id')
+          select#calendar_id(name='calendar_id' required)
         div
           label(for='summary') Summary
-          input#summary.fullLength(name='summary')
+          input#summary.fullLength(name='summary' required)
         div
           label(for='description') Description
           textarea#description(rows='2' name='description')
@@ -78,12 +78,11 @@
           input#location.fullLength(name='location')
         div
           label(for='date_start') From (DD/MM/YYYY HH:mm)
-          input#date_start.shortLength(type='text' name='dateStart')
-          input#time_start.shortLength(type='text' name='timeStart')
+          input#date_start.shortLength(type='text' name='dateStart' required)
+          input#time_start.shortLength(type='text' name='timeStart' required)
           label(for='date_end') to (DD/MM/YYYY HH:mm)
-          input#date_end.shortLength(type='text' name='dateEnd')
-          input#time_end.shortLength(type='text' name='timeEnd')
-          div#endearly(for='endearly') 
+          input#date_end.shortLength(type='text' name='dateEnd' required)
+          input#time_end.shortLength(type='text' name='timeEnd' required)
         div
           label(for='rrule_freq') Repeat
           select#rrule_freq(name='rrule_freq')
@@ -94,7 +93,7 @@
             option(value='YEARLY') Yearly
           span.rruleInfo
             |  for 
-            input#rrule_count(type='number' value='1' min='1' max='1024' name='rrule_count')
+            input#rrule_count(type='number' value='1' min='1' max='1024' name='rrule_count' required)
             |  times
         div#exclude
           label Exclude
@@ -116,4 +115,4 @@ div#calendar_controls_wrapper
     
 block footScripts
   script(src='/vendor/please.min.js')
-  script(src='/js/timetable.js')
+  script(src='/js/timetable2.js')
