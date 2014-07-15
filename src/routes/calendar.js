@@ -122,7 +122,7 @@ router.get('/user', loggedIn, function(req, res) {
 });
 
 router.post('/', loggedIn, function (req, res) {
-  Calendar.create({ name: req.body.name, events:[] }, 
+  Calendar.create({ name: req.params.name, events:[] }, 
     function (err, calendar) {
     User.findOneAndUpdate({username:req.user.username},
       {$push:{calendar:calendar._id}}, function (err, user) {
@@ -137,8 +137,10 @@ router.post('/', loggedIn, function (req, res) {
 });
 
 router.delete('/:calendar_id', loggedIn, function (req, res) {
-  Calendar.findOneAndRemove({_id:req.body.calendar_id},
+  console.log("Routing success");
+  Calendar.findOneAndRemove({_id:req.params.calendar_id},
     function (err, calendar) {
+          console.log("calendar found" +calendar);
       User.findOneAndUpdate({username:req.user.username},
         {$pull:{calendar:calendar._id}}, function (err, user) {
           if(err) { console.log(err); res.send(null); }
@@ -148,20 +150,21 @@ router.delete('/:calendar_id', loggedIn, function (req, res) {
 });
 
 router.put('/:calendar_id/privacy', function (req, res) {
-  Calendar.findOne({_id:req.body.calendar_id})
+  Calendar.findOne({_id:req.params.calendar_id})
   .exec( function (err, calendar) {
     calendar.hidden = req.body.hidden;
     calendar.save( function (err, calendar) {
-      res.send({success:"{Privacy setting changed."});
+      res.send({success:"Privacy setting changed."});
     });
   });
 });
 
-router.put('/:calendar_id/events/:event_id', loggedIn, 
+router.put('/:calendar_id/event/:event_id',
   function (req, res) {
-  Calendar.findOne({_id:req.body.calendar_id})
+  Calendar.findOne({_id:req.params.calendar_id,
+    'events._id':req.params.event_id})
   .exec(function (err, calendar) {
-    var myEvent = calendar.events.id(req.body.event_id);
+    var myEvent = calendar.events.id(req.params.event_id);
     myEvent.summary = req.body.summary;
     myEvent.description = req.body.description;
     myEvent.location = req.body.location;
@@ -169,22 +172,47 @@ router.put('/:calendar_id/events/:event_id', loggedIn,
                       count:req.body.rrule_count};
     myEvent.dateStart = req.body.date_start;
     myEvent.dateEnd = req.body.date_end;
-    myEvent.exlude = req.body.exclude;
+    myEvent.exclude = req.body.exclude;
     calendar.save( function (err, calendar) {
-      console.log(calendar);
-      res.send({success:"Added new event"});
+      res.send({success:"Edited an event",
+                calendar_id: req.params.calendar_id,
+                eventInfo: calendar.events.id(req.params.event_id)
+      });
     });
   });
 });
 
-router.delete('/:calendar_id/events/:event_id', loggedIn, 
+router.post('/:calendar_id/event/',
   function (req, res) {
-  Calendar.findOneAndUpdate({_id:req.body.calendar_id,
-    'events._id':req.body.event_id})
-  .exec( function (err, calendar) {
-    calendar.events.id(req.body.event_id).remove();
+  Calendar.findOne({_id:req.params.calendar_id})
+  .exec(function (err, calendar) {
+    calendar.events.push({
+      summary: req.body.summary,
+      description: req.body.description,
+      location: req.body.location,
+      rrule: {freq: req.body.rrule_freq,
+              count:req.body.rrule_count},
+      dateStart: req.body.date_start,
+      dateEnd: req.body.date_end,
+      exclude: req.body.exclude
+    });
     calendar.save( function (err, calendar) {
-      console.log(calendar);
+      res.send({success:"Added an event",
+                calendar_id: req.params.calendar_id,
+                eventInfo: calendar.events[calendar.events.length-1]
+      });
+    });
+  });
+});
+
+router.delete('/:calendar_id/event/:event_id', 
+  function (req, res) {
+  Calendar.findOne({_id:req.params.calendar_id,
+    'events._id':req.params.event_id})
+  .exec( function (err, calendar) {
+    console.log("calendar found" +calendar);
+    calendar.events.id(req.params.event_id).remove();
+    calendar.save( function (err, calendar) {
       res.send({success:"Calendar "+calendar.name+
                   " has been deleted."})
     });
