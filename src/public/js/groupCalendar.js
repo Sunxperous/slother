@@ -7,7 +7,11 @@
         var genericCalendar = {
           _id: member._id, name: member.username, events: member.events
         };
+<<<<<<< HEAD
         timetable.replaceOrAddCalendar(genericCalendar, false);
+=======
+        timetable.replaceOrAddCalendar(genericCalendar);
+>>>>>>> further modularize timetable.js
       })
     }
   );

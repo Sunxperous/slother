@@ -3,7 +3,11 @@
 
     $.getJSON('/calendar/user', function(calendars) {
       calendars.forEach(function (calendar) {
+<<<<<<< HEAD
         timetable.replaceOrAddCalendar(calendar, true);
+=======
+        timetable.replaceOrAddCalendar(calendar);
+>>>>>>> further modularize timetable.js
       });
     });
 
@@ -21,7 +25,11 @@
           $.getJSON('/extract',
             { addr: encodeURIComponent($('#url').val()) },
             function(calendar) {
+<<<<<<< HEAD
               timetable.replaceOrAddCalendar(calendar, true);
+=======
+              timetable.replaceOrAddCalendar(calendar);
+>>>>>>> further modularize timetable.js
               timetable.update();
             }
           );
