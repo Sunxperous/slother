@@ -169,6 +169,15 @@ label, span.label {
   text-transform: uppercase;
   font-size: 12px;  
 }
+
+#endearly {
+  display: block;
+  color: #E92946;
+  text-transform: uppercase;
+  font-family: "Comic Sans MS",arial;
+  font-size: 16px;  
+}
+
 input[type='submit'], input[type='button'], button {
   padding: 4px 16px;
   border: 2px solid #ccc;
@@ -268,6 +277,7 @@ div.tableWrapper {
 #calendar .dayDay {
   text-transform: capitalize;
 }
+
 #calendar .dateDisplay {
   z-index: 10;
   background-color: rgba(240, 240, 224, 0.8);

@@ -170,6 +170,33 @@
           exclude: item.exclude,
         });
       });
+      $('#end_early').unbind('click');
+      $('#end_early').click(function(event) {
+        if(exactDateEnd - exactDateStart > 3600000) {
+          exactDateEnd = exactDateEnd.subtract(30,'minutes');
+          $('#endearly').text("The ending time is set to 30 minutes earlier");
+        }
+        else {
+          $('#endearly').text("The ending time is set to 15 minutes earlier");
+          exactDateEnd = exactDateEnd.subtract(15,'minutes');  
+        }
+          displayEditablePopup({
+          submit: 'Edit event',
+          popup_title: 'Edit event',
+          event_id: item._id,
+          calendar_id: calendar_id,
+          summary: item.summary,
+          description: item.description,
+          location: item.location,
+          date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
+          date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
+          time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
+          time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
+          rrule_freq: item.rrule.freq,
+          rrule_count: item.rrule.count ? item.rrule.count : 1,
+          exclude: item.exclude,
+        });    
+      });
 
       // Delete this event instance.
       $('#delete_this').unbind('click');

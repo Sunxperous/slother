@@ -60,6 +60,7 @@
         button#edit_event Edit event
         button#delete_this Remove this
         button#delete_all Remove all
+        button#end_early End Early
     #new.hidden
       form#event_details(method='post')
         input#event_id(type='hidden' name='event_id')
@@ -82,6 +83,7 @@
           label(for='date_end') to (DD/MM/YYYY HH:mm)
           input#date_end.shortLength(type='text' name='dateEnd')
           input#time_end.shortLength(type='text' name='timeEnd')
+          div#endearly(for='endearly') 
         div
           label(for='rrule_freq') Repeat
           select#rrule_freq(name='rrule_freq')
