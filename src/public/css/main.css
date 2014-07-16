@@ -371,13 +371,20 @@ span.rruleFreq {
 #popup input[type='submit'] {
   margin-right: 8px;
 }
+#popup input[type='checkbox'] {
+  position: relative;
+  top: 2px;
+}
 #existing > div {
   margin-bottom: 8px;
 }
-#exclude > label.exclude {
+label.exclude {
   font-size: inherit;
   color: inherit;
   text-transform: inherit;
+}
+#popup .highlight {
+  color: #ef8c6c;
 }
 /*^ #popup ^*/
 

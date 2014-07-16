@@ -30,6 +30,7 @@ var timetable = (function() {
       close: function() {
         $('#popup_wrapper').addClass('hidden');
         this.status = this.statusTypes.HIDDEN;
+        return this;
       },
       show: function(type) {
         this.status = this.statusTypes.READ_ONLY; // Read-only until an input is edited.
@@ -37,8 +38,14 @@ var timetable = (function() {
         $('#' + type).removeClass('hidden');
         $('#' + otherType).addClass('hidden');
         $('#popup_wrapper').removeClass('hidden');
+        return this;
+      },
+      highlight: function(element) {
+        element.addClass('highlight');
+        return this;
       },
       displayItem: function(item) {
+        $('.highlight').removeClass('highlight');
         Object.keys(item).forEach(function(key) {
           if (key !== 'exclude') { // Not 'exclude'...
             var element = $('#' + key);
@@ -70,9 +77,9 @@ var timetable = (function() {
         if ($('#rrule_freq').val() === 'ONCE') {
           $('#rrule_count').prop('disabled', true);
         }
-        else { $('#rrule_count').removeAttr('disabled'); }
+        else { $('#rrule_count').removeProp('disabled'); }
 
-        this.show('new');
+        return this;
       },
     };
 
@@ -82,7 +89,7 @@ var timetable = (function() {
     };
     function externalClose(event) {
       if (popup.status !== popup.statusTypes.READ_ONLY) { return; }
-      if ($(event.target).attr('id') !== 'popup_wrapper') { return; }
+      if ($(event.target).prop('id') !== 'popup_wrapper') { return; }
       popup.close();
     }
     function displayDetailsOnClick(event) {
@@ -129,60 +136,97 @@ var timetable = (function() {
 
       popup.show('existing');
 
-      // Edit event.
-      $('#edit_event').unbind('click');
-      $('#edit_event').click(function editEvent(event) {
-        popup.displayItem({
-          submit: 'Edit event',
-          popup_title: 'Edit event',
-          event_id: item._id,
-          calendar_id: calendar_id,
-          summary: item.summary,
-          description: item.description,
-          location: item.location,
-          date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
-          date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
-          time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
-          time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
-          rrule_freq: item.rrule.freq,
-          rrule_count: item.rrule.count ? item.rrule.count : 1,
-          exclude: item.exclude,
+      if (calendars[calendar_id].editable) {
+        // Edit event.
+        $('#edit_event').unbind('click');
+        $('#edit_event').click(function editEvent(event) {
+          popup.displayItem({
+            submit: 'Edit event',
+            popup_title: 'Edit event',
+            event_id: item._id,
+            calendar_id: calendar_id,
+            summary: item.summary,
+            description: item.description,
+            location: item.location,
+            date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
+            date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
+            time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
+            time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
+            rrule_freq: item.rrule.freq,
+            rrule_count: item.rrule.count ? item.rrule.count : 1,
+            exclude: item.exclude,
+          }).show('new');
         });
-      });
 
-      // Delete this event instance.
-      $('#delete_this').unbind('click');
-      $('#delete_this').click(function(event) {
-        var excludes = item.exclude.map(function(exclude) { return exclude; }); // Cloning.
-        excludes.push(exactDateStart);
-        popup.displayItem({
-          submit: 'Edit event',
-          popup_title: 'Edit event',
-          event_id: item._id,
-          calendar_id: calendar_id,
-          summary: item.summary,
-          description: item.description,
-          location: item.location,
-          date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
-          date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
-          time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
-          time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
-          rrule_freq: item.rrule.freq,
-          rrule_count: item.rrule.count ? item.rrule.count : 1,
-          exclude: excludes,
-        });    
-      });
-
-      // Delete all of this event's instances.
-      $('#delete_all').unbind('click');
-      $('#delete_all').click(function(event) {
-        $.ajax('/calendar/' + calendar_id + '/event/' + item._id, {
-          type: 'DELETE'
-        })
-        .done(function(response) {
-          console.log(response);
+        // End early.
+        $('#end_early').unbind('click');
+        $('#end_early').click(function(event) {
+          if(exactDateEnd - exactDateStart > 3600000) {
+            exactDateEnd = exactDateEnd.subtract(30,'minutes');
+          }
+          else {
+            exactDateEnd = exactDateEnd.subtract(15,'minutes');  
+          }
+          popup.displayItem({
+            submit: 'Edit event',
+            popup_title: 'Edit event',
+            event_id: item._id,
+            calendar_id: calendar_id,
+            summary: item.summary,
+            description: item.description,
+            location: item.location,
+            date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
+            date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
+            time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
+            time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
+            rrule_freq: item.rrule.freq,
+            rrule_count: item.rrule.count ? item.rrule.count : 1,
+            exclude: item.exclude,
+          }).highlight($('#time_end')).show('new');    
         });
-      });
+
+        // Delete this event instance.
+        $('#delete_this').unbind('click');
+        $('#delete_this').click(function(event) {
+          var excludes = item.exclude.map(function(exclude) { return exclude; }); // Cloning.
+          excludes.push(exactDateStart);
+          popup.displayItem({
+            submit: 'Edit event',
+            popup_title: 'Edit event',
+            event_id: item._id,
+            calendar_id: calendar_id,
+            summary: item.summary,
+            description: item.description,
+            location: item.location,
+            date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
+            date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
+            time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
+            time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
+            rrule_freq: item.rrule.freq,
+            rrule_count: item.rrule.count ? item.rrule.count : 1,
+            exclude: excludes,
+          }).highlight($('.exclude:last')).show('new');    
+        });
+
+        // Delete all of this event's instances.
+        $('#delete_all').unbind('click');
+        $('#delete_all').click(function(event) {
+          $('#delete_all').prop('disabled', true);
+          $.ajax('/calendar/' + calendar_id + '/event/' + item._id, {
+            type: 'DELETE'
+          })
+          .done(function(response) {
+            console.log(response);
+            $('#delete_all').removeProp('disabled');
+          });
+        });
+      }
+      else {
+        $('#edit_event').hide();
+        $('#end_early').hide();
+        $('#delete_all').hide();
+        $('#delete_this').hide();
+      }
     }
 
     popup.status = popup.statusTypes.HIDDEN;
@@ -199,7 +243,7 @@ var timetable = (function() {
       if ($('#rrule_freq').val() === 'ONCE') {
         $('#rrule_count').prop('disabled', true);
       }
-      else { $('#rrule_count').removeAttr('disabled'); }    
+      else { $('#rrule_count').removeProp('disabled'); }    
     });
 
     // Popup for new event when empty areas of calendar are clicked.
@@ -234,7 +278,7 @@ var timetable = (function() {
         rrule_freq: 'ONCE',
         rrule_count: 1,
         exclude: [],
-      })
+      }).show('new');
     });
 
     // Sending event to server.
@@ -262,6 +306,7 @@ var timetable = (function() {
 
       var requestType = $('#popup_title').text() === 'Add event' ? 'POST' : 'PUT';
 
+      $('#submit').prop('disabled', true);
       $.ajax('/calendar/' + $('#calendar_id').val() + '/event/' + $('#event_id').val(),
         { data: sending, type: requestType })
         .done(function(response) {
@@ -269,6 +314,7 @@ var timetable = (function() {
           // Expecting response.data to contain event details and calendar_id.
           // Since only SOLO calendars can add/edit event for now, assume this is done in SOLO.
           calendars[response.calendar_id].replaceItem(response);
+          $('#submit').removeProp('disabled');
         });
     });
 
@@ -284,8 +330,9 @@ var timetable = (function() {
 
     function Calendar(calendar) {
       this._id = calendar._id;
-      this.name = calendar.name;
+      this.name = calendar.name || 'Calendar';
       this.items = calendar.events;
+      this.editable = calendar.editable || true;
       this.show = true;
       this.onDisplay = [];
       this.color = Please.make_color({
@@ -298,10 +345,12 @@ var timetable = (function() {
     }
 
     Calendar.prototype.appendToLists = function() {
-      // Append to popup select#calendar.
-      this.option = $('<option>');
-      this.option.val(this._id).text(this.name);
-      $('#calendar_id').append(this.option);
+      if (this.editable) {
+        // Append to popup select#calendar.
+        this.option = $('<option>');
+        this.option.val(this._id).text(this.name);
+        $('#calendar_id').append(this.option);
+      }
 
       this.li = $('#calendars .hidden').clone();
       this.li.removeClass('hidden')
@@ -464,7 +513,8 @@ var timetable = (function() {
     return Calendar;
   })();
 
-  timetable.replaceOrAddCalendar = function(calendar) {
+  timetable.replaceOrAddCalendar = function(calendar, editable) {
+    calendar.editable = editable;
     if (calendars.hasOwnProperty(calendar._id)) {
       calendars[calendar._id].destroy();
     }
