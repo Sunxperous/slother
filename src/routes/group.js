@@ -4,18 +4,7 @@ var User = require('../schema/userSchema');
 var Group = require('../schema/groupSchema');
 
 //***************Middleware*******************************//
-
-//Check logged in, else direct to login page
-function loggedIn(req, res, next) {
-  if (req.user) {
-    next();  
-  }
-  else { 
-    res.redirect('/login'); 
-    res.send({error: "Please log in"});
-  }
-}
-router.use(loggedIn);
+router.use(User.ensureAuthenticated());
 
 // Searches given _user in group[type], depending on positive.
 function userInGroup(_user, positive, type) {
@@ -45,7 +34,6 @@ function userInGroup(_user, positive, type) {
 //  body
 //    group_name: String
 router.post('/', 
-  User.attachLoggedIn(),
   function (req, res) {
     var user = req.attach.user;
     Group.create({
@@ -84,7 +72,6 @@ router.post('/',
 router.post('/:hash/invite',
   Group.ensureExistsByHash(true), // Attaches group.
   User.ensureExistsByUsername(true, ['body', 'username']), // Attaches target.
-  User.attachLoggedIn(), // Attaches user.
   userInGroup('user', true, 'admins'),
   userInGroup('target', false, 'members'),
   userInGroup('target', false, 'requested'),
@@ -117,7 +104,6 @@ router.post('/:hash/invite',
 router.delete('/:hash/member/:username',
   Group.ensureExistsByHash(true), // Attaches group.
   User.ensureExistsByUsername(true, ['params', 'username']), // Attaches target.
-  User.attachLoggedIn(), // Attaches user.
   userInGroup('target', true, 'members'),
   userInGroup('user', true, 'admins'),
   function (req,res) {

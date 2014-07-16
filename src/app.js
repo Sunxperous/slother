@@ -6,6 +6,7 @@ var express = require('express');
   var passport = require('passport');
     var bodyParser = require('body-parser');
   var mongoose = require('mongoose');
+    var User = require('./schema/userSchema');
 var path = require('path');
 var http = require('http');
 var config = require('./config');
@@ -47,8 +48,8 @@ app.use(applyLocals()); // Locals for jade templates, attaches for user-defined 
 app.use(express.static(__dirname + '/public'));
 app.use('/', login);
 app.use('/', routes);
-app.use('/extract', extractMod);
 app.use('/calendar', calendar);
+app.use('/extract', extractMod);
 app.use('/group', group);
 app.use('/user', user);
 
@@ -65,7 +66,6 @@ var server = app.listen(app.get('port'), function() {
 
 function applyLocals() {
   return function(req, res, next) {
-    app.locals.user = req.user;
     var flashMessages = {};
     flashMessages.alerts = req.flash('alert');
     flashMessages.errors = req.flash('error');
@@ -74,7 +74,19 @@ function applyLocals() {
 
     req.attach = {};
 
-    next();
+    if (req.isAuthenticated()) {
+      User.findOne({ username: req.user.username }, function(err, user) {
+        if (err) { console.log(err); }
+        else {
+          app.locals.user = user;
+          req.attach.user = user;
+          next();
+        }
+      });
+    }
+    else {
+      next ();
+    }
   }
 }
 

@@ -4,20 +4,9 @@ var User = require('../schema/userSchema');
 var Group = require('../schema/groupSchema');
 var Calendar = require('../schema/calendarSchema');
 
-function loggedIn(req, res, next) {
-  if (req.user) {
-    req.attach.myself = req.user;
-    next();  
-  }
-  else { 
-    req.flash('error', 'Please log in.');
-    res.redirect('/login');
-  }
-}
+router.use(User.ensureAuthenticated());
 
-router.get('/group/:hash/:name', loggedIn,
-  User.attachLoggedIn(), // Attaches user.
-  function(req, res) {
+router.get('/group/:hash/:name', function(req, res) {
   res.format({
 
     'text/html': function() { // If html page is requested...
@@ -83,7 +72,7 @@ router.get('/group/:hash/:name', loggedIn,
   });
 });
 
-router.get('/user', loggedIn, function(req, res) {
+router.get('/user', function(req, res) {
   res.format({
 
     'text/html': function() { // If html page is requested...
@@ -121,7 +110,7 @@ router.get('/user', loggedIn, function(req, res) {
   });
 });
 
-router.post('/', loggedIn, function (req, res) {
+router.post('/', function (req, res) {
   Calendar.create({ name: req.params.name, events:[] }, 
     function (err, calendar) {
     User.findOneAndUpdate({username:req.user.username},
@@ -136,7 +125,7 @@ router.post('/', loggedIn, function (req, res) {
   });
 });
 
-router.delete('/:calendar_id', loggedIn, function (req, res) {
+router.delete('/:calendar_id', function (req, res) {
   console.log("Routing success");
   Calendar.findOneAndRemove({_id:req.params.calendar_id},
     function (err, calendar) {

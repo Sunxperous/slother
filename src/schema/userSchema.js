@@ -25,6 +25,17 @@ userSchema.methods.authPassword = function(password, callback) {
   });
 };
 
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    next();
+  }
+  else {
+    req.flash('error', 'Please log in');
+    res.redirect('/login');
+  }
+}
+userSchema.statics.ensureAuthenticated = function() { return ensureAuthenticated; }
+
 function getNestedValue(obj, keys) {
   var target = obj;
   keys.forEach(function(key) {
@@ -55,20 +66,6 @@ userSchema.statics.ensureExistsByUsername = function(positive, source) {
         }
         else { next(); } // ...and it does not exist!
       }
-    });
-  };
-};
-
-userSchema.statics.attachLoggedIn = function() {
-  var _this = this;
-  return function(req, res, next) {
-    _this.findOne({ username: req.user.username }, function(err, user) {
-      if (err) { console.log(err); }
-      else if (user) {
-        req.attach.user = user;
-        next();
-      }
-      else { res.end(); } // Shouldn't reach here.
     });
   };
 };
