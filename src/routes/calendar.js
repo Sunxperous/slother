@@ -150,9 +150,11 @@ router.delete('/:calendar_id', function (req, res, next) {
             return res.send({success:"Calendar "+calendar.name+" is removed."});
           }
       });
+    });
   });
 });
 
+//Change privacy setting
 router.put('/:calendar_id/privacy', function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id})
   .exec( function (err, calendar) {
@@ -165,7 +167,7 @@ router.put('/:calendar_id/privacy', function (req, res, next) {
   });
 });
 
-router.put('/:calendar_id/color', function(req, res, next) {
+router.put('/:calendar_id/color', function (req, res, next) {
   Calendar.findOne({ _id:req.params.calendar_id })
   .exec(function (err, calendar) {
     if (err) { return next(err); }
@@ -177,6 +179,7 @@ router.put('/:calendar_id/color', function(req, res, next) {
   });
 });
 
+//Modify event
 router.put('/:calendar_id/event/:event_id',
   function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id,
@@ -202,6 +205,7 @@ router.put('/:calendar_id/event/:event_id',
   });
 });
 
+//Create event
 router.post('/:calendar_id/event/',
   function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id})
@@ -227,6 +231,7 @@ router.post('/:calendar_id/event/',
   });
 });
 
+//Delete event
 router.delete('/:calendar_id/event/:event_id', 
   function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id,

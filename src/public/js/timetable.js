@@ -645,16 +645,28 @@
             $.getJSON('/extract',
               { addr: encodeURIComponent($('#url').val()) },
               function(calendar) {
+                 // Check if calendar._id already exists.
                 if (_this.calendars.hasOwnProperty(calendar._id)) {
                   _this.calendars[calendar._id].destroy();
                 }
-                _this.calendars[calendar._id] = new Calendar(this, calendar); // Check if calendar._id already exists.
+                _this.calendars[calendar._id] = new Calendar(this, calendar);
                 update();
               }
             );
           }
           else {
           }
+        }
+        else if($('#type').val() == 'generic'){
+          $.ajax('/calendar/',{ data: { name: $('#url').val()}, type: 'POST'})
+          .done(function(response) {
+            console.log(response);
+            if (_this.calendars.hasOwnProperty(response.calendar._id)) {
+                  _this.calendars[response.calendar._id].destroy();
+                }
+                _this.calendars[response.calendar._id] = new Calendar(this, response.calendar); 
+                update();
+          });
         }
         return false;
       });
