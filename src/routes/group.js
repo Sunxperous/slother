@@ -12,7 +12,7 @@ function userInGroup(_user, positive, type) {
     var group = req.attach.group;
     var user = req.attach[_user];
     if (group && user) { // Compulsory to have.
-      var hasUser = group.hasUser(user, type);
+      var hasUser = group.hasUser(user, type) && user.hasGroup(group);
       if (positive) { // We want user in group list...
         if (hasUser) { next(); } // ...yay!
         else { // ...nope, user is not in group list.

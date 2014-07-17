@@ -25,6 +25,12 @@ userSchema.methods.authPassword = function(password, callback) {
   });
 };
 
+userSchema.methods.hasGroup = function(group) {
+  return this.groups.some(function(g) {
+    return (g.toString() === group._id.toString());
+  });
+};
+
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     next();

@@ -33,36 +33,42 @@ router.get('/group/:hash/:name', function(req, res) {
       var group_id = Group.decryptHash(req.params.hash);
       Group.findById(group_id)
       .select('groupName members requested')
-      .populate('members', 'calendars username')
       .lean()
       .exec(function(err, group) {
         if (err) { console.log(err); }
         else if (group) {
           var numUserQueried = 0;
+          var members = [];
           group.members.forEach(function(member, index) {
             User
-            .findById(member._id)
+            .findById(member) // member is an id.
             .populate('calendars')
-            .lean()
             .exec(function(err, user) {
               if (err) { console.log(err); }
+              else if (!user.hasGroup(group)) { // Group has user, but user does not have group...
+                group.members.splice(group.members.indexOf(member), 1);
+              }
               else {
-                group.members[index].events = [];
+                members[index] = {};
+                members[index]._id = user._id;
+                members[index].username = user.username;
+                members[index].events = [];
                 user.calendars.forEach(function(calendar) {
                   if(calendar.hidden) {
-                    calendar.events.forEach(function (eve) {
-                      eve.summary = "";
-                      eve.description = "";
-                      eve.location = "";
+                    calendar.events.forEach(function (event) {
+                      event.summary = "";
+                      event.description = "";
+                      event.location = "";
                     });
                   }
-                  group.members[index].events.push.apply(group.members[index].events, calendar.events);
+                  members[index].events.push.apply(members[index].events, calendar.events);
                 });
 
                 numUserQueried++;
-                if (numUserQueried >= group.members.length) {
-                  res.send(group);
-                }
+              }
+              if (numUserQueried >= group.members.length) {
+                group.members = members; // Replace with new members array.
+                res.send(group);
               }
             });
           });
