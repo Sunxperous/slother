@@ -68,7 +68,14 @@ router.get('/group/:hash/:name', function(req, res) {
               }
               if (numUserQueried >= group.members.length) {
                 group.members = members; // Replace with new members array.
-                res.send(group);
+                Calendar.findOne({ group: group._id }).lean()
+                .exec(function(err, calendar) {
+                  if (err) { console.log(err); }
+                  else if (calendar) {
+                    group.calendar = calendar;
+                    res.send(group);
+                  }
+                })
               }
             });
           });

@@ -8,7 +8,8 @@
           _id: member._id, name: member.username, events: member.events
         };
         timetable.replaceOrAddCalendar(genericCalendar, false);
-      })
+      });
+      timetable.replaceOrAddCalendar(response.calendar, true);
     }
   );
 

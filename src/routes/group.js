@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var User = require('../schema/userSchema');
 var Group = require('../schema/groupSchema');
+var Calendar = require('../schema/calendarSchema');
 
 //***************Middleware*******************************//
 router.use(User.ensureAuthenticated());
@@ -52,12 +53,19 @@ router.post('/',
           console.log(err);
         }
       }
-      else {
-        user.groups.push(group._id);
-        user.save(function (err, user) {
-          if(err) { console.log(err); res.send(null); }
-          else {
-            res.redirect('/group');
+      else if (group) {
+        Calendar.create({
+          name: group.groupName, group: group._id
+        }, function(err, calendar) {
+          if (err) { console.log(err); }
+          else if (calendar) {
+            user.groups.push(group._id);
+            user.save(function (err, user) {
+              if(err) { console.log(err); res.send(null); }
+              else {
+                res.redirect('/group');
+              }
+            });            
           }
         });
       }

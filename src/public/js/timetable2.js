@@ -60,7 +60,7 @@ var timetable = (function() {
                 break;
             }
           }
-          else { // key === 'exclude'
+          else if (item[key]) { // key === 'exclude' is not undefined...
             $('#exclude').html('<label>Exclude</label>')
             var appending = '';
             item[key].forEach(function(excludeDate) {
@@ -77,7 +77,7 @@ var timetable = (function() {
         if ($('#rrule_freq').val() === 'ONCE') {
           $('#rrule_count').prop('disabled', true);
         }
-        else { $('#rrule_count').removeProp('disabled'); }
+        else { $('#rrule_count').removeAttr('disabled'); }
 
         return this;
       },
@@ -98,6 +98,8 @@ var timetable = (function() {
 
       var item = $(event.target).data('item');
       var calendar_id = $(event.target).data('calendar_id');
+      var dateStart = moment(item.dateStart);
+      var dateEnd = moment(item.dateEnd);
       var exactDateStart = $(event.target).data('exactDate');
       var duration = $(event.target).data('duration');
 
@@ -133,6 +135,9 @@ var timetable = (function() {
           $('#existing .exclude').append(li);
         });
       }
+      else {
+        item.exclude = [];
+      }
 
       popup.show('existing');
 
@@ -148,10 +153,10 @@ var timetable = (function() {
             summary: item.summary,
             description: item.description,
             location: item.location,
-            date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
-            date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
-            time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
-            time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
+            date_start: dateStart.format(MOMENT_DATE_FORMAT),
+            date_end: dateEnd.format(MOMENT_DATE_FORMAT),
+            time_start: dateStart.format(MOMENT_TIME_FORMAT),
+            time_end: dateEnd.format(MOMENT_TIME_FORMAT),
             rrule_freq: item.rrule.freq,
             rrule_count: item.rrule.count ? item.rrule.count : 1,
             exclude: item.exclude,
@@ -175,10 +180,10 @@ var timetable = (function() {
             summary: item.summary,
             description: item.description,
             location: item.location,
-            date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
-            date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
-            time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
-            time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
+            date_start: dateStart.format(MOMENT_DATE_FORMAT),
+            date_end: dateEnd.format(MOMENT_DATE_FORMAT),
+            time_start: dateStart.format(MOMENT_TIME_FORMAT),
+            time_end: dateEnd.format(MOMENT_TIME_FORMAT),
             rrule_freq: item.rrule.freq,
             rrule_count: item.rrule.count ? item.rrule.count : 1,
             exclude: item.exclude,
@@ -198,10 +203,10 @@ var timetable = (function() {
             summary: item.summary,
             description: item.description,
             location: item.location,
-            date_start: exactDateStart.format(MOMENT_DATE_FORMAT),
-            date_end: exactDateEnd.format(MOMENT_DATE_FORMAT),
-            time_start: exactDateStart.format(MOMENT_TIME_FORMAT),
-            time_end: exactDateEnd.format(MOMENT_TIME_FORMAT),
+            date_start: dateStart.format(MOMENT_DATE_FORMAT),
+            date_end: dateEnd.format(MOMENT_DATE_FORMAT),
+            time_start: dateStart.format(MOMENT_TIME_FORMAT),
+            time_end: dateEnd.format(MOMENT_TIME_FORMAT),
             rrule_freq: item.rrule.freq,
             rrule_count: item.rrule.count ? item.rrule.count : 1,
             exclude: excludes,
@@ -217,7 +222,7 @@ var timetable = (function() {
           })
           .done(function(response) {
             console.log(response);
-            $('#delete_all').removeProp('disabled');
+            $('#delete_all').removeAttr('disabled');
           });
         });
       }
@@ -243,7 +248,7 @@ var timetable = (function() {
       if ($('#rrule_freq').val() === 'ONCE') {
         $('#rrule_count').prop('disabled', true);
       }
-      else { $('#rrule_count').removeProp('disabled'); }    
+      else { $('#rrule_count').removeAttr('disabled'); }    
     });
 
     // Popup for new event when empty areas of calendar are clicked.
@@ -313,8 +318,8 @@ var timetable = (function() {
           console.log(response);
           // Expecting response.data to contain event details and calendar_id.
           // Since only SOLO calendars can add/edit event for now, assume this is done in SOLO.
-          calendars[response.calendar_id].replaceItem(response);
-          $('#submit').removeProp('disabled');
+          calendars[response.calendar_id].addOrReplaceItem(response.eventInfo); // Replace or add.
+          $('#submit').removeAttr('disabled');
         });
     });
 
@@ -370,11 +375,16 @@ var timetable = (function() {
       return _this.show;
     };
 
-    Calendar.prototype.replaceItem = function(event) {
+    Calendar.prototype.addOrReplaceItem = function(event) {
+      var found = false;
       this.items.forEach(function(item, index, items) {
-        if (item._id === event._id) { items[index] = event; }
+        if (item._id === event._id) {
+          items[index] = event;
+          found = true;
+        }
       });
-      update();
+      if (!found) { this.items.push(event); }
+      timetable.update();
     };
 
     Calendar.prototype.display = function() {
