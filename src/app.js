@@ -70,7 +70,7 @@ function applyLocals() {
     flashMessages.alerts = req.flash('alert');
     flashMessages.errors = req.flash('error');
     flashMessages.requests = req.flash('requests');
-    app.locals.messages = flashMessages;
+    res.locals.messages = flashMessages;
 
     req.attach = {};
 
@@ -78,7 +78,7 @@ function applyLocals() {
       User.findOne({ username: req.user.username }, function(err, user) {
         if (err) { console.log(err); }
         else {
-          app.locals.user = user;
+          res.locals.user = user;
           req.attach.user = user;
           next();
         }

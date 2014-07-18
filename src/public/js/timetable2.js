@@ -2,7 +2,7 @@ var timetable = (function() {
   'use strict';
 
   var CELL_WIDTH             = 76; // Cell width.
-  var CELL_HEIGHT            = 14; // Cell height.
+  var CELL_HEIGHT            = 15; // Cell height.
   var RIGHT_DIV_TRIM         = 2;  // Pixels to trim at the right of each item div.
   var DATEPICKER_DATE_FORMAT = "d/m/Y"; // Not in use at the moment.
   var MOMENT_DATE_FORMAT     = "DD/MM/YYYY"; // For input elements.
