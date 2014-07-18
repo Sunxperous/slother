@@ -17,18 +17,33 @@
       event.preventDefault();
       
       if ($('#type').val() === 'nusmods') {
-        if (validateNUSModsLink($('#url').val())) {
-          $.getJSON('/extract',
-            { addr: encodeURIComponent($('#url').val()) },
+        if (validateNUSModsLink($('#nusmods_string').val())) {
+          $.post('/extract',
+            { addr: encodeURIComponent($('#nusmods_string').val()) },
             function(calendar) {
               timetable.replaceOrAddCalendar(calendar, true);
               timetable.update();
             }
           );
         }
-        else {
+        else { // Display error.
         }
       }
+      else if ($('#type').val() === 'generic') {
+        $.post('/calendar',
+          { name: $('#generic_string').val() },
+          function(calendar) {
+            timetable.replaceOrAddCalendar(calendar, true);
+            timetable.update();
+          }
+        );
+      }
       return false;
+    });
+
+    $('#type').change(function(event) {
+      $('#nusmods').hide();
+      $('#generic').hide();
+      $('#' + $(this).val()).show();
     });
 })();

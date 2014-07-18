@@ -18,11 +18,14 @@ block content
         div
           label(for='type') Type
           select#type(name='type')
-            option(value='nusmods') NUSMods.com
-            option(value='generic') Generic (not implemented)
-        div
-          label(for='url') URL
-          input#url(name='url' type='text' placeholder='http://nusmods.com/timetable/2014-2015/sem1?')
+            option(value='nusmods' data-label='URL') NUSMods.com
+            option(value='generic' data-label='Name') Generic
+        div#nusmods
+          label(for='nusmods_string') URL
+          input#nusmods_string(name='string' type='text' placeholder='http://nusmods.com/timetable/2014-2015/sem1?')
+        div#generic.hidden
+          label(for='generic_string') Name
+          input#generic_string(name='string' type='text')
         div
           input#add.green(type='submit' value='Add calendar')
 

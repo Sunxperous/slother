@@ -125,15 +125,17 @@ router.get('/user', function(req, res) {
 });
 
 router.post('/', function (req, res) {
-  Calendar.create({ name: req.params.name, events:[] }, 
+  console.log(req.body);
+  Calendar.create({ name: req.body.name, events:[] }, 
     function (err, calendar) {
+    if (err) { console.log(err); }
     User.findOneAndUpdate({username:req.user.username},
-      {$push:{calendar:calendar._id}}, function (err, user) {
+      {$push:{calendars:calendar._id}}, function (err, user) {
         if(err) { console.log(err); res.send(null); }
         calendar.user = user._id;
         calendar.save( function (err, calendar) {
           if(err) { console.log(err); res.send(null); }
-          else res.send({success:"New calendar is created."});
+          else res.send(calendar);
         });
     });
   });
@@ -143,7 +145,6 @@ router.delete('/:calendar_id', function (req, res) {
   console.log("Routing success");
   Calendar.findOneAndRemove({_id:req.params.calendar_id},
     function (err, calendar) {
-          console.log("calendar found" +calendar);
       User.findOneAndUpdate({username:req.user.username},
         {$pull:{calendar:calendar._id}}, function (err, user) {
           if(err) { console.log(err); res.send(null); }

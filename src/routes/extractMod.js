@@ -266,8 +266,8 @@ function loggedIn(req, res, next) {
   }
 }
 
-router.get('/', loggedIn, function (req,res) {
-  var addr = req.query.addr;
+router.post('/', loggedIn, function (req,res) {
+  var addr = req.body.addr;
   extract(decodeURIComponent(addr), req.user._id, function (err, calendar) {
     if(err) { console.log(err); res.send(null); }
     else {
