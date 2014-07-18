@@ -223,9 +223,12 @@ var timetable = (function() {
           $.ajax('/calendar/' + calendar_id + '/event/' + item._id, {
             type: 'DELETE'
           })
-          .done(function(response) {
-            console.log(response);
-            $('#delete_all').removeAttr('disabled');
+          .success(function(response) {
+            if (response.success) {
+              calendars[calendar_id].deleteItem(item._id);
+              popup.close();
+              $('#delete_all').removeAttr('disabled');
+            }
           });
         });
       }
@@ -318,7 +321,6 @@ var timetable = (function() {
       $.ajax('/calendar/' + $('#calendar_id').val() + '/event/' + $('#event_id').val(),
         { data: sending, type: requestType })
         .done(function(response) {
-          console.log(response);
           // Expecting response.data to contain event details and calendar_id.
           // Since only SOLO calendars can add/edit event for now, assume this is done in SOLO.
           calendars[response.calendar_id].addOrReplaceItem(response.eventInfo); // Replace or add.
@@ -330,31 +332,28 @@ var timetable = (function() {
     return popup;
   })();
 
+  function toggleView(event) {
+    var status = event.data.toggleView();
+    $(this).text(status ? 'hide' : 'show');
+  }
+
+  function colorPicker(event) {
+    var colorpicker = $('#colorpicker');
+    if (colorpicker.is(':visible') && colorpicker.parent().is(event.data.li)) {
+      // Visible and has same calendar parent.
+      colorpicker.hide();
+    }
+    else { // Not visible, or is on different calendar parent...
+      colorpicker.data('calendar', event.data);
+      colorpicker.hide().detach().appendTo(event.data.li).show(); // Move to new parent.
+    }
+  }
+
+  $('.color').click(function(event) {
+    $('#colorpicker').data('calendar').changeColor($(this).data('color'));
+  });
 
   var Calendar = (function() {
-    function toggleView(event) {
-      var status = event.data.toggleView();
-      $(this).text(status ? 'hide' : 'show');
-    }
-
-    function colorPicker(event) {
-      var colorpicker = $('#colorpicker');
-      console.log(colorpicker.parent());
-      console.log(event.data.li);
-      if (colorpicker.is(':visible') && colorpicker.parent().is(event.data.li)) {
-        // Visible and has same calendar parent.
-        colorpicker.hide();
-      }
-      else { // Not visible, or is on different calendar parent...
-        colorpicker.data('calendar', event.data);
-        colorpicker.hide().detach().appendTo(event.data.li).show(); // Move to new parent.
-      }
-    }
-
-    $('.color').click(function(event) {
-      $('#colorpicker').data('calendar').changeColor($(this).data('color'));
-    });
-
     function Calendar(calendar) {
       this._id = calendar._id;
       this.name = calendar.name || 'Calendar';
@@ -426,6 +425,13 @@ var timetable = (function() {
       timetable.update();
     };
 
+    Calendar.prototype.deleteItem = function(itemId) {
+      this.items = $.grep(this.items, function(item) {
+        return item._id !== itemId
+      });
+      timetable.update();
+    }
+
     Calendar.prototype.display = function() {
       var _this = this;
       if (this.items) {
@@ -456,7 +462,6 @@ var timetable = (function() {
         case 'ONCE':
           // Simple.
           if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
-            console.log(date);
             return date;
           }
           break;
