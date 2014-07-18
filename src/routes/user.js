@@ -43,5 +43,31 @@ router.post('/createCalendar', loggedIn, function (req, res) {
   });
 });
 
+router.get('/', function(req, res) {
+  res.format({
+    'text/html': function() { // If html page is requested...
+      User
+      .findOne({ username: req.user.username })
+      .populate('groups','groupName _id')
+      .populate('requests','groupName _id')
+      .populate('calendars','name hidden _id')
+      .exec(function(err, user) {
+        user.groups.forEach(function(group) {
+          var friendly_url;
+          friendly_url = group.groupName.replace(/\s+/g, '-').toLowerCase();
+          group.url = '/calendar/group/' + group.getHash() + '/' + friendly_url;
+        });
+        res.render('user', {
+          username: user.username,
+          groups: user.groups,
+          requests: user.requests,
+          displays: user.display_name,
+          calendar: user.calendars
+        });
+      });
+    },
+  });
+});
+
 
 module.exports = router;

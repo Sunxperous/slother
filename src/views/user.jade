@@ -1,0 +1,54 @@
+extends layout
+
+block headScript
+
+
+block content
+  .user-block#profile
+    h4 My Profile
+    p
+      div#user_name
+        span#profile_header Username
+        span#profile_value=username
+      div#displayname
+        span#profile_header Display Name
+        span#profile_value 
+      div#change_display_name  
+        input#display_name(type='text' placeholder='Change your name')
+        input#change_name(type='button' value='Change Display Name')
+     
+  .user-block#request
+    h4 Group Request
+    p
+      div
+        for request in requests
+          span.req-name=request.name
+          input.req-accept(value='Accept' type='submit')
+          input.req-reject(value='Reject' type='submit')
+
+  .user-block#calendar_info
+    h4 My calendars
+    p
+        for item in calendar
+          li
+            span.cal-name=item.name 
+            span=item.privacy
+            if(item.privacy)
+              a(href='../Private.png') 
+            input(id=item.id value=item.name type='hidden')
+            select.cal-privacy-type(type='select')
+
+              option(value=item.privacy selected)
+              option(value=item.privacy selected)
+            input.cal-name(value='Change Name' type='submit')
+            input.cal-privacy(value='Change Privacy' type='submit')
+            input.cal-delete(value='Delete' type='submit') 
+  
+  .user-block#group_info
+    h4 My Group
+    for group in groups
+      a(href=group.url)= group.groupName
+
+block footScripts
+  script(src='/vendor/please.min.js')
+  script(src='/js/user.js')

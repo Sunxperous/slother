@@ -101,32 +101,69 @@ nav {
   text-align: right;
   position: absolute;
   top: 4px;
-  right: 4px;
+  right: 30px;
   width: 100%;
   z-index: 0;
 }
 #links > * {
-  margin-left: 16px;
+  margin-left: 5px;
   display: inline-block;
   vertical-align: bottom;
 }
 #user {
+  position: relative;
+  right: 5px;
   display: inline-block;
   max-width: 40%;
   color: #960;
-  overflow: hidden;
   text-overflow: ellipsis;
   position: relative;
   z-index: 0;
 }
+
+#username {
+  text-align: left;
+  position: relative;
+  left:1px;
+}
+
+#profile_link {
+  position: relative;
+  left:3px;
+}
+
 #number {
   font-size: 14px;
   padding: 2px 8px;
   border-radius: 8px;  
 }
+<<<<<<< HEAD
 a.has-notifications {
   color: #fff;
   background-color: #f66;
+=======
+#errors, #alerts, #requests {
+  padding: 0;
+  text-align: center;
+}
+.message {
+  display: block;
+  padding: 4px 8px;
+  background-color: #ffc;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 8px;
+  margin: 2px auto;
+  white-space: wrap;
+  overflow: hidden;
+  text-overflow: ellipsis;  
+}
+#errors .message {
+  color: #f66;
+}
+#alerts .message {
+  color: #c93;
+>>>>>>> Initial set up of user page
 }
 a.no-notifications {
   color: #333;
@@ -545,6 +582,7 @@ h3.info-block-title {
 }
 /*^ #calendar_controls ^*/
 
+<<<<<<< HEAD
 /*v #colorpicker v*/
 #colorpicker {
   margin-top: 4px;
@@ -559,3 +597,84 @@ h3.info-block-title {
   cursor: pointer;
 }
 /*^ #colorpicker ^*/
+=======
+/*^ user.jade ^*/
+
+.user-block {
+  margin: 10px auto auto auto;
+  width: 95%;
+  min-width: 400px;
+  max-width: 480px;
+  position: relative;
+  min-height: 135px;
+  height: auto;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  text-align: left;
+  position: relative;
+}
+
+#profile {
+  width: 95%;
+  max-width: 230px;
+}
+
+#request {
+  width: 95%;
+  max-width: 200px;
+}
+
+#calendar_info {
+  border: 1px solid;
+  width: 480px;
+  max-width: 480px;
+}
+
+#calendar_info li {
+  position: relative;
+  left:5px;
+}
+
+
+
+.cal-delete {
+  position:absolute;
+  right:10px;
+}
+
+.cal-name {
+
+}
+
+#user_name {
+  margin: 10px;
+}
+
+#displayname {
+  margin: 10px;
+}
+#profile_header {
+  position: relative;
+  left:10px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+
+#profile_value {
+  position: absolute;
+  right: 10px;
+}
+
+#change_display_name {
+  padding: 10px;
+  text-align: center;
+}
+
+h4 {
+  text-align: center;
+  margin: 10px 0px 5px;
+  font-size: 20px;
+  font-style: bold;
+  font-weight: 500;
+}
+/*^ user.jade ^*/

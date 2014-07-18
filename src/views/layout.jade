@@ -19,18 +19,19 @@ html(lang='en')
         a(href='/')
           #brand
             h1 - Slother -
-        #links
+        
           if (user)
-            div
+            span Hi, 
+            span#username= user.username
+            div#links
               a#groups(href='/group') Groups
-            span#user
-              //- a#username(href='#') MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-              a#username(href='#')= user.display_name
+              a#profile_link(href='/user') Profile
             #notification
               if (user.requests.length > 0)
                 a#number.has-notifications(href='#')= user.requests.length
               else
                 a#number.no-notifications(href='#')= user.requests.length
+              
           else
             a(href='/login') Login
             a(href='/register') Register

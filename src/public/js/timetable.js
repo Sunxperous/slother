@@ -1,5 +1,4 @@
 (function() {
-
   'use strict';
 
   var CELL_WIDTH             = 76; // Cell width.

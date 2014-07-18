@@ -93,6 +93,7 @@ router.get('/user', function(req, res, next) {
       .findOne({ username: req.user.username })
       .populate('groups')
       .populate('requests')
+      .populate('calendars')
       .exec(function(err, user) {
         if (err) { return next(err); }
         if (user) {

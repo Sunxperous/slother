@@ -16,17 +16,6 @@ var async = require('async');
 //                  summary,exclude,location,rrule
 //
 //  Manual enter of semStart date 
-/*
-  http://nusmods.com/timetable/
-  [{"ModuleCode":"CS2010",
-  "selectedLessons":[{"ClassNo":"1","LessonType":"Lecture"},
-                    {"ClassNo":"4","LessonType":"Tutorial"},
-                    {"ClassNo":"5","LessonType":"Laboratory"}]},
-  {"ModuleCode":"CS2101",
-  "selectedLessons":[{"ClassNo":"1","LessonType":"Sectional Teaching"}]},
-
-
-*/
 function extract(addr, userId, callback) {
   
   var addr = decodeURIComponent(addr.trim().replace("http://","").
