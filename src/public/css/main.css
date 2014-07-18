@@ -120,10 +120,16 @@ nav {
 }
 #number {
   font-size: 14px;
-  color: #fff;
-  background-color: #f66;
   padding: 2px 8px;
   border-radius: 8px;  
+}
+a.has-notifications {
+  color: #fff;
+  background-color: #f66;
+}
+a.no-notifications {
+  color: #333;
+  background-color: #ccc;
 }
 #errors, #alerts, #requests {
   padding: 0;
