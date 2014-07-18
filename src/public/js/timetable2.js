@@ -361,11 +361,7 @@ var timetable = (function() {
       this.editable = calendar.editable;
       this.show = true;
       this.onDisplay = [];
-      this.color = calendar.color || Please.make_color({
-        golden: false,
-        saturation: .2,
-        value: 1
-      });
+      this.color = calendar.color;
       this.appendToLists(); // Append to popup select and calendars display.
       this.display();
     }
