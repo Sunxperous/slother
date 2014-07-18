@@ -5,9 +5,21 @@ var config = require('../config');
 var Hashids = require('hashids');
   var hashids = new Hashids(config.hashid.salt);
 
+function randomColor() {
+  return config.colors[Math.floor(Math.random() * config.colors.length)];
+}
+
 var groupSchema = new Schema({
   groupName: { type: String, required: true },
-  members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  members: [{
+    _id: {
+      type: Schema.Types.ObjectId, ref: 'User',
+    },
+    color: {
+      type: String,
+      default: randomColor
+    }
+  }],
   requested: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   admins: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   created_by: { type: Schema.Types.ObjectId, ref: 'User' }
@@ -17,7 +29,12 @@ var groupSchema = new Schema({
 groupSchema.methods.hasUser = function(user, type) {
   type = type || 'members';
   return this[type].some(function(member) { // .some returns true prematurely.
-    return (member.toString() === user._id.toString());
+    if (type === 'members') {
+      return (member._id.toString() === user._id.toString());
+    }
+    else {
+      return (member.toString() === user._id.toString());
+    }
   });
 };
 

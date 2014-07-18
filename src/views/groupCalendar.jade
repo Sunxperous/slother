@@ -13,8 +13,6 @@ block content
         li.hidden
           span.calendar-name
           span.toggle-view.small-text hide
-          if (isAdmin)
-            a.delete.small-text delete
     .info-block
       form#add_friend(action='/group/' + group.getHash() + '/invite')
         h3.info-block-title Invite a friend

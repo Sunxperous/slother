@@ -41,7 +41,7 @@ router.get('/group/:hash/:name', function(req, res) {
           var members = [];
           group.members.forEach(function(member, index) {
             User
-            .findById(member) // member is an id.
+            .findById(member._id)
             .populate('calendars')
             .exec(function(err, user) {
               if (err) { console.log(err); }
@@ -52,6 +52,7 @@ router.get('/group/:hash/:name', function(req, res) {
                 members[index] = {};
                 members[index]._id = user._id;
                 members[index].username = user.username;
+                members[index].color = member.color;
                 members[index].events = [];
                 user.calendars.forEach(function(calendar) {
                   if(calendar.hidden) {
@@ -156,6 +157,16 @@ router.put('/:calendar_id/privacy', function (req, res) {
   .exec( function (err, calendar) {
     calendar.hidden = req.body.hidden;
     calendar.save( function (err, calendar) {
+      res.send({success:"Privacy setting changed."});
+    });
+  });
+});
+
+router.put('/:calendar_id/color', function(req, res) {
+  Calendar.findOne({ _id:req.params.calendar_id })
+  .exec(function (err, calendar) {
+    calendar.color = req.body.color;
+    calendar.save(function (err, calendar) {
       res.send({success:"Privacy setting changed."});
     });
   });

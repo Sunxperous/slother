@@ -39,7 +39,7 @@ router.post('/',
     var user = req.attach.user;
     Group.create({
       groupName: req.body.group_name,
-      members: [user._id],
+      members: [{ _id: user._id }],
       admins: [user._id],
       requested: [],
       created_by: user._id
@@ -89,7 +89,7 @@ router.post('/:hash/invite',
 
     target.requests.push(group._id);
     //group.requested.push(target._id);
-    group.members.push(target._id); // Temporary.
+    group.members.push({ _id: target._id }); // Temporary.
 
     group.save(function(err) {
       if (err) { console.log(err); }
@@ -105,7 +105,7 @@ router.post('/:hash/invite',
   }
 );
    
-// Post request to remove user in a group.
+// Delete request to remove user in a group.
 //  params
 //    hash: Group.ObjectId.hashed
 //    username: String
@@ -118,9 +118,7 @@ router.delete('/:hash/member/:username',
     var group = req.attach.group;
     var target = req.attach.target;
 
-    console.log(group, target);
-
-    group.members.pull(target._id);
+    group.members.pull({ _id: target._id });
     target.groups.pull(group._id);
 
     group.save(function(err) {
@@ -132,6 +130,33 @@ router.delete('/:hash/member/:username',
             res.send({ success: 'User ' + target.username + ' is removed from the group.' })
           }
         });
+      }
+    });
+});
+   
+// Put request to remove user in a group.
+//  params
+//    hash: Group.ObjectId.hashed
+//    username: String
+router.put('/:hash/member/:username/color',
+  Group.ensureExistsByHash(true), // Attaches group.
+  User.ensureExistsByUsername(true, ['params', 'username']), // Attaches target.
+  userInGroup('target', true, 'members'),
+  userInGroup('user', true, 'admins'),
+  function (req,res) {
+    var group = req.attach.group;
+    var target = req.attach.target;
+
+    group.members.forEach(function(member, index, members) {
+      if (member._id.toString() === target._id.toString()) {
+        group.members[index].color = req.body.color;
+      }
+    });
+
+    group.save(function(err) {
+      if (err) { console.log(err); }
+      else {
+        res.send({ success: 'Member ' + target.username + ' changed colors.' })
       }
     });
 });

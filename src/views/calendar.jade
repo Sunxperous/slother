@@ -57,10 +57,12 @@
         span.label Exclude
         ul.exclude
       div
-        button#edit_event Edit event
-        button#end_early End early
-        button#delete_this Remove this
-        button#delete_all Remove all
+        div
+          button#edit_event.orange Edit event
+          button#end_early.yellow End early
+        div
+          button#delete_this.pink Remove this
+          button#delete_all.grey Remove all
     #new.hidden
       form#event_details(method='post')
         input#event_id(type='hidden' name='event_id')
@@ -112,6 +114,47 @@ div#calendar_controls_wrapper
         span#sat_day
       p#year_display
     button#after &#9654;
+
+div#colorpicker.hidden
+  div.color-light
+    button.color(style='background-color: #fecccc' data-color='#fecccc')
+    button.color(style='background-color: #fedacc' data-color='#fedacc')
+    button.color(style='background-color: #fee7cc' data-color='#fee7cc')
+    button.color(style='background-color: #fef4cc' data-color='#fef4cc')
+    button.color(style='background-color: #fefecc' data-color='#fefecc')
+    button.color(style='background-color: #dafecc' data-color='#dafecc')
+    button.color(style='background-color: #ccfed9' data-color='#ccfed9')
+    button.color(style='background-color: #ccfef5' data-color='#ccfef5')
+    button.color(style='background-color: #cceafe' data-color='#cceafe')
+    button.color(style='background-color: #ccd1fe' data-color='#ccd1fe')
+    button.color(style='background-color: #e1ccfe' data-color='#e1ccfe')
+    button.color(style='background-color: #fbccfe' data-color='#fbccfe')
+  div.color-normal
+    button.color(style='background-color: #ffb2b2' data-color='#ffb2b2')
+    button.color(style='background-color: #ffc8b2' data-color='#ffc8b2')
+    button.color(style='background-color: #ffddb2' data-color='#ffddb2')
+    button.color(style='background-color: #ffefb2' data-color='#ffefb2')
+    button.color(style='background-color: #ffffb2' data-color='#ffffb2')
+    button.color(style='background-color: #c8ffb2' data-color='#c8ffb2')
+    button.color(style='background-color: #b2ffc9' data-color='#b2ffc9')
+    button.color(style='background-color: #b2fff3' data-color='#b2fff3')
+    button.color(style='background-color: #b2e0ff' data-color='#b2e0ff')
+    button.color(style='background-color: #b2baff' data-color='#b2baff')
+    button.color(style='background-color: #d4b2ff' data-color='#d4b2ff')
+    button.color(style='background-color: #fcb2ff' data-color='#fcb2ff')
+  div.color-dark
+    button.color(style='background-color: #ff9999' data-color='#ff9999')
+    button.color(style='background-color: #ffb599' data-color='#ffb599')
+    button.color(style='background-color: #ffd299' data-color='#ffd299')
+    button.color(style='background-color: #ffea99' data-color='#ffea99')
+    button.color(style='background-color: #feff99' data-color='#feff99')
+    button.color(style='background-color: #b5ff99' data-color='#b5ff99')
+    button.color(style='background-color: #99ffb7' data-color='#99ffb7')
+    button.color(style='background-color: #99ffef' data-color='#99ffef')
+    button.color(style='background-color: #99d6ff' data-color='#99d6ff')
+    button.color(style='background-color: #99a3ff' data-color='#99a3ff')
+    button.color(style='background-color: #c699ff' data-color='#c699ff')
+    button.color(style='background-color: #fb99ff' data-color='#fb99ff')
     
 block footScripts
   script(src='/vendor/please.min.js')

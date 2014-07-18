@@ -144,7 +144,7 @@ function buildNUSEvent(data, semStart, classNo) {
         location: data.Timetable[classNo].Venue,
         rrule: {
           freq: "dummy",
-          count: 14 //default semester week
+          count: 13 //default semester week
         },
         exclude: []
   };

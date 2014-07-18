@@ -8,6 +8,8 @@ var timetable = (function() {
   var MOMENT_DATE_FORMAT     = "DD/MM/YYYY"; // For input elements.
   var MOMENT_TIME_FORMAT     = "HH:mm"; // For input elements.
   var START_VIEWING_AT       = 7; // Scrolls to hour on page load.
+  var OVER_HOUR_END_EARLY    = 30; // Minutes to end early for duration over an hour.
+  var UNDER_HOUR_END_EARLY   = 15; // Minutes to end early for duration under an hour.
   var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
   var calendars = {};
@@ -166,11 +168,12 @@ var timetable = (function() {
         // End early.
         $('#end_early').unbind('click');
         $('#end_early').click(function(event) {
-          if(exactDateEnd - exactDateStart > 3600000) {
-            exactDateEnd = exactDateEnd.subtract(30,'minutes');
+          var newDateEnd;
+          if(dateEnd - dateStart > 3600000) {
+            newDateEnd = dateEnd.clone().subtract(OVER_HOUR_END_EARLY, 'minutes');
           }
           else {
-            exactDateEnd = exactDateEnd.subtract(15,'minutes');  
+            newDateEnd = dateEnd.clone().subtract(UNDER_HOUR_END_EARLY, 'minutes');  
           }
           popup.displayItem({
             submit: 'Edit event',
@@ -181,9 +184,9 @@ var timetable = (function() {
             description: item.description,
             location: item.location,
             date_start: dateStart.format(MOMENT_DATE_FORMAT),
-            date_end: dateEnd.format(MOMENT_DATE_FORMAT),
+            date_end: newDateEnd.format(MOMENT_DATE_FORMAT),
             time_start: dateStart.format(MOMENT_TIME_FORMAT),
-            time_end: dateEnd.format(MOMENT_TIME_FORMAT),
+            time_end: newDateEnd.format(MOMENT_TIME_FORMAT),
             rrule_freq: item.rrule.freq,
             rrule_count: item.rrule.count ? item.rrule.count : 1,
             exclude: item.exclude,
@@ -319,6 +322,7 @@ var timetable = (function() {
           // Expecting response.data to contain event details and calendar_id.
           // Since only SOLO calendars can add/edit event for now, assume this is done in SOLO.
           calendars[response.calendar_id].addOrReplaceItem(response.eventInfo); // Replace or add.
+          popup.close();
           $('#submit').removeAttr('disabled');
         });
     });
@@ -333,6 +337,24 @@ var timetable = (function() {
       $(this).text(status ? 'hide' : 'show');
     }
 
+    function colorPicker(event) {
+      var colorpicker = $('#colorpicker');
+      console.log(colorpicker.parent());
+      console.log(event.data.li);
+      if (colorpicker.is(':visible') && colorpicker.parent().is(event.data.li)) {
+        // Visible and has same calendar parent.
+        colorpicker.hide();
+      }
+      else { // Not visible, or is on different calendar parent...
+        colorpicker.data('calendar', event.data);
+        colorpicker.hide().detach().appendTo(event.data.li).show(); // Move to new parent.
+      }
+    }
+
+    $('.color').click(function(event) {
+      $('#colorpicker').data('calendar').changeColor($(this).data('color'));
+    });
+
     function Calendar(calendar) {
       this._id = calendar._id;
       this.name = calendar.name || 'Calendar';
@@ -340,7 +362,7 @@ var timetable = (function() {
       this.editable = calendar.editable;
       this.show = true;
       this.onDisplay = [];
-      this.color = Please.make_color({
+      this.color = calendar.color || Please.make_color({
         golden: false,
         saturation: .2,
         value: 1
@@ -363,8 +385,25 @@ var timetable = (function() {
           .text(this.name)
           .css('background-color', this.color);
       this.li.children('.toggle-view').click(this, toggleView);
+      this.li.children('.calendar-name').click(this, colorPicker);
       $('#calendars').append(this.li);
     };
+
+    Calendar.prototype.changeColor = function(color) {
+      this.color = color;
+      this.onDisplay.forEach(function(item) {
+        item.css('background-color', color);
+      });
+      this.li.children('.calendar-name').css('background-color', color);
+      var url;
+      if (this.editable) { // Put request to /calendar/color.
+        url = '/calendar/' + this._id + '/color';
+      }
+      else { // Put request to group/member/color.
+        url = window.location.pathname.match(/\/group\/.+\//g) + 'member/' + this.name + '/color';
+      }
+      $.ajax(url, { type: 'PUT', data: { color: color } });
+    }
 
     Calendar.prototype.toggleView = function() {
       var _this = this;
@@ -410,12 +449,6 @@ var timetable = (function() {
       this.onDisplay = [];
     };
 
-    Calendar.prototype.destroy = function() {
-      this.clear();
-      this.li.remove();
-      this.option.remove();
-    };
-
     var duringDisplayedWeek = function(item) {
       var date = moment(item.dateStart);
 
@@ -423,6 +456,7 @@ var timetable = (function() {
         case 'ONCE':
           // Simple.
           if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) {
+            console.log(date);
             return date;
           }
           break;
@@ -432,7 +466,7 @@ var timetable = (function() {
             return null;
           }
           // If end event date is before Sunday, it is over.
-          if (sunOfWeek.diff(date, 'week') >= item.rrule.count - 1) { return null;}
+          if (sunOfWeek.diff(date, 'week') >= item.rrule.count) { return null;}
 
           // Assume day is valid, then check for exclusion.
           var exactDate = sunOfWeek.clone().day(date.day()).hour(date.hour()).minutes(date.minutes());
@@ -544,7 +578,7 @@ var timetable = (function() {
       $(day).text($(day).data('date').format("DD MMM"));
     });
 
-    satOfWeek = date;
+    satOfWeek = date.add(1, 'day'); // Technically Sunday 00:00am.
     $('#sun_day').text(sunOfWeek.format("DD MMM"));
     $('#sat_day').text(satOfWeek.format("DD MMM"));
 

@@ -60,7 +60,7 @@ body {
   margin-bottom: 60px;
   color: #333;
 }
-input, select, textarea {
+input, select, textarea, button {
   font-family: 'Telex', sans-serif;
   margin-left: 0;
   color: #333;
@@ -169,15 +169,6 @@ label, span.label {
   text-transform: uppercase;
   font-size: 12px;  
 }
-
-#endearly {
-  display: block;
-  color: #E92946;
-  text-transform: uppercase;
-  font-family: "Comic Sans MS",arial;
-  font-size: 16px;  
-}
-
 input[type='submit'], input[type='button'], button {
   padding: 4px 16px;
   border: 2px solid #ccc;
@@ -193,11 +184,29 @@ input[type='submit']:active, input[type='button']:active, button:active {
   border: 2px solid #eee;
   outline: none;
 }
-input.green {
-  background-color: #e5fbbf;
+.green {
+  background-color: #dafecc;
 }
-input.red {
-  background-color: #fbcfc5;
+.red {
+  background-color: #fecccc;
+}
+.yellow {
+  background-color: #fef4cc;
+}
+.blue {
+  background-color: #ccd1fe;
+}
+.purple {
+  background-color: #e1ccfe;
+}
+.pink {
+  background-color: #fbccfe;
+}
+.orange {
+  background-color: #fee7cc;
+}
+.grey, .gray {
+  background-color: #e6e6e6;
 }
 form > div {
   margin-bottom: 8px;
@@ -301,6 +310,11 @@ div.tableWrapper {
   font-size: 10px;
   box-sizing: border-box;
   cursor: pointer;
+}
+.calendar-name {
+  cursor: pointer;
+  padding: 0 8px;
+  border-radius: 2px;
 }
 /*^ calendar.jade ^*/
 
@@ -483,3 +497,18 @@ ul li {
   margin: 2px;
 }
 /*^ #calendar_controls ^*/
+
+/*v #colorpicker v*/
+#colorpicker {
+  margin-top: 4px;
+  margin-left: 4px;
+}
+button.color {
+  border: 0;
+  height: 14px;
+  width: 14px;
+  padding: 0;
+  margin: 1px;
+  cursor: pointer;
+}
+/*^ #colorpicker ^*/
