@@ -1,5 +1,6 @@
 // Requires. Indentation signifies "dependence".
 var express = require('express');
+var methodOverride = require('method-override');
   var session = require('express-session');
   var cookieParser = require('cookie-parser');
   var flash = require('connect-flash');
@@ -38,14 +39,15 @@ passport.deserializeUser(function(obj, done) {
 });
 
 // Middleware.
+app.use(methodOverride('_method'));
 app.use(cookieParser());
 app.use(session({ secret: config.app.sessionSecret }));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser());
-app.use(applyLocals()); // Locals for jade templates, attaches for user-defined functions.
 app.use(express.static(__dirname + '/public'));
+app.use(applyLocals()); // Locals for jade templates, attaches for user-defined functions.
 app.use('/', login);
 app.use('/', routes);
 app.use('/calendar', calendar);

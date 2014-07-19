@@ -22,7 +22,7 @@ html(lang='en')
               a#groups(href='/group') Groups
             span#user
               //- a#username(href='#') MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-              a#username(href='#')= user.username
+              a#username(href='#')= user.display_name
             #notification
               if (user.requests.length > 0)
                 a#number.has-notifications(href='#')= user.requests.length

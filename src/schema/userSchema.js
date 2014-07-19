@@ -5,18 +5,24 @@ var calendarSchema = require('../schema/calendarSchema');
 var Schema = mongoose.Schema;
 
 var userSchema = Schema({
-  username: { type: String, required: true, unique: true },
+  username: { type: String, unique: true },
   email: String,
   display_name: String,
   password: String,
   nusId: String,
   calendars: [{ type: Schema.Types.ObjectId, ref: 'Calendar' }],
   groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
-  requests: [{ type: Schema.Types.ObjectId, ref: 'Group' }]
+  requests: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
+  status: { type: Number, default: 2 }
 });
 
+userSchema.statics.statusTypes = {
+  PENDING: 1,
+  COMPLETE: 2,
+};
+
 userSchema.path('username').validate(function(value) {
-  return /^[a-zA-Z]\w{2,}$/g.test(value)
+  return /^[a-zA-Z]\w{2,19}$/g.test(value)
 }, 'Invalid username.');
 
 userSchema.methods.authPassword = function(password, callback) {
@@ -33,7 +39,10 @@ userSchema.methods.hasGroup = function(group) {
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
-    next();
+    if (req.attach.user.status === userSchema.statics.statusTypes.PENDING) {
+      return res.redirect('/register/continue');
+    }
+    return next();
   }
   else {
     req.flash('error', 'Please log in');

@@ -10,13 +10,16 @@ block content
         label(for='username') Username
           input#username(type='text' placeholder='username' name='username' autofocus)
       div
-        label(for='password') password
+        label(for='password') Password
           input#password(type='password' placeholder='password' name='password')
+      div
+        label(for='display_name') Display name
+          input#display_name(type='text' placeholder='display name' name='display_name')
       div
         input.green(type='submit' value='Register')
     div
       form#register_nus(method='get' action='/login/nus')
         input(type='hidden' name='openid_identifier' value='https://openid.nus.edu.sg')
-        input(type='submit' value='Register with NUS OpenID')
+        input(type='submit' value='Use NUS OpenID')
 
 block footScripts

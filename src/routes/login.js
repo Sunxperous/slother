@@ -17,9 +17,18 @@ function redirectIfAuthenticated(req, res, next) {
   else { next(); }
 }
 
+function redirectUnlessPending(req, res, next) {
+  if (req.isAuthenticated() && req.attach.user.status === User.statusTypes.PENDING) {
+    next();
+  }
+  else {
+    return res.redirect('/login');
+  }
+}
+
 // Login page.
 router.get('/login', redirectIfAuthenticated,
-  function(req, res) {
+  function(req, res, next) {
     res.render('login');
   }
 );
@@ -61,19 +70,31 @@ router.post('/login/default',
 // login via NUS only via localhost:8000,
 // then continue development on original port.
 passport.use('nus', new OpenIDStrategy({
-    returnURL: config.nus.openId + '/login/nus/callback',
-    realm: config.nus.openId,
+    returnURL: config.site.url + '/login/nus/callback',
+    realm: config.site.url,
     profile: true
   },
   function(identifier, profile, done) { // Only calls this function if successfully, I assume.
-    console.log(profile);
     var nusId = identifier.slice(26, identifier.length); // Slice identifier: https://openid.nus.edu.sg/[.........] for nusId.
     User.findOne({ nusId: nusId }, function(err, user) {
       if (err) { return done(err); }
       if (!user) { // No such nusId found...
-        User.create({ username: nusId, nusId: nusId }, function(err, user) { // Make new user.
-          return done(null, user);
-        })
+        User.findOne({ username: nusId }, function(err, user) {
+          if (err) { return done(err); }
+          var userInfo = {
+            nusId: nusId,
+            status: User.statusTypes.PENDING,
+            display_name: profile.displayName,
+          };
+          var info = {};
+          if (user) {
+            info.flash = 'Username ' + nusId + ' already taken, please pick another.';
+          }
+          else { userInfo.username = nusId; }
+          User.create(userInfo, function(err, user) { // Make new user.
+            return done(null, user, info); // To continue registration.
+          });
+        });
       }
       if (user) { // nusId found.
         return done(null, user);
@@ -82,29 +103,65 @@ passport.use('nus', new OpenIDStrategy({
   }
 ));
 
+// Login -> give username and display name
+//          -> give blank username if already taken
+// -> If not confirmed, redirect to confirm registration.
+
 // NUS login.
-router.get('/login/nus', redirectIfAuthenticated,
+router.get('/login/nus',
+  redirectIfAuthenticated,
+  passport.authenticate('nus')
+);
+router.get('/login/nus/callback', function(req, res, next) {
+  passport.authenticate('nus', function(err, user, info) {
+    if (err) { return next(err); }
+    if (!user) { return res.redirect('/login'); }
+    req.logIn(user, function(err) {
+      if (err) { return next(err); }
+      if (info) {
+        if (info.flash) { req.flash('error', info.flash); }
+        return res.redirect('/register/continue');
+      }
+      return res.redirect('/calendar/user');
+    });
+  })(req, res, next);
+});
+
+// Continue registration for OpenID.
+router.get('/register/continue', redirectUnlessPending,
   function(req, res) {
-    passport.authenticate('nus');
+    res.render('registerContinue');
   }
 );
-router.get('/login/nus/callback', passport.authenticate('nus', {
-    successRedirect: '/',
-    failureRedirect: '/login'
-  })
+// Complete registration for OpenID.
+router.post('/register/complete', redirectUnlessPending,
+  function(req, res, next) {
+    var user = req.attach.user;
+    user.username = req.body.username;
+    user.display_name = req.body.display_name;
+    user.status = User.statusTypes.COMPLETE;
+    user.save(function(err, user) {
+      if (err) { return next(err); }
+      req.logout();
+      req.login(user, function(err) {
+        if (err) { return next(err); }
+        return res.redirect('/calendar/user');
+      });
+    });
+  }
 );
-
 
 // Default registration.
 router.get('/register', redirectIfAuthenticated,
-  function(req, res) {
+  function(req, res, next) {
     res.render('register');
   }
 );
 
 router.post('/register',
+  redirectIfAuthenticated,
   User.ensureExistsByUsername(false, ['body', 'username']),
-  function(req, res) {
+  function(req, res, next) {
   // Assuming valid, non-existing user...
     if (req.body.username.length < 3 || req.body.username.length > 20) {
       req.flash('error', 'Username should be between 3 and 20 characters.');
@@ -118,7 +175,8 @@ router.post('/register',
       bcrypt.hash(req.body.password, null, null, function(err, hash) {
         User.create({
           username: req.body.username,
-          password: hash
+          display_name : req.body.display_name,
+          password: hash,
         }, function(err, user) {
           if (err) {
             if (err.name === 'ValidationError') {
@@ -143,7 +201,7 @@ router.post('/register',
 
 
 // Logout
-router.get('/logout', function(req, res) {
+router.get('/logout', function(req, res, next) {
   req.logout();
   res.redirect('/');
 });
