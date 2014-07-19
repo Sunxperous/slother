@@ -21,6 +21,11 @@ block content
           input#friend_name(name='url' type='text')
         div
           input#add.green(type='submit' value='Invite')
+    .info-block
+      form#leave_group(action='/group/' + group.getHash() + '/leave' method='POST')
+        h3.info-block-title Leave group
+        div
+          input#leave.red(type='submit', value='Leave')
 
 block footScripts
   script(src='/js/groupCalendar.js')

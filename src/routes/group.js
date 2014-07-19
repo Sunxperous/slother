@@ -35,7 +35,7 @@ function userInGroup(_user, positive, type) {
 //  body
 //    group_name: String
 router.post('/', 
-  function (req, res) {
+  function(req, res, next) {
     var user = req.attach.user;
     Group.create({
       groupName: req.body.group_name,
@@ -43,7 +43,7 @@ router.post('/',
       admins: [user._id],
       requested: [],
       created_by: user._id
-    }, function (err, group) {
+    }, function(err, group) {
       if (err) {
         if (err.name === 'ValidationError') {
           req.flash('error', err.message);
@@ -83,7 +83,7 @@ router.post('/:hash/invite',
   userInGroup('user', true, 'admins'),
   userInGroup('target', false, 'members'),
   userInGroup('target', false, 'requested'),
-  function (req,res) {
+  function(req,res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
 
@@ -114,7 +114,7 @@ router.delete('/:hash/member/:username',
   User.ensureExistsByUsername(true, ['params', 'username']), // Attaches target.
   userInGroup('target', true, 'members'),
   userInGroup('user', true, 'admins'),
-  function (req,res) {
+  function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
 
@@ -143,7 +143,7 @@ router.put('/:hash/member/:username/color',
   User.ensureExistsByUsername(true, ['params', 'username']), // Attaches target.
   userInGroup('target', true, 'members'),
   userInGroup('user', true, 'admins'),
-  function (req,res) {
+  function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
 
@@ -160,6 +160,52 @@ router.put('/:hash/member/:username/color',
       }
     });
 });
+
+// POST request to leave group.
+router.post('/:hash/leave',
+  Group.ensureExistsByHash(true),
+  userInGroup('user', true, 'members'),
+  userInGroup('user', false, 'admins'), // Administrators cannot leave group at the moment.
+  function(req, res, next) {
+    var group = req.attach.group;
+    var user = req.attach.user;
+
+    group.members.forEach(function(member, index, members) {
+      if (member._id.toString() === user._id.toString()) {
+        group.members.pull(member);
+      }
+    });
+
+    group.save(function(err) {
+      if (err) { return next(err); }
+      return res.redirect('/group');
+    })
+  }
+);
+
+// DELETE request to evict member.
+router.post('/:hash/member/:username',
+  Group.ensureExistsByHash(true),
+  User.ensureExistsByUsername(true, ['params', 'username']),
+  userInGroup('target', true, 'members'),
+  userInGroup('target', false, 'admins'), // Cannot evict admins at the moment.
+  userInGroup('user', true, 'admins'),
+  function(req, res, next) {
+    var group = req.attach.group;
+    var target = req.attach.target;
+
+    group.members.forEach(function(member, index, members) {
+      if (member._id.toString() === target._id.toString()) {
+        group.members.pull(member);
+      }
+    });
+
+    group.save(function(err) {
+      if (err) { return next(err); }
+      return res.send({ success: 'yay kicked him' });
+    })
+  }
+);
 
 
 // //Post request to accept request
@@ -197,7 +243,7 @@ router.put('/:hash/member/:username/color',
 // });
 
 // Get request for list of groups of logged in user.
-router.get('/', function(req, res) {
+router.get('/', function(req, res, next) {
   User
   .findOne({ username: req.user.username })
   .populate('groups', 'groupName')
