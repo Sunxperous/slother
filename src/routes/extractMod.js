@@ -45,12 +45,12 @@ function extract(addr, userId, callback) {
     user: userId,
     events: []
   }, function (err,calendar) {
-    if(err) { console.log(err); res.send(null); }
+    if(err) { callback(err); }
     async.each(modInfos, function (modInfo, callback){
       tempURL = tempURL.replace(tempModCode,modInfo.ModuleCode); 
       tempModCode = modInfo.ModuleCode;
-      request({ url: tempURL, json: true}, function (error, res, body) {
-        if(err) { console.log(err); res.send(null); }
+      request({ url: tempURL, json: true}, function (err, res, body) {
+        if(err) { callback(err); }
         var modJSON = res.body,
             exam = false;
         for(var y in modJSON.Timetable) {
@@ -71,7 +71,7 @@ function extract(addr, userId, callback) {
       });
     }, function(err) {
       calendar.save(function (err,calendar) {
-        if(err) { console.log(err); res.send(null); }
+        if(err) { callback(err); }
         else callback(null, calendar); 
       });
     });
@@ -258,29 +258,22 @@ function semesterStart(year,sem) {
   return test.toDate();
 }
 
-function loggedIn(req, res, next) {
-  if (req.user) { next(); }
-  else { 
-    res.redirect('/login'); 
-    res.send({error: "Please log in"});
-  }
-}
+router.use(User.ensureAuthenticated());
 
-router.post('/', loggedIn, function (req,res) {
+router.post('/', function (req, res, next) {
   var addr = req.body.addr;
   extract(decodeURIComponent(addr), req.user._id, function (err, calendar) {
-    if(err) { console.log(err); res.send(null); }
+    if(err) { return next(err); }
     else {
       User.findOneAndUpdate({username: req.user.username},
         {$push:{calendars:calendar._id}}, function (err, user) {
-          if(err) { console.log(err); res.send(null); }
+          if(err) { return next(err); }
           else {
             calendar.user = user._id;
             calendar.save(function (err,calendar) {
-              if(err) { console.log(err); res.send(null); }
+              if(err) { return next(err); }
               else {
-                console.log("calendar "+calendar.events.length);
-                res.send(calendar);
+                return res.send(calendar);
               }
             });
           }

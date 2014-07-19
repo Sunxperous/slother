@@ -15,16 +15,16 @@ function userInGroup(_user, positive, type) {
     if (group && user) { // Compulsory to have.
       var hasUser = group.hasUser(user, type) && user.hasGroup(group);
       if (positive) { // We want user in group list...
-        if (hasUser) { next(); } // ...yay!
+        if (hasUser) { return next(); } // ...yay!
         else { // ...nope, user is not in group list.
-          res.send({ error: user.username+' is not part of '+type+' of the group '+group.groupName+'.' });
+          return res.send({ error: user.username+' is not part of '+type+' of the group '+group.groupName+'.' });
         }
       }
       else { // We don't want user in group list...
         if (hasUser) { // ...nope, user is in group list.
-          res.send({ error: user.username+' is already part of '+type+' of the group '+group.groupName+'.' });
+          return res.send({ error: user.username+' is already part of '+type+' of the group '+group.groupName+'.' });
         }
-        else { next(); } // ...yay!
+        else { return next(); } // ...yay!
       }
     }
   }
@@ -47,23 +47,21 @@ router.post('/',
       if (err) {
         if (err.name === 'ValidationError') {
           req.flash('error', err.message);
-          res.redirect('/group');
+          return res.redirect('/group');
         }
-        else {
-          console.log(err);
-        }
+        else { return next(err); }
       }
       else if (group) {
         Calendar.create({
           name: group.groupName, group: group._id
         }, function(err, calendar) {
-          if (err) { console.log(err); }
+          if (err) { return next(err); }
           else if (calendar) {
             user.groups.push(group._id);
             user.save(function (err, user) {
-              if(err) { console.log(err); res.send(null); }
+              if (err) { return next(err); }
               else {
-                res.redirect('/group');
+                return res.redirect('/group');
               }
             });            
           }
@@ -92,12 +90,12 @@ router.post('/:hash/invite',
     group.members.push({ _id: target._id }); // Temporary.
 
     group.save(function(err) {
-      if (err) { console.log(err); }
+      if (err) { return next(err); }
       else {
         target.save(function(err) {
-          if (err) { console.log(err); }
+          if (err) { return next(err); }
           else { // Success.
-            res.send({ success: 'Request has been sent to ' + target.username + '.' })
+            return res.send({ success: 'Request has been sent to ' + target.username + '.' })
           }
         });
       }
@@ -122,12 +120,12 @@ router.delete('/:hash/member/:username',
     target.groups.pull(group._id);
 
     group.save(function(err) {
-      if (err) { console.log(err); }
+      if (err) { return next(err); }
       else {
         target.save(function(err) {
-          if (err) { console.log(err); }
+          if (err) { return next(err); }
           else { // Success.
-            res.send({ success: 'User ' + target.username + ' is removed from the group.' })
+            return res.send({ success: 'User ' + target.username + ' is removed from the group.' })
           }
         });
       }
@@ -154,9 +152,9 @@ router.put('/:hash/member/:username/color',
     });
 
     group.save(function(err) {
-      if (err) { console.log(err); }
+      if (err) { return next(err); }
       else {
-        res.send({ success: 'Member ' + target.username + ' changed colors.' })
+        return res.send({ success: 'Member ' + target.username + ' changed colors.' })
       }
     });
 });
@@ -248,7 +246,7 @@ router.get('/', function(req, res, next) {
   .findOne({ username: req.user.username })
   .populate('groups', 'groupName')
   .exec(function(err, user) {
-    if (err) { console.log(err); }
+    if (err) { return next(err); }
     else if (user) {
       var hashids = req.app.settings.hashids;
       user.groups.forEach(function(group) {
@@ -256,7 +254,7 @@ router.get('/', function(req, res, next) {
         friendly_url = group.groupName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
         group.url = '/calendar/group/' + group.getHash() + '/' + friendly_url;
       });
-      res.render('groups', { groups: user.groups });
+      return res.render('groups', { groups: user.groups });
     }
   })
 });

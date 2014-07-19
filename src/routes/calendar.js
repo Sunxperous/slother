@@ -6,24 +6,22 @@ var Calendar = require('../schema/calendarSchema');
 
 router.use(User.ensureAuthenticated());
 
-router.get('/group/:hash/:name', function(req, res) {
+router.get('/group/:hash/:name', function(req, res, next) {
   res.format({
 
     'text/html': function() { // If html page is requested...
       var group_id = Group.decryptHash(req.params.hash);
       Group.findById(group_id, function(err, group) {
         if (err) { // Due to invalid hash that decrypts to empty...
-          console.log(err);
-          req.flash('error', 'There is no such group.');
-          res.redirect('/group');
+          return next(err);
         }
         else if (!group) { // Group not found...
           req.flash('error', 'There is no such group.');
-          res.redirect('/group');
+          return res.redirect('/group');
         }
         else { // Group found!
           var isAdmin = group.hasUser(req.attach.user, 'admins');
-          res.render('groupCalendar', { group: group, isAdmin: isAdmin });
+          return res.render('groupCalendar', { group: group, isAdmin: isAdmin });
         }
       });
     },
@@ -35,7 +33,7 @@ router.get('/group/:hash/:name', function(req, res) {
       .select('groupName members requested')
       .lean()
       .exec(function(err, group) {
-        if (err) { console.log(err); }
+        if (err) { next(err); }
         else if (group) {
           var numUserQueried = 0;
           var members = [];
@@ -44,7 +42,7 @@ router.get('/group/:hash/:name', function(req, res) {
             .findById(member._id)
             .populate('calendars')
             .exec(function(err, user) {
-              if (err) { console.log(err); }
+              if (err) { next(err); }
               else if (!user.hasGroup(group)) { // Group has user, but user does not have group...
                 group.members.splice(group.members.indexOf(member), 1);
               }
@@ -72,10 +70,10 @@ router.get('/group/:hash/:name', function(req, res) {
                 group.members = members; // Replace with new members array.
                 Calendar.findOne({ group: group._id }).lean()
                 .exec(function(err, calendar) {
-                  if (err) { console.log(err); }
+                  if (err) { return next(err); }
                   else if (calendar) {
                     group.calendar = calendar;
-                    res.send(group);
+                    return res.send(group);
                   }
                 })
               }
@@ -87,7 +85,7 @@ router.get('/group/:hash/:name', function(req, res) {
   });
 });
 
-router.get('/user', function(req, res) {
+router.get('/user', function(req, res, next) {
   res.format({
 
     'text/html': function() { // If html page is requested...
@@ -96,7 +94,8 @@ router.get('/user', function(req, res) {
       .populate('groups')
       .populate('requests')
       .exec(function(err, user) {
-        res.render('soloCalendar', {
+        if (err) { return next(err); }
+        return res.render('soloCalendar', {
           groups: user.groups,
           requests: user.requests
         });
@@ -108,77 +107,81 @@ router.get('/user', function(req, res) {
       .findOne({username: req.user.username})
       .populate('calendars')
       .exec(function(err, user) {
-        if (err) {
-          console.log(err);
-        }
+        if (err) { return next(err); }
         if (user) {
           if (user.calendars.length > 0) {
-            res.send(user.calendars);
+            return res.send(user.calendars);
           }
-          else { res.send([]); }
+          else { return res.send([]); }
         }
         else {
-          res.send(null);
+          return res.send(null);
         }
       });
     }
   });
 });
 
-router.post('/', function (req, res) {
-  console.log(req.body);
+router.post('/', function (req, res, next) {
   Calendar.create({ name: req.body.name, events:[] }, 
     function (err, calendar) {
-    if (err) { console.log(err); }
+    if (err) { return next(err); }
     User.findOneAndUpdate({username:req.user.username},
       {$push:{calendars:calendar._id}}, function (err, user) {
-        if(err) { console.log(err); res.send(null); }
+        if(err) { return next(err); }
         calendar.user = user._id;
         calendar.save( function (err, calendar) {
-          if(err) { console.log(err); res.send(null); }
+          if(err) { return next(err); }
           else res.send(calendar);
         });
     });
   });
 });
 
-router.delete('/:calendar_id', function (req, res) {
-  console.log("Routing success");
+router.delete('/:calendar_id', function (req, res, next) {
   Calendar.findOneAndRemove({_id:req.params.calendar_id},
     function (err, calendar) {
+      if (err) { return next(err); }
       User.findOneAndUpdate({username:req.user.username},
         {$pull:{calendar:calendar._id}}, function (err, user) {
-          if(err) { console.log(err); res.send(null); }
-          else res.send({success:"Calendar "+calendar.name+" is removed."});
+          if(err) { return next(err); }
+          else {
+            return res.send({success:"Calendar "+calendar.name+" is removed."});
+          }
       });
   });
 });
 
-router.put('/:calendar_id/privacy', function (req, res) {
+router.put('/:calendar_id/privacy', function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id})
   .exec( function (err, calendar) {
+    if (err) { return next(err); }
     calendar.hidden = req.body.hidden;
     calendar.save( function (err, calendar) {
-      res.send({success:"Privacy setting changed."});
+      if (err) { return next(err); }
+      return res.send({success:"Privacy setting changed."});
     });
   });
 });
 
-router.put('/:calendar_id/color', function(req, res) {
+router.put('/:calendar_id/color', function(req, res, next) {
   Calendar.findOne({ _id:req.params.calendar_id })
   .exec(function (err, calendar) {
+    if (err) { return next(err); }
     calendar.color = req.body.color;
     calendar.save(function (err, calendar) {
-      res.send({success:"Privacy setting changed."});
+      if (err) { return next(err); }
+      return res.send({success:"Privacy setting changed."});
     });
   });
 });
 
 router.put('/:calendar_id/event/:event_id',
-  function (req, res) {
+  function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id,
     'events._id':req.params.event_id})
   .exec(function (err, calendar) {
+    if (err) { return next(err); }
     var myEvent = calendar.events.id(req.params.event_id);
     myEvent.summary = req.body.summary;
     myEvent.description = req.body.description;
@@ -189,7 +192,8 @@ router.put('/:calendar_id/event/:event_id',
     myEvent.dateEnd = req.body.date_end;
     myEvent.exclude = req.body.exclude;
     calendar.save( function (err, calendar) {
-      res.send({success:"Edited an event",
+      if (err) { return next(err); }
+      return res.send({success:"Edited an event",
                 calendar_id: req.params.calendar_id,
                 eventInfo: calendar.events.id(req.params.event_id)
       });
@@ -198,9 +202,10 @@ router.put('/:calendar_id/event/:event_id',
 });
 
 router.post('/:calendar_id/event/',
-  function (req, res) {
+  function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id})
   .exec(function (err, calendar) {
+    if (err) { return next(err); }
     calendar.events.push({
       summary: req.body.summary,
       description: req.body.description,
@@ -212,7 +217,8 @@ router.post('/:calendar_id/event/',
       exclude: req.body.exclude
     });
     calendar.save( function (err, calendar) {
-      res.send({success:"Added an event",
+      if (err) { return next(err); }
+      return res.send({success:"Added an event",
                 calendar_id: req.params.calendar_id,
                 eventInfo: calendar.events[calendar.events.length-1]
       });
@@ -221,20 +227,21 @@ router.post('/:calendar_id/event/',
 });
 
 router.delete('/:calendar_id/event/:event_id', 
-  function (req, res) {
+  function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id,
     'events._id':req.params.event_id})
   .exec( function (err, calendar) {
-    console.log("calendar found" +calendar);
+    if (err) { return next(err); }
     calendar.events.id(req.params.event_id).remove();
     calendar.save( function (err, calendar) {
-      res.send({success:"Calendar "+calendar.name+
+      if (err) { return next(err); }
+      return res.send({success:"Calendar "+calendar.name+
                   " has been deleted."})
     });
   });
 });
 
-router.get('/', function(req, res) {
+router.get('/', function(req, res, next) {
   res.redirect('/calendar/user');
 });
 

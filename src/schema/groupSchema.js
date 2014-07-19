@@ -52,19 +52,19 @@ groupSchema.statics.ensureExistsByHash = function(positive) {
   return function(req, res, next) {
     var group_id = _this.decryptHash(req.params.hash);
     _this.findById(group_id, function(err, group) {
-      if (err) { console.log(err); }
+      if (err) { return next(err); }
       else if (group) { // Group found...
         if (positive) { // ...and we want it to exist!
           req.attach.group = group;
-          next();
+          return next();
         }
-        else { res.send({ error: 'Group already exists.' }); } // ...but it does not exist.
+        else { return res.send({ error: 'Group already exists.' }); } // ...but it does not exist.
       }
       else { // Group not found...
         if (positive) { // ...but we want it to exist.
-          res.send({ error: 'Group does not exist.' });
+          return res.send({ error: 'Group does not exist.' });
         }
-        else { next(); } // ...and it does not exist!
+        else { return next(); } // ...and it does not exist!
       }
     });
   };

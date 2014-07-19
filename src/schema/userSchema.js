@@ -46,7 +46,7 @@ function ensureAuthenticated(req, res, next) {
   }
   else {
     req.flash('error', 'Please log in');
-    res.redirect('/login');
+    return res.redirect('/login');
   }
 }
 userSchema.statics.ensureAuthenticated = function() { return ensureAuthenticated; }
@@ -67,19 +67,19 @@ userSchema.statics.ensureExistsByUsername = function(positive, source) {
   return function(req, res, next) {
     var target = getNestedValue(req, source);
     _this.findOne({ username: target }, function(err, user) {
-      if (err) { console.log(err); }
+      if (err) { return next(err); }
       else if (user) { // Found...
         if (positive) { // ...and we want it to exist!
           req.attach.target = user;
-          next();
+          return next();
         }
-        else { res.send({ error: 'User already exists.' }); } // ...but it does not exist.
+        else { return res.send({ error: 'User already exists.' }); } // ...but it does not exist.
       }
       else { // Not found...
         if (positive) { // ...but we want it to exist.
-          res.send({ error: 'User does not exist.' });
+          return res.send({ error: 'User does not exist.' });
         }
-        else { next(); } // ...and it does not exist!
+        else { return next(); } // ...and it does not exist!
       }
     });
   };

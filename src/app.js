@@ -55,9 +55,10 @@ app.use('/extract', extractMod);
 app.use('/group', group);
 app.use('/user', user);
 
-// Something broke middleware.
+// Errors final middleware.
 // Maybe can render a Sloth sleeping.
 app.use(function(err, req, res, next) {
+  console.log(err);
   console.error(err.stack);
   res.send(500, 'Something broke...');
 });
@@ -78,16 +79,16 @@ function applyLocals() {
 
     if (req.isAuthenticated()) {
       User.findOne({ username: req.user.username }, function(err, user) {
-        if (err) { console.log(err); }
+        if (err) { return next(err); }
         else {
           res.locals.user = user;
           req.attach.user = user;
-          next();
+          return next();
         }
       });
     }
     else {
-      next ();
+      return next ();
     }
   }
 }
