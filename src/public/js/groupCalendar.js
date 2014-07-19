@@ -7,6 +7,7 @@
         var genericCalendar = {
           _id: member._id,
           name: member.username,
+          display_name: member.display_name,
           events: member.events,
           color: member.color,
         };

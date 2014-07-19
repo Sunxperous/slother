@@ -207,9 +207,7 @@ router.get('/', function(req, res) {
       var hashids = req.app.settings.hashids;
       user.groups.forEach(function(group) {
         var friendly_url;
-        if (group.groupName) { // Because I entered an 'undefined' name previously...
-          friendly_url = group.groupName.replace(/\s+/g, '-').toLowerCase();
-        }
+        friendly_url = group.groupName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
         group.url = '/calendar/group/' + group.getHash() + '/' + friendly_url;
       });
       res.render('groups', { groups: user.groups });

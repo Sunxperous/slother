@@ -52,6 +52,7 @@ router.get('/group/:hash/:name', function(req, res) {
                 members[index] = {};
                 members[index]._id = user._id;
                 members[index].username = user.username;
+                members[index].display_name = user.display_name;
                 members[index].color = member.color;
                 members[index].events = [];
                 user.calendars.forEach(function(calendar) {
