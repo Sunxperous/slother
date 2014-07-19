@@ -433,7 +433,14 @@ var timetable = (function() {
       if (this.items) {
         this.items.forEach(function(item, index) {
           var date = duringDisplayedWeek(item);
-          if (date) { _this.onDisplay.push(insertEvent(item, _this, date)); }
+          if (date instanceof Array) {
+            date.forEach(function (d) {
+              if (d !== -1) {
+                _this.onDisplay.push(insertEvent(item, _this, sunOfWeek.clone().add(d, 'days')));
+              }
+            });
+          }
+          else if (date) { _this.onDisplay.push(insertEvent(item, _this, date)); }
         });
       }
       if (!this.show) {
@@ -461,13 +468,34 @@ var timetable = (function() {
             return date;
           }
           break;
-        case 'WEEKLY':
-          // If start event date is after Saturday, it hasn't started.
-          if (date.isAfter(satOfWeek)) {
-            return null;
+        case 'DAILY':
+          if (date.isAfter(satOfWeek)) { return null; }
+          if (sunOfWeek.diff(date, 'day') >= item.rrule.count) { return null; }
+
+          var exactDates = [0, 1, 2, 3, 4, 5, 6];
+
+          if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) { // Starting date is during this week, remove all before it.
+            for (var i = 0; i < date.day(); i++) { exactDates[i] = -1; }
+          }          
+          date.add(item.rrule.count, 'days');
+          if (date.isAfter(sunOfWeek) && date.isBefore(satOfWeek)) { // Ending date is during this week, remove all after it.
+            for (var i = date.day() + 1; i < 7; i++) { exactDates[i] = -1; }
           }
-          // If end event date is before Sunday, it is over.
-          if (sunOfWeek.diff(date, 'week') >= item.rrule.count) { return null;}
+
+          if (item.exclude && item.exclude.length > 0) {
+            for (var i = 0; i < item.exclude.length; i++) {
+              excludeDate = moment(item.exclude[i]);
+              if (excludeDate.isAfter(sunOfWeek) && excludeDate.isBefore(satOfWeek)) {
+                exactDates[excludeDate.day()] = -1;
+              }
+            }
+          }
+
+          return exactDates;
+          break;
+        case 'WEEKLY':
+          if (date.isAfter(satOfWeek)) { return null; }
+          if (sunOfWeek.diff(date, 'week') >= item.rrule.count) { return null; }
 
           // Assume day is valid, then check for exclusion.
           var exactDate = sunOfWeek.clone().day(date.day()).hour(date.hour()).minutes(date.minutes());
@@ -482,6 +510,61 @@ var timetable = (function() {
           }
           return exactDate;
           break;
+        case 'MONTHLY':
+          if (date.isAfter(satOfWeek)) { return null; }
+          if (sunOfWeek.diff(date, 'month') >= item.rrule.count) { return null; }
+
+          var exactDate = sunOfWeek.clone().subtract(1, 'day');
+          var found = false;
+          for (var i = 0; i < 7; i++) {
+            exactDate.add(1, 'day');
+            if (exactDate.date() === date.date()) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) { return null; }
+
+          exactDate.hour(date.hour()).minutes(date.minutes());
+          var excludeDate;
+          if (item.exclude && item.exclude.length > 0) {
+            for (var i = 0; i < item.exclude.length; i++) {
+              excludeDate = moment(item.exclude[i]);
+              if (exactDate.isSame(excludeDate, 'day')) {
+                return null;
+              }
+            }
+          }
+          return exactDate;
+          break;
+        case 'YEARLY':
+          if (date.isAfter(satOfWeek)) { return null; }
+          if (sunOfWeek.diff(date, 'year') >= item.rrule.count) { return null; }
+
+          var exactDate = sunOfWeek.clone().subtract(1, 'day');
+          var found = false;
+          for (var i = 0; i < 7; i++) {
+            exactDate.add(1, 'day');
+            if (exactDate.month() === date.month() && exactDate.date() === date.date()) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) { return null; }
+
+          exactDate.hour(date.hour()).minutes(date.minutes());
+          var excludeDate;
+          if (item.exclude && item.exclude.length > 0) {
+            for (var i = 0; i < item.exclude.length; i++) {
+              excludeDate = moment(item.exclude[i]);
+              if (exactDate.isSame(excludeDate, 'day')) {
+                return null;
+              }
+            }
+          }
+          return exactDate;
+          break;
+
         default: break;
       }
       return null;
@@ -490,7 +573,7 @@ var timetable = (function() {
     // Adds an item to be shown on the timetable.
     var insertEvent = function(item, calendar, exactDate) {
       var dateStart = moment(item.dateStart);
-      var day = dateStart.day();
+      var day = exactDate.day();
       var durationInMilli = moment(item.dateEnd).diff(dateStart);
       var durationInHours = durationInMilli / 3600000;
       var dateStartMinutes = dateStart.minutes();

@@ -406,6 +406,10 @@ label.exclude {
 #popup .highlight {
   color: #ef8c6c;
 }
+#popup button {
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
 /*^ #popup ^*/
 
 /*v #info_controls v*/
@@ -509,7 +513,7 @@ ul li {
   margin-top: 4px;
   margin-left: 4px;
 }
-button.color {
+.color {
   border: 0;
   height: 14px;
   width: 14px;
