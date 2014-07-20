@@ -26,15 +26,18 @@
             }
           );
         }
-        else { // Display error.
+        else {
+          errors.add('error', 'Invalid URL.', $('#add_calendar'));
         }
       }
       else if ($('#type').val() === 'generic') {
         $.post('/calendar',
           { name: $('#generic_string').val() },
           function(calendar) {
-            timetable.replaceOrAddCalendar(calendar, true);
-            timetable.update();
+            if (!calendar.error) {
+              timetable.replaceOrAddCalendar(calendar, true);
+              timetable.update();
+            }
           }
         );
       }

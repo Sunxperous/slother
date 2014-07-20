@@ -11,7 +11,7 @@ function randomColor() {
 }
 
 var groupSchema = new Schema({
-  groupName: { type: String, required: true },
+  groupName: { type: String, required: 'Group name cannot be blank.', trim: true },
   members: [{
     _id: {
       type: Schema.Types.ObjectId, ref: 'User',

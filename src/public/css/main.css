@@ -46,7 +46,7 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-a:link, a:active, a:visited, a:hover {
+a:link, a:active, a:visited, a:hover, .link {
   text-decoration: none;
   color: #960;
 }
@@ -132,31 +132,6 @@ a.no-notifications {
   color: #333;
   background-color: #ccc;
 }
-#errors, #alerts, #requests {
-  padding: 0;
-  text-align: center;
-}
-.message {
-  display: block;
-  padding: 4px 8px;
-  background-color: #ffc;
-  width: 80%;
-  max-width: 500px;
-  border-radius: 8px;
-  margin: 2px auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;  
-}
-#errors .message {
-  color: #f66;
-}
-#alerts .message {
-  color: #c93;
-}
-#requests .message {
-  color: #6c6;
-}
 #content {
   margin: auto auto;
   text-align: center;
@@ -222,6 +197,52 @@ form > div {
   margin-bottom: 8px;
 }
 /*^ layout.jade ^*/
+
+/*v errors.jade v*/
+.error_box {
+  margin: 2px auto;
+  padding: 0;
+  text-align: right;
+  width: 90%;
+  max-width: 480px;
+}
+.errors li {
+  margin-bottom: 2px;
+  text-align: center;
+  display: block;
+  padding: 4px 20px 4px 16px;
+  background-color: #ffc;
+  border-radius: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+  position: relative; 
+}
+.error {
+  color: #f66;
+}
+.alert {
+  color: #c93;
+}
+.request {
+  color: #6c6;
+}
+.error-close {
+  cursor: pointer;
+  padding: 2px;
+  position: absolute;
+  right: 2px;
+  top: 0;
+  font-size: 18px;
+}
+.dismiss {
+  cursor: pointer;
+  font-size: 12px;
+  display: inline-block;
+  padding: 2px 16px;
+  margin-top: 2px;
+}
+/*^ errors.jade ^*/
 
 /*v login.jade v*/
 .forms-wrapper {
@@ -451,8 +472,7 @@ h3.info-block-title {
   cursor: pointer;
   margin-left: 8px;
 }
-
-ul li {
+#calendars li {
   margin-top: 5px;
 }
 /*^ #info_controls ^*/

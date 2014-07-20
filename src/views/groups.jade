@@ -1,13 +1,17 @@
 extends layout
+include mixins/errors.jade
 
 block headScript
 
 block content
   h2.empty-space Groups
 
+  +errors(messages)
+
   #info_controls
     .info-block
       h3.info-block-title Your groups
+      +errors
       ul#groups
         for group in groups
           li
@@ -15,6 +19,7 @@ block content
     .info-block
       form#create_group(action='/group' method='post')
         h3.info-block-title Create a group
+        +errors
         div
           label(for='group_name') Name
           input#group_name(name='group_name' type='text')

@@ -9,7 +9,7 @@ function randomColor() {
 }
 
 var calendarSchema = Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: 'Calendar name cannot be blank.', trim: true },
   events: [eventSchema],
   group: { type: Schema.Types.ObjectId, ref: 'Group' },
   user: { type: Schema.Types.ObjectId, ref: 'User' },

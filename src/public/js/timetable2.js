@@ -231,12 +231,17 @@ var timetable = (function() {
             }
           });
         });
+
+        $('#edit_event').removeClass('hidden');
+        $('#end_early').removeClass('hidden');
+        $('#delete_all').removeClass('hidden');
+        $('#delete_this').removeClass('hidden');
       }
       else {
-        $('#edit_event').hide();
-        $('#end_early').hide();
-        $('#delete_all').hide();
-        $('#delete_this').hide();
+        $('#edit_event').addClass('hidden');
+        $('#end_early').addClass('hidden');
+        $('#delete_all').addClass('hidden');
+        $('#delete_this').addClass('hidden');
       }
     }
 
@@ -341,11 +346,11 @@ var timetable = (function() {
     var colorpicker = $('#colorpicker');
     if (colorpicker.is(':visible') && colorpicker.parent().is(event.data.li)) {
       // Visible and has same calendar parent.
-      colorpicker.hide();
+      colorpicker.addClass('hidden');
     }
     else { // Not visible, or is on different calendar parent...
       colorpicker.data('calendar', event.data);
-      colorpicker.hide().detach().appendTo(event.data.li).show(); // Move to new parent.
+      colorpicker.addClass('hidden').detach().appendTo(event.data.li).removeClass('hidden'); // Move to new parent.
     }
   }
 

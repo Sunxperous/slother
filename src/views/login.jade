@@ -1,9 +1,13 @@
 extends layout
+include mixins/errors.jade
 
 block headScript
 
 block content
   h2.empty-space Login
+
+  +errors(messages)
+
   div.forms-wrapper
     form#login_default.form-horizontal(method='post' action='/login/default')
       div

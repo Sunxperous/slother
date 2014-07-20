@@ -1,3 +1,4 @@
+include mixins/errors.jade
 - var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 .tableWrapper
   table#calendar
@@ -30,6 +31,7 @@
     #popup_header
       #popup_title
       #popup_close &#215;
+    +errors
     #existing.hidden
       div
         span.label Summary

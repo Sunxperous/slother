@@ -8,7 +8,7 @@ var UserError = require('../userError.js');
 router.use(User.ensureAuthenticated());
 
 router.get('/group/:hash/:name', function(req, res, next) {
-  res.error.redirect('/group');
+  res.error.redirect = '/group';
   res.format({
 
     'text/html': function() { // If html page is requested...

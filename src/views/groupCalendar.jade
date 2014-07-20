@@ -1,14 +1,18 @@
 extends layout
+include mixins/errors.jade
 
 block headScript
 
 block content
-  include calendar
+  include calendar  
+
+  +errors(messages)
 
   #info_controls
     .info-block
       h2#group_name= group.groupName
       h3.info-block-title Members
+      +errors
       ul#calendars
         li.hidden
           span.calendar-name
@@ -16,6 +20,7 @@ block content
     .info-block
       form#add_friend(action='/group/' + group.getHash() + '/invite')
         h3.info-block-title Invite a friend
+        +errors
         div
           label(for='friend_name') Username
           input#friend_name(name='url' type='text')
@@ -24,6 +29,7 @@ block content
     .info-block
       form#leave_group(action='/group/' + group.getHash() + '/leave' method='POST')
         h3.info-block-title Leave group
+        +errors
         div
           input#leave.red(type='submit', value='Leave')
 

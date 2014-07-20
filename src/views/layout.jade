@@ -1,4 +1,5 @@
 doctype html
+
 html(lang='en')
   head
     - var title = title || "Slother"
@@ -10,6 +11,8 @@ html(lang='en')
     block headScripts
     link(rel='stylesheet' href='/css/main.css')
     link(href='http://fonts.googleapis.com/css?family=Telex' rel='stylesheet' type='text/css')
+    script(src='/js/errors.js')
+
   body
     header
       nav
@@ -31,20 +34,7 @@ html(lang='en')
           else
             a(href='/login') Login
             a(href='/register') Register
-
-      if (messages)
-        if (messages.requests.length > 0)
-          #requests
-            each message in messages.requests
-              span.message= message
-        if (messages.errors.length > 0)
-          #errors
-            each message in messages.errors
-              span.message= message
-        if (messages.alerts.length > 0)
-          #alerts
-            each message in messages.alerts
-              span.message= message
+            
     div#content
       block content
     block footScripts

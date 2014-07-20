@@ -1,13 +1,17 @@
 extends layout
+include mixins/errors.jade
 
 block headScript
 
 block content
   include calendar
 
+  +errors(messages)
+  
   #info_controls
     .info-block
       h3.info-block-title Your calendars
+      +errors
       ul#calendars
         li.hidden
           span.calendar-name
@@ -15,6 +19,7 @@ block content
     .info-block
       form#add_calendar
         h3.info-block-title Add a calendar
+        +errors
         div
           label(for='type') Type
           select#type(name='type')

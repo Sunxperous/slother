@@ -35,6 +35,7 @@ function userInGroup(_user, positive, type, message) {
 //    group_name: String
 router.post('/', 
   function(req, res, next) {
+    res.error.redirect = '/group';
     var user = req.attach.user;
     Group.create({
       groupName: req.body.group_name,

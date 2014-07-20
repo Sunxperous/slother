@@ -58,14 +58,19 @@ app.use('/user', user);
 // Maybe can render a Sloth sleeping.
 app.use(function(err, req, res, next) {
   if (err.name === 'ValidationError' || err.name === 'UserError') {
+    var message = err.message;
+    if (err.name === 'ValidationError') {
+      // Trim 'ValidatorError: ' from validation messages.
+      message = err.toString().substr(17);
+    }
     console.log(err);
     return res.format({
       'application/json': function() {
-        return res.send({ 'error': err.message });
+        return res.send({ 'error': message });
       },
 
       'text/html': function() {
-        req.flash('error', err.message);
+        req.flash('error', message);
         return res.redirect(res.error.redirect || '/calendar/user');
       }
     });
