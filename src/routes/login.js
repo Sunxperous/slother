@@ -8,6 +8,7 @@ var router = express.Router();
 var config = require('../config');
 var bcrypt = require('bcrypt-nodejs');
 var User = require('../schema/userSchema');
+var UserError = require('../userError.js');
 
 function redirectIfAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
@@ -40,12 +41,12 @@ passport.use(new LocalStrategy(
     User.findOne({ username: username }, function(err, user) {
       if (err) { return done(err); }
       if (!user) {
-        return done(null, false, { message: 'Invalid login.' });
+        return done(null, false, { message: 'Invalid username/password.' });
       }
       else {
         user.authPassword(password, function(res) {
           if (!res) {
-            return done(null, false, { message: 'Invalid login.' });
+            return done(null, false, { message: 'Invalid username/password.' });
           }
           else {
             return done(null, user);
@@ -159,37 +160,30 @@ router.get('/register', redirectIfAuthenticated,
 );
 
 router.post('/register',
-  redirectIfAuthenticated,
-  User.ensureExistsByUsername(false, ['body', 'username']),
   function(req, res, next) {
-  // Assuming valid, non-existing user...
-    if (req.body.username.length < 3 || req.body.username.length > 20) {
-      req.flash('error', 'Username should be between 3 and 20 characters.');
-      res.redirect('/register');
-    }
-    else if (req.body.password.length < 3 || req.body.password.length > 128) {
-      req.flash('error', 'Password should be between 3 and 128 characters.');
-      res.redirect('/register');
+    res.error.redirect = '/register';
+    next();
+  },
+  redirectIfAuthenticated,
+  User.ensureExistsByUsername(false, ['body', 'username'], 'Username already taken.'),
+  function(req, res, next) {
+    // Validate password length here, because we are hashing it later.
+    if (req.body.password.length < 3 || req.body.password.length > 128) {
+      return next(new UserError('Password should be between 3 and 128 characters.'));
     }
     else {
       bcrypt.hash(req.body.password, null, null, function(err, hash) {
+        if (err) { return next(err); }
+
         User.create({
           username: req.body.username,
           display_name : req.body.display_name,
           password: hash,
         }, function(err, user) {
-          if (err) {
-            if (err.name === 'ValidationError') {
-              req.flash('error', err.message);
-              res.redirect('/register');
-            }
-            else {
-              console.log(err);
-            }
-          }
-          else if (user) {
+          if (err) { return next(err); }
+          if (user) {
             req.login(user, function(err_login) {
-              if (err) { res.redirect('/register'); }        
+              if (err) { return next(err); }        
               return res.redirect('/');
             });
           }

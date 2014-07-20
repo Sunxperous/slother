@@ -3,21 +3,20 @@ var router = express.Router();
 var User = require('../schema/userSchema');
 var Group = require('../schema/groupSchema');
 var Calendar = require('../schema/calendarSchema');
+var UserError = require('../userError.js');
 
 router.use(User.ensureAuthenticated());
 
 router.get('/group/:hash/:name', function(req, res, next) {
+  res.error.redirect('/group');
   res.format({
 
     'text/html': function() { // If html page is requested...
       var group_id = Group.decryptHash(req.params.hash);
       Group.findById(group_id, function(err, group) {
-        if (err) { // Due to invalid hash that decrypts to empty...
-          return next(err);
-        }
+        if (err) { return next(err); } // Due to invalid hash that decrypts to empty...
         else if (!group) { // Group not found...
-          req.flash('error', 'There is no such group.');
-          return res.redirect('/group');
+          return next(new UserError('There is no such group.'));
         }
         else { // Group found!
           var isAdmin = group.hasUser(req.attach.user, 'admins');
@@ -33,7 +32,7 @@ router.get('/group/:hash/:name', function(req, res, next) {
       .select('groupName members requested')
       .lean()
       .exec(function(err, group) {
-        if (err) { next(err); }
+        if (err) { return next(err); }
         else if (group) {
           var numUserQueried = 0;
           var members = [];
@@ -42,7 +41,7 @@ router.get('/group/:hash/:name', function(req, res, next) {
             .findById(member._id)
             .populate('calendars')
             .exec(function(err, user) {
-              if (err) { next(err); }
+              if (err) { return next(err); }
               else if (!user.hasGroup(group)) { // Group has user, but user does not have group...
                 group.members.splice(group.members.indexOf(member), 1);
               }
@@ -86,6 +85,7 @@ router.get('/group/:hash/:name', function(req, res, next) {
 });
 
 router.get('/user', function(req, res, next) {
+  res.error.redirect = '/';
   res.format({
 
     'text/html': function() { // If html page is requested...
@@ -95,10 +95,13 @@ router.get('/user', function(req, res, next) {
       .populate('requests')
       .exec(function(err, user) {
         if (err) { return next(err); }
-        return res.render('soloCalendar', {
-          groups: user.groups,
-          requests: user.requests
-        });
+        if (user) {
+          return res.render('soloCalendar', {
+            groups: user.groups,
+            requests: user.requests
+          });
+        }
+        else { return next(new UserError('?')); }
       });
     },
 
@@ -114,9 +117,7 @@ router.get('/user', function(req, res, next) {
           }
           else { return res.send([]); }
         }
-        else {
-          return res.send(null);
-        }
+        else { return next(new UserError('?')); }
       });
     }
   });

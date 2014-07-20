@@ -1,11 +1,12 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
 var timestamps = require('mongoose-timestamp');
-var calendarSchema = require('../schema/calendarSchema');
 var Schema = mongoose.Schema;
+var calendarSchema = require('../schema/calendarSchema');
+var UserError = require('../userError.js');
 
 var userSchema = Schema({
-  username: { type: String, unique: true },
+  username: { type: String, unique: true, lowercase: true },
   email: String,
   display_name: String,
   password: String,
@@ -45,8 +46,8 @@ function ensureAuthenticated(req, res, next) {
     return next();
   }
   else {
-    req.flash('error', 'Please log in');
-    return res.redirect('/login');
+    res.error.redirect = '/login';
+    return next(new UserError('Please log in.'));
   }
 }
 userSchema.statics.ensureAuthenticated = function() { return ensureAuthenticated; }
@@ -62,22 +63,22 @@ function getNestedValue(obj, keys) {
 // Searches for a user by username, and attach target.
 //  source: Array of keys to nest from req, 
 //    e.g. ['body', 'username'] => req.body.username
-userSchema.statics.ensureExistsByUsername = function(positive, source) {
+userSchema.statics.ensureExistsByUsername = function(positive, source, message) {
   var _this = this;
   return function(req, res, next) {
     var target = getNestedValue(req, source);
-    _this.findOne({ username: target }, function(err, user) {
+    _this.findOne({ username: target.toLowerCase() }, function(err, user) {
       if (err) { return next(err); }
       else if (user) { // Found...
         if (positive) { // ...and we want it to exist!
           req.attach.target = user;
           return next();
         }
-        else { return res.send({ error: 'User already exists.' }); } // ...but it does not exist.
+        else { return next(new UserError(message)); } // ...but it does not exist.
       }
       else { // Not found...
         if (positive) { // ...but we want it to exist.
-          return res.send({ error: 'User does not exist.' });
+          return next(new UserError(message));
         }
         else { return next(); } // ...and it does not exist!
       }

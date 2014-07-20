@@ -21,7 +21,6 @@ var app = express();
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.set('port', config.app.port);
-app.set('hashids', hashids);
 
 // Routing.
 var routes = require('./routes/index');
@@ -58,9 +57,21 @@ app.use('/user', user);
 // Errors final middleware.
 // Maybe can render a Sloth sleeping.
 app.use(function(err, req, res, next) {
-  console.log(err);
+  if (err.name === 'ValidationError' || err.name === 'UserError') {
+    console.log(err);
+    return res.format({
+      'application/json': function() {
+        return res.send({ 'error': err.message });
+      },
+
+      'text/html': function() {
+        req.flash('error', err.message);
+        return res.redirect(res.error.redirect || '/calendar/user');
+      }
+    });
+  }
   console.error(err.stack);
-  res.send(500, 'Something broke...');
+  return res.send(500, 'What went wrong?');
 });
 
 var server = app.listen(app.get('port'), function() {
@@ -76,6 +87,7 @@ function applyLocals() {
     res.locals.messages = flashMessages;
 
     req.attach = {};
+    res.error = {};
 
     if (req.isAuthenticated()) {
       User.findOne({ username: req.user.username }, function(err, user) {
@@ -88,7 +100,7 @@ function applyLocals() {
       });
     }
     else {
-      return next ();
+      return next();
     }
   }
 }

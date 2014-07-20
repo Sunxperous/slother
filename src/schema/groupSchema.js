@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 var config = require('../config');
 var Hashids = require('hashids');
   var hashids = new Hashids(config.hashid.salt);
+var UserError = require('../userError.js');
 
 function randomColor() {
   return config.colors[Math.floor(Math.random() * config.colors.length)];
@@ -47,7 +48,7 @@ groupSchema.statics.decryptHash = function(hash) {
 }
 
 // Searches for a group by hashed id, and attach group.
-groupSchema.statics.ensureExistsByHash = function(positive) {
+groupSchema.statics.ensureExistsByHash = function(positive, message) {
   var _this = this;
   return function(req, res, next) {
     var group_id = _this.decryptHash(req.params.hash);
@@ -58,11 +59,11 @@ groupSchema.statics.ensureExistsByHash = function(positive) {
           req.attach.group = group;
           return next();
         }
-        else { return res.send({ error: 'Group already exists.' }); } // ...but it does not exist.
+        else { return next(new UserError(message)); } // ...but it does not exist.
       }
       else { // Group not found...
         if (positive) { // ...but we want it to exist.
-          return res.send({ error: 'Group does not exist.' });
+          return next(new UserError(message));
         }
         else { return next(); } // ...and it does not exist!
       }
