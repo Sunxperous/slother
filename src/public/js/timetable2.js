@@ -40,6 +40,7 @@ var timetable = (function() {
         $('#' + type).removeClass('hidden');
         $('#' + otherType).addClass('hidden');
         $('#popup_wrapper').removeClass('hidden');
+        $('#summary').focus();
         return this;
       },
       highlight: function(element) {
@@ -224,6 +225,9 @@ var timetable = (function() {
             type: 'DELETE'
           })
           .success(function(response) {
+            if (response.error) {
+              return errors.add('error', response.error, $('#delete_all'));
+            }
             if (response.success) {
               calendars[calendar_id].deleteItem(item._id);
               popup.close();
@@ -326,8 +330,9 @@ var timetable = (function() {
       $.ajax('/calendar/' + $('#calendar_id').val() + '/event/' + $('#event_id').val(),
         { data: sending, type: requestType })
         .done(function(response) {
-          // Expecting response.data to contain event details and calendar_id.
-          // Since only SOLO calendars can add/edit event for now, assume this is done in SOLO.
+          if (response.error) {
+            return errors.add('error', response.error, $('#event_details'));
+          }
           calendars[response.calendar_id].addOrReplaceItem(response.eventInfo); // Replace or add.
           popup.close();
           $('#submit').removeAttr('disabled');

@@ -21,6 +21,9 @@
           $.post('/extract',
             { addr: encodeURIComponent($('#nusmods_string').val()) },
             function(calendar) {
+              if (calendar.error) {
+                return errors.add('error', calendar.error, $('#add_calendar'));
+              }
               timetable.replaceOrAddCalendar(calendar, true);
               timetable.update();
             }
@@ -34,10 +37,11 @@
         $.post('/calendar',
           { name: $('#generic_string').val() },
           function(calendar) {
-            if (!calendar.error) {
-              timetable.replaceOrAddCalendar(calendar, true);
-              timetable.update();
+            if (calendar.error) {
+              return errors.add('error', calendar.error, $('#add_calendar'));
             }
+            timetable.replaceOrAddCalendar(calendar, true);
+            timetable.update();
           }
         );
       }

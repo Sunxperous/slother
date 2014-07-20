@@ -172,7 +172,7 @@ router.put('/:calendar_id/color', function(req, res, next) {
     calendar.color = req.body.color;
     calendar.save(function (err, calendar) {
       if (err) { return next(err); }
-      return res.send({success:"Privacy setting changed."});
+      return res.send({success:"Color setting changed."});
     });
   });
 });
