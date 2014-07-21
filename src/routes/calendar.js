@@ -134,7 +134,8 @@ router.post('/', function (req, res, next) {
         calendar.user = user._id;
         calendar.save( function (err, calendar) {
           if(err) { return next(err); }
-          else res.send(calendar);
+          else 
+            return res.send(calendar);
         });
     });
   });
@@ -143,14 +144,18 @@ router.post('/', function (req, res, next) {
 router.delete('/:calendar_id', function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id})
   .exec( function (err, calendar) {
+    if (err) { return next(err); }
     calendar.remove();
     calendar.save( function (err, calendarD) {
+      if (err) { return next(err); }
       User.findOne({username:req.user.username})
       .exec( function (err, user) {
+        if (err) { return next(err); }
         user.calendars.remove(req.params.calendar_id);
         user.save( function (err, user) {
-          if(err) { console.log(err); res.send(null); }
-          else res.send({ success:"Calendar "+calendar.name+" is removed."});
+          if (err) { return next(err); }
+          else 
+            return res.send({ success:"Calendar "+calendar.name+" is removed."});
         });   
       });
     });
@@ -178,7 +183,8 @@ router.put('/:calendar_id/color', function (req, res, next) {
     calendar.color = req.body.color;
     calendar.save(function (err, calendar) {
       if (err) { return next(err); }
-      return res.send({success:"Color setting changed."});
+      else 
+        return res.send({success:"Color setting changed."});
     });
   });
 });
@@ -188,9 +194,12 @@ router.put('/:calendar_id/color', function (req, res, next) {
 router.put('/:calendar_id/name', function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id})
   .exec( function (err, calendar) {
+    if (err) { return next(err); }
     calendar.name = req.body.name;
     calendar.save( function (err, calendar) {
-      res.send({success:"Name changed."});
+      if (err) { return next(err); }
+      else
+        res.send({success:"Name changed."});
     });
   });
 });
@@ -213,7 +222,8 @@ router.put('/:calendar_id/event/:event_id',
     myEvent.exclude = req.body.exclude;
     calendar.save( function (err, calendar) {
       if (err) { return next(err); }
-      return res.send({success:"Edited an event",
+      else 
+        return res.send({success:"Edited an event",
                 calendar_id: req.params.calendar_id,
                 eventInfo: calendar.events.id(req.params.event_id)
       });
@@ -239,7 +249,8 @@ router.post('/:calendar_id/event/',
     });
     calendar.save( function (err, calendar) {
       if (err) { return next(err); }
-      return res.send({success:"Added an event",
+      else
+        return res.send({success:"Added an event",
                 calendar_id: req.params.calendar_id,
                 eventInfo: calendar.events[calendar.events.length-1]
       });

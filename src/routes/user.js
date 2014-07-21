@@ -4,56 +4,51 @@ var mongoose = require('mongoose');
 var User = require('../schema/userSchema');
 var Calendar = require('../schema/calendarSchema');
 // /user/calendar
+router.use(User.ensureAuthenticated());
 
-function loggedIn(req, res, next) {
-  if (req.user) { 
-    req.attach.myself = req.user;
-    next();  
-  }
-  else { 
-    res.redirect('/login'); 
-    res.send({error: "Please log in"});
-  }
-}
 
-router.get('/request', loggedIn, function (req, res) {
+router.get('/request', function (req, res, next) {
   User.findOne({username:req.user.username}, 
     function (err, user) {
-      if(err) 
-        res.send("err '"+err+"'.");
+      if (err) { return next(err); }
       else 
-        res.send(user.requests);
+        return res.send(user.requests);
   });
 });
 
-router.put('/displayName', function (req, res, err) {
+router.put('/displayName', function (req, res, next) {
   User.findOne({username:req.user.username},
-   function (err, user) {
+    function (err, user) {
+    if (err) { return next(err); }
     user.display_name = req.body.disName;
     user.save( function (err, user) {
-      res.send({ success: "Username Changed."});
-    })
-   })
+      if (err) { return next(err); }
+      else
+        return res.send({ success: "Username Changed."});
+    });
+   });
 })
 
-router.post('/createCalendar', loggedIn, function (req, res) {
+router.post('/createCalendar', function (req, res, next) {
   Calendar.create({
     name: req.body.name,
     events:[]
   }, function (err, calendar) {
+    if (err) { return next(err); }
     User.findOneAndUpdate({username:req.user.username},
       {$push:{calendar:calendar._id}}, function (err, user) {
-        if(err) { console.log(err); res.send(null); }
+        if (err) { return next(err); }
         calendar.user = user._id;
         calendar.save( function (err, calendar) {
-          if(err) { console.log(err); res.send(null); }
-          else res.send({success:"New calendar is created."});
+          if (err) { return next(err); }
+          else 
+            return res.send({success:"New calendar is created."});
         });
       });
   });
 });
 
-router.get('/', function(req, res) {
+router.get('/', function (req, res, next) {
   res.format({
     'text/html': function() { // If html page is requested...
       User
