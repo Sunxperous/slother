@@ -7,8 +7,12 @@ var UserError = require('../userError.js');
 
 router.use(User.ensureAuthenticated());
 
-router.get('/group/:hash/:name', function(req, res, next) {
-  res.error.redirect = '/group';
+router.param('hash', Group.ensureExistsByHash());
+
+router.get('/group/:hash/:name',
+  function(req, res, next) { res.error.redirect = '/group'; next(); },
+  Group.userInGroup('user', true, 'members', 'You are not a member of this group.'),
+  function(req, res, next) {
   res.format({
 
     'text/html': function() { // If html page is requested...

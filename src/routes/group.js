@@ -4,34 +4,22 @@ var User = require('../schema/userSchema');
 var Group = require('../schema/groupSchema');
 var Calendar = require('../schema/calendarSchema');
 var Request = require('../schema/requestSchema');
+var groupAdmin = require('./groupAdmin');
 var UserError = require('../userError.js');
 
 router.use(User.ensureAuthenticated());
 
-// Searches given _user in group[type], depending on positive.
-function userInGroup(_user, positive, type, message) {
-  return function(req, res, next) {
-    var group = req.attach.group;
-    var user = req.attach[_user];
-    if (group && user) { // Compulsory to have.
-      var hasUser;
-      if (type === 'requested') { hasUser = group.hasUser(user, type); }
-      else { hasUser = group.hasUser(user, type) && user.hasGroup(group) }
-      if (positive) { // We want user in group list...
-        if (hasUser) { return next(); } // ...yay!
-        else { // ...nope, user is not in group list.
-          return next(new UserError(message));
-        }
-      }
-      else { // We don't want user in group list...
-        if (hasUser) { // ...nope, user is in group list.
-          return next(new UserError(message));
-        }
-        else { return next(); } // ...yay!
-      }
-    }
-  }
-}
+// Deals with hash.
+router.param('hash', Group.ensureExistsByHash());
+router.all('/:hash', function(req, res, next) {
+  res.error.redirect = '/group/' + req.params.hash;
+  next();
+});
+
+router.use('/:hash/admin',
+  groupAdmin,
+  function(req, res, next) { console.log('hi'); next(); }
+);
 
 // Post request to create new Group.
 //  body
@@ -65,22 +53,16 @@ router.post('/',
     });
 });
 
-router.all('/:hash', function(req, res, next) {
-  res.error.redirect = '/group/' + req.params.hash;
-  next();
-});
-
 // Post request to send invitation to user.
 //  params
 //    hash: Group.ObjectId.hashed
 //  body
 //    username: String
 router.post('/:hash/invite',
-  Group.ensureExistsByHash(true, 'There is no such group.'), // Attaches group.
   User.ensureExistsByUsername(true, ['body', 'username'], 'There is no such user.'), // Attaches target.
-  userInGroup('user', true, 'admins', 'Only admins can invite other users.'),
-  userInGroup('target', false, 'members', 'User is already in the group.'),
-  userInGroup('target', false, 'requested', 'User is already invited to the group.'),
+  Group.userInGroup('user', true, 'admins', 'Only admins can invite other users.'),
+  Group.userInGroup('target', false, 'members', 'User is already in the group.'),
+  Group.userInGroup('target', false, 'requested', 'User is already invited to the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
@@ -113,9 +95,8 @@ router.post('/:hash/invite',
 //  body
 //    username: String
 router.post('/:hash/accept',
-  Group.ensureExistsByHash(true, 'There is no such group.'), // Attaches group.
-  userInGroup('user', true, 'requested', 'You have not been invited to the group.'),
-  userInGroup('user', false, 'members', 'You are already in the group.'),
+  Group.userInGroup('user', true, 'requested', 'You have not been invited to the group.'),
+  Group.userInGroup('user', false, 'members', 'You are already in the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var user = req.attach.user;
@@ -157,9 +138,8 @@ router.post('/:hash/accept',
 //  body
 //    username: String
 router.post('/:hash/reject',
-  Group.ensureExistsByHash(true, 'There is no such group.'), // Attaches group.
-  userInGroup('user', true, 'requested', 'You have not been invited to the group.'),
-  userInGroup('user', false, 'members', 'You are already in the group.'),
+  Group.userInGroup('user', true, 'requested', 'You have not been invited to the group.'),
+  Group.userInGroup('user', false, 'members', 'You are already in the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var user = req.attach.user;
@@ -192,10 +172,9 @@ router.post('/:hash/reject',
 //    hash: Group.ObjectId.hashed
 //    username: String
 router.delete('/:hash/member/:username',
-  Group.ensureExistsByHash(true, 'There is no such group.'), // Attaches group.
   User.ensureExistsByUsername(true, ['params', 'username'], 'There is no such user.'), // Attaches target.
-  userInGroup('target', true, 'members', 'User does not belong to the group.'),
-  userInGroup('user', true, 'admins', 'Admins cannot be removed from the group.'),
+  Group.userInGroup('target', true, 'members', 'User does not belong to the group.'),
+  Group.userInGroup('user', true, 'admins', 'Admins cannot be removed from the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
@@ -221,9 +200,8 @@ router.delete('/:hash/member/:username',
 //    hash: Group.ObjectId.hashed
 //    username: String
 router.put('/:hash/member/:username/color',
-  Group.ensureExistsByHash(true, 'There is no such group.'), // Attaches group.
   User.ensureExistsByUsername(true, ['params', 'username'], 'There is no such user.'), // Attaches target.
-  userInGroup('target', true, 'members', 'User does not belong in the group.'),
+  Group.userInGroup('target', true, 'members', 'User does not belong in the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
@@ -242,9 +220,8 @@ router.put('/:hash/member/:username/color',
 
 // Post request to leave group.
 router.post('/:hash/leave',
-  Group.ensureExistsByHash(true, 'There is no such group.'),
-  userInGroup('user', true, 'members', 'You are not a member of the group.'),
-  userInGroup('user', false, 'admins', 'Admins cannot leave the group.'), // Administrators cannot leave group at the moment.
+  Group.userInGroup('user', true, 'members', 'You are not a member of the group.'),
+  Group.userInGroup('user', false, 'admins', 'Admins cannot leave the group.'), // Administrators cannot leave group at the moment.
   function(req, res, next) {
     var group = req.attach.group;
     var user = req.attach.user;
