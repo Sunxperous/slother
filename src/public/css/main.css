@@ -689,3 +689,7 @@ h4 {
   margin: 3px;
 }
 /*^ user.jade ^*/
+#user_panel {
+  margin: auto auto;
+  max-width: 500px;
+}

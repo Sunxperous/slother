@@ -5,70 +5,72 @@ block headScript
 
 block content
   +errors(messages)
-  input#user(value=user.id name=user.username type='hidden')
-  .user-block#profile
-    h4 My Profile
-    +errors
-    div#user_name
-      span#profile_header Username
-      span#profile_value=username
-    div#displayname
-      span#profile_header Display Name
-      span#profile_value=displays
-    div#change_display_name
-      input#display_name(type='text' placeholder='Change your name')
-      input#change_name(type='button' value='Change Display Name')
-     
-  .user-block#request
-    h4 Group Request
-    +errors
-    div
-      if(requests.length > 0)
-        for request in requests
-          span.req-name=request.groupName
-          input(id=request.url value=request.groupName type='hidden')
-          input.req-accept(value='Accept' type='submit')
-          input.req-reject(value='Reject' type='submit')
-      else
-        div.nothing-display No Request
-  .user-block#calendar_info
-    h4 My calendars
-    +errors
-    if(calendar.length > 0)      
-        
-      for item in calendar
-        div.cal-block
-          li.cal-name
-            span=item.name 
-            if(item.hidden)
-              span#hidden Private
-          div.cal-func
-            input(id=item.id value=item.name type='hidden')
-            
-            div.cal-change
-              input.cal-name-input(val="" placeholder='Change calendar name')
-              input.cal-change-name(value='Change Name' type='submit') 
-            div.cal-change
-              select.cal-privacy-type(type='select')
-                option(value='Open' selected) Public
-                option(value='Hidden') Hidden
-              input.cal-privacy(value='Change Privacy' type='submit')
-            div.cal-change
-              input.cal-delete(value='Delete Calendar' type='submit') 
-      else
-        div.nothing-display No Calendars Yet
 
-  .user-block#group_info
-    h4 My Group
-    +errors
-    if(groups.length > 0 )
-      for group in groups
-        div.group-data
-          a(href=group.url)= group.groupName
-          input(id=group._id value=group.groupName type='hidden')
-          input.group-leave(value='Leave' type='submit')
-    else
-      div.nothing-display You do not belong to any groups yet
+  input#user(value=user.id name=user.username type='hidden')
+  div#user_panel
+    .user-block#profile
+      h4 My Profile
+      +errors
+      div#user_name
+        span#profile_header Username
+        span#profile_value=username
+      div#displayname
+        span#profile_header Display Name
+        span#profile_value=displays
+      div#change_display_name
+        input#display_name(type='text' placeholder='Change your name')
+        input#change_name(type='button' value='Change Display Name')
+       
+    .user-block#request
+      h4 Group Request
+      +errors
+      div
+        if(requests.length > 0)
+          for request in requests
+            span.req-name=request.groupName
+            input(id=request.url value=request.groupName type='hidden')
+            input.req-accept(value='Accept' type='submit')
+            input.req-reject(value='Reject' type='submit')
+        else
+          div.nothing-display No Request
+    .user-block#calendar_info
+      h4 My calendars
+      +errors
+      if(calendar.length > 0)      
+          
+        for item in calendar
+          div.cal-block
+            li.cal-name
+              span=item.name 
+              if(item.hidden)
+                span#hidden Private
+            div.cal-func
+              input(id=item.id value=item.name type='hidden')
+              
+              div.cal-change
+                input.cal-name-input(val="" placeholder='Change calendar name')
+                input.cal-change-name(value='Change Name' type='submit') 
+              div.cal-change
+                select.cal-privacy-type(type='select')
+                  option(value='Open' selected) Public
+                  option(value='Hidden') Hidden
+                input.cal-privacy(value='Change Privacy' type='submit')
+              div.cal-change
+                input.cal-delete(value='Delete Calendar' type='submit') 
+        else
+          div.nothing-display No Calendars Yet
+
+    .user-block#group_info
+      h4 My Group
+      +errors
+      if(groups.length > 0 )
+        for group in groups
+          div.group-data
+            a(href=group.url)= group.groupName
+            input(id=group._id value=group.groupName type='hidden')
+            input.group-leave(value='Leave' type='submit')
+      else
+        div.nothing-display You do not belong to any groups yet
 
 block footScripts
   script(src='/js/user.js')
