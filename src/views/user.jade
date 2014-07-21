@@ -4,6 +4,7 @@ block headScript
 
 
 block content
+  input#user(value=user.id name=user.username type='hidden')
   .user-block#profile
     h4 My Profile
     p
@@ -21,34 +22,49 @@ block content
     h4 Group Request
     p
       div
-        for request in requests
-          span.req-name=request.name
-          input.req-accept(value='Accept' type='submit')
-          input.req-reject(value='Reject' type='submit')
-
+        if(requests.length > 0)
+          for request in requests
+            span.req-name=request.groupName
+            input(id=request.url value=request.groupName type='hidden')
+            input.req-accept(value='Accept' type='submit')
+            input.req-reject(value='Reject' type='submit')
+        else
+          div.nothing-display No Request
   .user-block#calendar_info
     h4 My calendars
     p
+      if(calendar.length > 0)      
+          
         for item in calendar
           li
             span.cal-name=item.name 
             span=item.privacy
-            if(item.privacy)
-              a(href='../Private.png') 
+            if(item.hidden)
+              img.picture() 
             input(id=item.id value=item.name type='hidden')
             select.cal-privacy-type(type='select')
-
-              option(value=item.privacy selected)
-              option(value=item.privacy selected)
-            input.cal-name(value='Change Name' type='submit')
+              option(value='Open' selected) Public
+              option(value='Hidden') Hidden
             input.cal-privacy(value='Change Privacy' type='submit')
-            input.cal-delete(value='Delete' type='submit') 
-  
+            div
+              input(id=item.id value=item.name type='hidden')
+              input.cal-name-input(val="" placeholder='Change calendar name')
+              input.cal-change-name(value='Change Name' type='submit') 
+              input.cal-delete(value='Delete Calendar' type='submit') 
+        else
+          div.nothing-display No Calendars Yet
+
   .user-block#group_info
     h4 My Group
-    for group in groups
-      a(href=group.url)= group.groupName
-
+      p 
+        if(groups.length > 0 )
+          for group in groups
+            li.group-data
+              a(href=group.url)= group.groupName
+              input(id=group._id value=group.groupName type='hidden')
+              input.group-leave(value='Leave' type='submit')
+        else
+          div.nothing-display You do not belong to any groups yet
 block footScripts
   script(src='/vendor/please.min.js')
   script(src='/js/user.js')

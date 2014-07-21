@@ -131,17 +131,15 @@ nav {
   position: relative;
   left:3px;
 }
-
 #number {
   font-size: 14px;
   padding: 2px 8px;
   border-radius: 8px;  
 }
-<<<<<<< HEAD
 a.has-notifications {
   color: #fff;
   background-color: #f66;
-=======
+}
 #errors, #alerts, #requests {
   padding: 0;
   text-align: center;
@@ -163,8 +161,8 @@ a.has-notifications {
 }
 #alerts .message {
   color: #c93;
->>>>>>> Initial set up of user page
 }
+
 a.no-notifications {
   color: #333;
   background-color: #ccc;
@@ -582,7 +580,6 @@ h3.info-block-title {
 }
 /*^ #calendar_controls ^*/
 
-<<<<<<< HEAD
 /*v #colorpicker v*/
 #colorpicker {
   margin-top: 4px;
@@ -597,8 +594,8 @@ h3.info-block-title {
   cursor: pointer;
 }
 /*^ #colorpicker ^*/
-=======
-/*^ user.jade ^*/
+
+/*v user.jade ^*/
 
 .user-block {
   margin: 10px auto auto auto;
@@ -635,15 +632,51 @@ h3.info-block-title {
   left:5px;
 }
 
+.picture {
+   width: 5%; 
+   height: 5%;
+}
 
-
-.cal-delete {
-  position:absolute;
-  right:10px;
+.cal-privacy-type {
+  position: relative;
+  left: 50px;
 }
 
 .cal-name {
+  margin-right: 50px;
+}
 
+.cal-privacy {
+  position: relative;
+  left: 90px;
+}
+
+.cal-delete {
+  position: relative;
+  left: 100px;
+}
+
+.cal-name-input {
+  position: relative;
+  left: 50px; 
+}
+
+.cal-change-name {
+  position: relative;
+  left: 80px;
+  margin-right: 0px;
+}
+
+.group-leave {
+  position:absolute;
+  left:100px;
+}
+
+li.group-data {
+  margin: 5px;
+  position: relative;
+  left:10px;
+  text-align: left;
 }
 
 #user_name {
@@ -668,6 +701,12 @@ h3.info-block-title {
 #change_display_name {
   padding: 10px;
   text-align: center;
+}
+
+.nothing-display {
+  font-size: 20px;
+  text-align: center;
+  color: red;
 }
 
 h4 {
