@@ -26,6 +26,16 @@ router.get('/request', loggedIn, function (req, res) {
   });
 });
 
+router.put('/displayName', function (req, res, err) {
+  User.findOne({username:req.user.username},
+   function (err, user) {
+    user.display_name = req.body.disName;
+    user.save( function (err, user) {
+      res.send({ success: "Username Changed."});
+    })
+   })
+})
+
 router.post('/createCalendar', loggedIn, function (req, res) {
   Calendar.create({
     name: req.body.name,

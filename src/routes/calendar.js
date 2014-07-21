@@ -150,10 +150,7 @@ router.delete('/:calendar_id', function (req, res, next) {
         user.calendars.remove(req.params.calendar_id);
         user.save( function (err, user) {
           if(err) { console.log(err); res.send(null); }
-          else res.send({
-            success:"Calendar "+calendar.name+" is removed.",
-            id: calendar._id
-            });
+          else res.send({ success:"Calendar "+calendar.name+" is removed."});
         });   
       });
     });
@@ -165,7 +162,7 @@ router.put('/:calendar_id/privacy', function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id})
   .exec( function (err, calendar) {
     if (err) { return next(err); }
-    calendar.hidden = req.body.hidden;
+    calendar.hidden = req.body.privacy;
     calendar.save( function (err, calendar) {
       if (err) { return next(err); }
       return res.send({success:"Privacy setting changed."});
@@ -173,6 +170,7 @@ router.put('/:calendar_id/privacy', function (req, res, next) {
   });
 });
 
+//Change color setting
 router.put('/:calendar_id/color', function (req, res, next) {
   Calendar.findOne({ _id:req.params.calendar_id })
   .exec(function (err, calendar) {
@@ -185,8 +183,9 @@ router.put('/:calendar_id/color', function (req, res, next) {
   });
 });
 
-//Change privacy setting
-router.put('/:calendar_id/name', function (req, res) {
+
+//Change name setting
+router.put('/:calendar_id/name', function (req, res, next) {
   Calendar.findOne({_id:req.params.calendar_id})
   .exec( function (err, calendar) {
     calendar.name = req.body.name;
@@ -264,7 +263,7 @@ router.delete('/:calendar_id/event/:event_id',
   });
 });
 
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
   res.redirect('/calendar/user');
 });
 

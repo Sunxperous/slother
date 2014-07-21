@@ -595,125 +595,97 @@ h3.info-block-title {
 }
 /*^ #colorpicker ^*/
 
-/*v user.jade ^*/
+/*v user.jade v*/
 
 .user-block {
   margin: 10px auto auto auto;
   width: 95%;
-  min-width: 400px;
+  min-width: 480px;
   max-width: 480px;
   position: relative;
-  min-height: 135px;
+  min-height: 100px;
   height: auto;
-  border: 2px solid #ccc;
   border-radius: 4px;
   text-align: left;
   position: relative;
+  display:inline-block;
 }
-
-#profile {
-  width: 95%;
-  max-width: 230px;
-}
-
-#request {
-  width: 95%;
-  max-width: 200px;
-}
-
-#calendar_info {
-  border: 1px solid;
-  width: 480px;
-  max-width: 480px;
-}
-
-#calendar_info li {
-  position: relative;
-  left:5px;
-}
-
-.picture {
-   width: 5%; 
-   height: 5%;
-}
-
-.cal-privacy-type {
-  position: relative;
-  left: 50px;
-}
-
-.cal-name {
-  margin-right: 50px;
-}
-
-.cal-privacy {
-  position: relative;
-  left: 90px;
-}
-
-.cal-delete {
-  position: relative;
-  left: 100px;
-}
-
-.cal-name-input {
-  position: relative;
-  left: 50px; 
-}
-
-.cal-change-name {
-  position: relative;
-  left: 80px;
-  margin-right: 0px;
-}
-
-.group-leave {
-  position:absolute;
-  left:100px;
-}
-
-li.group-data {
-  margin: 5px;
-  position: relative;
-  left:10px;
-  text-align: left;
-}
-
-#user_name {
-  margin: 10px;
-}
-
-#displayname {
-  margin: 10px;
-}
-#profile_header {
-  position: relative;
-  left:10px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-}
-
-#profile_value {
-  position: absolute;
-  right: 10px;
-}
-
-#change_display_name {
-  padding: 10px;
-  text-align: center;
-}
-
-.nothing-display {
-  font-size: 20px;
-  text-align: center;
-  color: red;
-}
-
 h4 {
   text-align: center;
   margin: 10px 0px 5px;
   font-size: 20px;
   font-style: bold;
   font-weight: 500;
+}
+#profile, #calendar_info {
+  border: 2px solid #ccc;
+}
+#request, #group_info {
+  border: 2px solid;
+}
+.cal-func {
+  display:inline-block;
+  width: 270px;
+  float:right;
+  padding:0px;
+  margin: 5px;
+  height:140px;
+  display: none;
+  border: 2px solid #FFF2FF;
+}
+.cal-change {
+  width: 250px;
+  margin:5px;
+  height:40px;
+}
+.cal-name {
+  margin: 5px;
+  display:inline-block;
+}
+.cal-privacy-type {
+  margin: 0px 20px;
+}
+.cal-change-name, .cal-delete, .cal-privacy  {
+  float:right;
+}
+.group-data {
+  min-width: 130px;
+  height: 30px;
+  display:inline-block;
+}
+.group-leave {
+  margin: 0px 0px 0px 20px; 
+}
+#user_name, #displayname {
+  margin: 10px;
+  height:20px;
+}
+#profile_header {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+#profile_value {
+  position: absolute;
+  right: 20px;
+  margin: 5px;
+}
+#change_display_name {
+  display: none;
+  padding: 10px;
+  text-align: center;
+}
+.nothing-display {
+  margin: 20px;
+  font-size: 18px;
+  text-align: center;
+  color: red;
+}
+.picture {
+   width: 5%; 
+   height: 5%;
+}
+#hidden {
+  color: red;
+  margin: 3px;
 }
 /*^ user.jade ^*/
