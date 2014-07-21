@@ -27,7 +27,12 @@
               if (calendar.error) {
                 return errors.add('error', calendar.error, $('#add_calendar'));
               }
-              newCalendar = timetable.replaceOrAddCalendar(calendar, true);            }
+              newCalendar = timetable.replaceOrAddCalendar(calendar, true);
+              newCalendar.appendToLists(function liForAppend(li) {
+                $('#calendars').append(li);
+              });
+              timetable.update();
+            }
           );
         }
         else {
@@ -42,13 +47,13 @@
               return errors.add('error', calendar.error, $('#add_calendar'));
             }
             newCalendar = timetable.replaceOrAddCalendar(calendar, true);
+            newCalendar.appendToLists(function liForAppend(li) {
+              $('#calendars').append(li);
+            });
+            timetable.update();
           }
         );
       }
-      newCalendar.appendToLists(function liForAppend(li) {
-        $('#calendars').append(li);
-      });
-      timetable.update();
 
       return false;
     });

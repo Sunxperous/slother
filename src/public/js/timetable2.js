@@ -661,9 +661,10 @@ var timetable = (function() {
     var date = moment(sunOfWeek);
     $('#year_display').text(date.format("YYYY"));
     date.subtract(1, 'day'); // For Sunday.
-    $('.dayDate').each(function (index, day) {
+    $('.dateDisplay').each(function (index, day) {
       $(day).data('date', date.add(1, 'day').clone());
-      $(day).text($(day).data('date').format("DD MMM"));
+      $(day).children('.dayDate').text($(day).data('date').format("DD "));
+      $(day).children('.dayMonth').text($(day).data('date').format("MMM "));
     });
 
     satOfWeek = date.add(1, 'day'); // Technically Sunday 00:00am.

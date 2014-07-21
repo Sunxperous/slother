@@ -15,8 +15,9 @@ include mixins/errors.jade
         tr(class= days[daysI])
           td.day
             .dateDisplay
-              span.dayDay= days[daysI] + ', '
+              span.dayMonth
               span.dayDate
+              span.dayDay= days[daysI]
           - for (var i = 0; i < 24; i++)
             td.slot(class= i)
     tfoot

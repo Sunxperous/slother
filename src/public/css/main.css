@@ -328,8 +328,19 @@ div.tableWrapper {
   border-top-right-radius: 16px;
   width: 75px;
   margin-top: -2px;
-  padding: 2px 0 2px 8px;
+  padding: 3px 0 1px 8px;
   font-size: 10px;
+}
+#calendar .dayDate {
+  font-size: 13px;
+  font-weight: 800;
+  color: #222;
+}
+#calendar .dayMonth {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: #666;
 }
 .item {
   position: absolute;
