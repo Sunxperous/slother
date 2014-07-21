@@ -140,14 +140,11 @@ router.put('/:hash/member/:username/color',
   function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
-
-<<<<<<< HEAD
     group.members.forEach(function(member, index, members) {
       if (member._id.toString() === target._id.toString()) {
         group.members[index].color = req.body.color;
       }
     });
-
     group.save(function(err) {
       if (err) { return next(err); }
       else {
@@ -197,8 +194,6 @@ router.get('/', function(req, res, next) {
   })
 });
 
-=======
->>>>>>> Imprved on user page. Not all function useable
 // //Post request to accept request
 // router.post('/acceptInvitation', searchGroupAndRequest(true), 
 //   function (req, res) {
