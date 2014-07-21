@@ -3,7 +3,10 @@
 
     $.getJSON('/calendar/user', function(calendars) {
       calendars.forEach(function (calendar) {
-        timetable.replaceOrAddCalendar(calendar, true);
+        calendar = timetable.replaceOrAddCalendar(calendar, true);
+        calendar.appendToLists(function liForAppend(li) {
+          $('#calendars').append(li);
+        });
       });
     });
 
@@ -15,7 +18,7 @@
     // Add NUSMods address.
     $('#add_calendar').submit(function(event) {
       event.preventDefault();
-      
+      var newCalendar;
       if ($('#type').val() === 'nusmods') {
         if (validateNUSModsLink($('#nusmods_string').val())) {
           $.post('/extract',
@@ -24,9 +27,7 @@
               if (calendar.error) {
                 return errors.add('error', calendar.error, $('#add_calendar'));
               }
-              timetable.replaceOrAddCalendar(calendar, true);
-              timetable.update();
-            }
+              newCalendar = timetable.replaceOrAddCalendar(calendar, true);            }
           );
         }
         else {
@@ -40,11 +41,15 @@
             if (calendar.error) {
               return errors.add('error', calendar.error, $('#add_calendar'));
             }
-            timetable.replaceOrAddCalendar(calendar, true);
-            timetable.update();
+            newCalendar = timetable.replaceOrAddCalendar(calendar, true);
           }
         );
       }
+      newCalendar.appendToLists(function liForAppend(li) {
+        $('#calendars').append(li);
+      });
+      timetable.update();
+
       return false;
     });
 

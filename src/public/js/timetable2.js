@@ -342,27 +342,6 @@ var timetable = (function() {
     return popup;
   })();
 
-  function toggleView(event) {
-    var status = event.data.toggleView();
-    $(this).text(status ? 'hide' : 'show');
-  }
-
-  function colorPicker(event) {
-    var colorpicker = $('#colorpicker');
-    if (colorpicker.is(':visible') && colorpicker.parent().is(event.data.li)) {
-      // Visible and has same calendar parent.
-      colorpicker.addClass('hidden');
-    }
-    else { // Not visible, or is on different calendar parent...
-      colorpicker.data('calendar', event.data);
-      colorpicker.addClass('hidden').detach().appendTo(event.data.li).removeClass('hidden'); // Move to new parent.
-    }
-  }
-
-  $('.color').click(function(event) {
-    $('#colorpicker').data('calendar').changeColor($(this).data('color'));
-  });
-
   var Calendar = (function() {
     function Calendar(calendar) {
       this._id = calendar._id;
@@ -372,11 +351,11 @@ var timetable = (function() {
       this.show = true;
       this.onDisplay = [];
       this.color = calendar.color;
-      this.appendToLists(); // Append to popup select and calendars display.
+      this.colorUrl = calendar.colorUrl; // Group member calendars' color url are given.
       this.display();
     }
 
-    Calendar.prototype.appendToLists = function() {
+    Calendar.prototype.appendToLists = function(liForAppend) {
       if (this.editable) {
         // Append to popup select#calendar.
         this.option = $('<option>');
@@ -391,7 +370,8 @@ var timetable = (function() {
           .css('background-color', this.color);
       this.li.children('.toggle-view').click(this, toggleView);
       this.li.children('.calendar-name').click(this, colorPicker);
-      $('#calendars').append(this.li);
+      //$('#calendars').append(this.li);
+      liForAppend(this.li);
     };
 
     Calendar.prototype.changeColor = function(color) {
@@ -400,13 +380,7 @@ var timetable = (function() {
         item.css('background-color', color);
       });
       this.li.children('.calendar-name').css('background-color', color);
-      var url;
-      if (this.editable) { // Put request to /calendar/color.
-        url = '/calendar/' + this._id + '/color';
-      }
-      else { // Put request to group/member/color.
-        url = window.location.pathname.match(/\/group\/.+\//g) + 'member/' + this.name + '/color';
-      }
+      var url = this.colorUrl || ('/calendar/' + this._id + '/color');
       $.ajax(url, { type: 'PUT', data: { color: color } });
     }
 
@@ -651,12 +625,32 @@ var timetable = (function() {
     return Calendar;
   })();
 
+  function toggleView(event) {
+    var status = event.data.toggleView();
+    $(this).text(status ? 'hide' : 'show');
+  }
+  function colorPicker(event) {
+    var colorpicker = $('#colorpicker');
+    if (colorpicker.is(':visible') && colorpicker.parent().is(event.data.li)) {
+      // Visible and has same calendar parent.
+      colorpicker.addClass('hidden');
+    }
+    else { // Not visible, or is on different calendar parent...
+      colorpicker.data('calendar', event.data);
+      colorpicker.addClass('hidden').detach().appendTo(event.data.li).removeClass('hidden'); // Move to new parent.
+    }
+  }
+  $('.color').click(function(event) {
+    $('#colorpicker').data('calendar').changeColor($(this).data('color'));
+  });
+
   timetable.replaceOrAddCalendar = function(calendar, editable) {
     calendar.editable = editable;
     if (calendars.hasOwnProperty(calendar._id)) {
       calendars[calendar._id].destroy();
     }
     calendars[calendar._id] = new Calendar(calendar);
+    return calendars[calendar._id];
   }
 
   timetable.update = function(num, type) {

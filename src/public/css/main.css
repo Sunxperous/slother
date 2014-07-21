@@ -75,7 +75,7 @@ h1 {
 }
 h2 {
   font-size: 24px;
-  padding: 16px 0;
+  padding: 0 0 16px 0;
   font-weight: 600;
 }
 header {
@@ -317,7 +317,6 @@ div.tableWrapper {
 #calendar .dayDay {
   text-transform: capitalize;
 }
-
 #calendar .dateDisplay {
   z-index: 10;
   background-color: rgba(240, 240, 224, 0.8);
@@ -341,11 +340,6 @@ div.tableWrapper {
   font-size: 10px;
   box-sizing: border-box;
   cursor: pointer;
-}
-.calendar-name {
-  cursor: pointer;
-  padding: 0 8px;
-  border-radius: 2px;
 }
 /*^ calendar.jade ^*/
 
@@ -474,6 +468,14 @@ h3.info-block-title {
 }
 #calendars li {
   margin-top: 5px;
+}
+#group_calendar {
+  margin-bottom: 8px;
+}
+.calendar-name {
+  cursor: pointer;
+  padding: 0 8px;
+  border-radius: 2px;
 }
 /*^ #info_controls ^*/
 
