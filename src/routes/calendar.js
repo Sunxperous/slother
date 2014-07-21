@@ -140,27 +140,11 @@ router.post('/', function (req, res, next) {
   });
 });
 
-<<<<<<< HEAD
 router.delete('/:calendar_id', function (req, res, next) {
-  Calendar.findOneAndRemove({_id:req.params.calendar_id},
-    function (err, calendar) {
-      if (err) { return next(err); }
-      User.findOneAndUpdate({username:req.user.username},
-        {$pull:{calendar:calendar._id}}, function (err, user) {
-          if(err) { return next(err); }
-          else {
-            return res.send({success:"Calendar "+calendar.name+" is removed."});
-          }
-=======
-
-//Delete calendar
-router.delete('/:calendar_id', function (req, res) {
   Calendar.findOne({_id:req.params.calendar_id})
   .exec( function (err, calendar) {
     calendar.remove();
-    console.log(calendar);
     calendar.save( function (err, calendarD) {
-      
       User.findOne({username:req.user.username})
       .exec( function (err, user) {
         user.calendars.remove(req.params.calendar_id);
@@ -170,8 +154,7 @@ router.delete('/:calendar_id', function (req, res) {
             success:"Calendar "+calendar.name+" is removed.",
             id: calendar._id
             });
-        });          
->>>>>>> Imprved on user page. Not all function useable
+        });   
       });
     });
   });
