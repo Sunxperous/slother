@@ -63,6 +63,7 @@ var errors = (function() {
         if (li.hasClass('error')) { type = 'error'; }
         else if (li.hasClass('request')) { type = 'request'; }
         else if (li.hasClass('alert')) { type = 'alert'; }
+        else if (li.hasClass('success')) { type = 'success'; }
         var newError = new ErrorMessage(type, li.text(), li);
         _this.errorMessages.push(newError);
       });

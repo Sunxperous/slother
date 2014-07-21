@@ -27,8 +27,8 @@ block content
       div
         if(requests.length > 0)
           for request in requests
-            span.req-name=request.groupName
-            input(id=request.url value=request.groupName type='hidden')
+            span.req-name=request.description
+            input.req-url(value=request.getUrl() type='hidden')
             input.req-accept(value='Accept' type='submit')
             input.req-reject(value='Reject' type='submit')
         else
@@ -59,18 +59,16 @@ block content
                 input.cal-delete(value='Delete Calendar' type='submit') 
         else
           div.nothing-display No Calendars Yet
-
-    .user-block#group_info
-      h4 My Group
-      +errors
-      if(groups.length > 0 )
-        for group in groups
-          div.group-data
-            a(href=group.url)= group.groupName
-            input(id=group._id value=group.groupName type='hidden')
-            input.group-leave(value='Leave' type='submit')
-      else
-        div.nothing-display You do not belong to any groups yet
-
+  .user-block#group_info
+    h4 My Group
+      p 
+        if(groups.length > 0 )
+          for group in groups
+            li.group-data
+              a(href=group.getUrl())= group.groupName
+              input(id=group._id value=group.groupName type='hidden')
+              input.group-leave(value='Leave' type='submit')
+        else
+          div.nothing-display You do not belong to any groups yet
 block footScripts
   script(src='/js/user.js')

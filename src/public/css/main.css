@@ -140,28 +140,6 @@ a.has-notifications {
   color: #fff;
   background-color: #f66;
 }
-#errors, #alerts, #requests {
-  padding: 0;
-  text-align: center;
-}
-.message {
-  display: block;
-  padding: 4px 8px;
-  background-color: #ffc;
-  width: 80%;
-  max-width: 500px;
-  border-radius: 8px;
-  margin: 2px auto;
-  white-space: wrap;
-  overflow: hidden;
-  text-overflow: ellipsis;  
-}
-#errors .message {
-  color: #f66;
-}
-#alerts .message {
-  color: #c93;
-}
 
 a.no-notifications {
   color: #333;
@@ -259,7 +237,7 @@ form > div {
 .alert {
   color: #c93;
 }
-.request {
+.request, .success {
   color: #6c6;
 }
 .error-close {

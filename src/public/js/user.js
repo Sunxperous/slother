@@ -16,10 +16,21 @@
     $(this).css('background-color','#FFFF00');
 
   });
-  $('.req-reject').click(function (event) {
+
+  $('.req-reject').click(function(event) {
+    $.post($(this).siblings('.req-url').val() + 'reject', [], 
+      function(response) {
+        console.log(response);
+      }
+    );
   });
 
-  $('.req-accept').click(function (event) {
+  $('.req-accept').click(function(event) {
+    $.post($(this).siblings('.req-url').val() + 'accept', [],
+      function(response) {
+        console.log(response);
+      }
+    );
   });
 
   $('.cal-delete').click(function (event) {

@@ -22,7 +22,7 @@ html(lang='en')
         
           if (user)
             span Hi, 
-            span#username= user.username
+            span#username= user.display_name
             div#links
               a#groups(href='/group') Groups
               a#profile_link(href='/user') Profile

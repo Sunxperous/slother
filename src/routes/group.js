@@ -3,6 +3,7 @@ var router = express.Router();
 var User = require('../schema/userSchema');
 var Group = require('../schema/groupSchema');
 var Calendar = require('../schema/calendarSchema');
+var Request = require('../schema/requestSchema');
 var UserError = require('../userError.js');
 
 router.use(User.ensureAuthenticated());
@@ -13,7 +14,9 @@ function userInGroup(_user, positive, type, message) {
     var group = req.attach.group;
     var user = req.attach[_user];
     if (group && user) { // Compulsory to have.
-      var hasUser = group.hasUser(user, type) && user.hasGroup(group);
+      var hasUser;
+      if (type === 'requested') { hasUser = group.hasUser(user, type); }
+      else { hasUser = group.hasUser(user, type) && user.hasGroup(group) }
       if (positive) { // We want user in group list...
         if (hasUser) { return next(); } // ...yay!
         else { // ...nope, user is not in group list.
@@ -78,13 +81,17 @@ router.post('/:hash/invite',
   userInGroup('user', true, 'admins', 'Only admins can invite other users.'),
   userInGroup('target', false, 'members', 'User is already in the group.'),
   userInGroup('target', false, 'requested', 'User is already invited to the group.'),
-  function(req,res, next) {
+  function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
 
-    target.requests.push(group._id);
-    //group.requested.push(target._id);
-    group.members.push({ _id: target._id }); // Temporary.
+    group.requested.push(target._id);
+    target.requests.push({
+      type: Request.types.GROUP,
+      requester: req.attach.user,
+      subject_id: group._id,
+      description: req.attach.user.display_name + ' invited you to join the group ' + group.groupName + '.',
+    });
 
     group.save(function(err) {
       if (err) { return next(err); }
@@ -93,6 +100,86 @@ router.post('/:hash/invite',
           if (err) { return next(err); }
           else { // Success.
             return res.send({ success: 'Request has been sent to ' + target.username + '.' })
+          }
+        });
+      }
+    });
+  }
+);
+
+// Post request to accept invitation.
+//  params
+//    hash: Group.ObjectId.hashed
+//  body
+//    username: String
+router.post('/:hash/accept',
+  Group.ensureExistsByHash(true, 'There is no such group.'), // Attaches group.
+  userInGroup('user', true, 'requested', 'You have not been invited to the group.'),
+  userInGroup('user', false, 'members', 'You are already in the group.'),
+  function(req, res, next) {
+    var group = req.attach.group;
+    var user = req.attach.user;
+
+    var requestedIndex = group.requested.indexOf(user._id);
+    group.requested.splice(requestedIndex, 1);
+    group.members.push({ _id: user._id });
+
+    var requestIndex;
+    user.requests.forEach(function(request, index) {
+      if (request.subject_id === group._id) { requestIndex = index; }
+    });
+    user.requests.splice(requestIndex, 1);
+    user.groups.push(group._id);
+
+    group.save(function(err) {
+      if (err) { return next(err); }
+      else {
+        user.save(function(err) {
+          if (err) { return next(err); }
+          else { // Success.
+            res.send({
+              success: 'You have joined the group.',
+              data: {
+                groupName: group.groupName,
+                groupUrl: group.getUrl(),
+              }
+            })
+          }
+        });
+      }
+    });
+  }
+);
+
+// Post request to reject invitation.
+//  params
+//    hash: Group.ObjectId.hashed
+//  body
+//    username: String
+router.post('/:hash/reject',
+  Group.ensureExistsByHash(true, 'There is no such group.'), // Attaches group.
+  userInGroup('user', true, 'requested', 'You have not been invited to the group.'),
+  userInGroup('user', false, 'members', 'You are already in the group.'),
+  function(req, res, next) {
+    var group = req.attach.group;
+    var user = req.attach.user;
+
+    var requestedIndex = group.requested.indexOf(user._id);
+    group.requested.splice(requestedIndex, 1);
+
+    var requestIndex;
+    user.requests.forEach(function(request, index) {
+      if (request.subject_id === group._id) { requestIndex = index; }
+    });
+    user.requests.splice(requestIndex, 1);
+
+    group.save(function(err) {
+      if (err) { return next(err); }
+      else {
+        user.save(function(err) {
+          if (err) { return next(err); }
+          else { // Success.
+            res.send({ success: 'You have declined the invitation.' })
           }
         });
       }
@@ -184,48 +271,9 @@ router.get('/', function(req, res, next) {
     if (err) { return next(err); }
     else if (user) {
       var hashids = req.app.settings.hashids;
-      user.groups.forEach(function(group) {
-        var friendly_url;
-        friendly_url = group.groupName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
-        group.url = '/calendar/group/' + group.getHash() + '/' + friendly_url;
-      });
       return res.render('groups', { groups: user.groups });
     }
   })
 });
-
-// //Post request to accept request
-// router.post('/acceptInvitation', searchGroupAndRequest(true), 
-//   function (req, res) {
-//     Group.findOneAndUpdate({groupName: req.body.groupName},
-//       {$push:{members:req.attach.requested._id}, 
-//        $pull:{requested:req.attach.requested._id}},
-//       function (err, group) {
-//         if(err) { console.log(err); res.send(null); }
-//         User.findOneAndUpdate({username:req.user.username},
-//           {$push:{groups:group._id}, $pull:{requests:group._id}}, 
-//           function (err, user) {
-//             if(err) { console.log(err); res.send(null); }
-//             res.send({sucess:"User "+req.user.username+
-//                     " added into group "+req.body.groupName});
-//         }); 
-//     }); 
-// });
-
-// //Post request to reject invitation
-// router.post('/rejectInvitation', searchGroupAndRequest(true), 
-//   function (req, res) {
-//     Group.findOneAndUpdate({groupName: req.body.groupName},
-//       {$pull:{requested:req.attach.requested._id}},
-//       function (err, group) {
-//         if(err) { console.log(err); res.send(null); }
-//         User.findOneAndUpdate({username:req.user.username},
-//           {$pull:{requests:group._id}}, function (err, user) {
-//             if(err) { console.log(err); res.send(null); }
-//             res.send({sucess:"User "+req.user.username+
-//                     " has rejected the invitation into group "+req.body.groupName});
-//         }); 
-//     }); 
-// });
 
 module.exports = router;

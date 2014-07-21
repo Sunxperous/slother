@@ -24,4 +24,18 @@
     }
   );
 
+  // Send request to join
+  $('#add_friend').submit(function(event) {
+    event.preventDefault();
+    $.post($('#add_friend').attr('action'),
+      { username: $('#friend_name').val() },
+      function(response) {
+        if (response.error) {
+          return errors.add('error', response.error, $('#add_friend'));
+        }
+        return errors.add('success', response.success, $('#add_friend'));
+      }
+    );
+  });
+
 })();

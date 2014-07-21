@@ -57,11 +57,6 @@ router.get('/', function (req, res, next) {
       .populate('requests','groupName _id')
       .populate('calendars','name hidden _id')
       .exec(function(err, user) {
-        user.groups.forEach(function(group) {
-          var friendly_url;
-          friendly_url = group.groupName.replace(/\s+/g, '-').toLowerCase();
-          group.url = '/calendar/group/' + group.getHash() + '/' + friendly_url;
-        });
         res.render('user', {
           username: user.username,
           groups: user.groups,

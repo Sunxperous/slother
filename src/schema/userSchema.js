@@ -3,6 +3,7 @@ var bcrypt = require('bcrypt-nodejs');
 var timestamps = require('mongoose-timestamp');
 var Schema = mongoose.Schema;
 var calendarSchema = require('../schema/calendarSchema');
+var requestSchema = require('../schema/requestSchema');
 var UserError = require('../userError.js');
 
 var userSchema = Schema({
@@ -13,7 +14,7 @@ var userSchema = Schema({
   nusId: String,
   calendars: [{ type: Schema.Types.ObjectId, ref: 'Calendar' }],
   groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
-  requests: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
+  requests: [requestSchema],
   status: { type: Number, default: 2 }
 });
 

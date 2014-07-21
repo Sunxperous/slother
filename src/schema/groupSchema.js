@@ -39,13 +39,22 @@ groupSchema.methods.hasUser = function(user, type) {
   });
 };
 
+groupSchema.methods.getUrl = function() {
+  var friendly_url = this.groupName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
+  return '/calendar/group/' + this.getHash() + '/' + friendly_url;
+};
+
+groupSchema.statics.getHashOfId = function(id) {
+  return hashids.encryptHex(id);
+};
+
 groupSchema.methods.getHash = function() {
   return hashids.encryptHex(this._id);
 };
 
 groupSchema.statics.decryptHash = function(hash) {
   return hashids.decryptHex(hash);
-}
+};
 
 // Searches for a group by hashed id, and attach group.
 groupSchema.statics.ensureExistsByHash = function(positive, message) {

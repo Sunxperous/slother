@@ -15,7 +15,7 @@ block content
       ul#groups
         for group in groups
           li
-            a(href=group.url)= group.groupName
+            a(href=group.getUrl())= group.groupName
     .info-block
       form#create_group(action='/group' method='post')
         h3.info-block-title Create a group
