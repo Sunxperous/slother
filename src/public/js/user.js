@@ -27,6 +27,8 @@
     $.ajax('/calendar/'+$(this).parents('.cal-func').children()[0].id, {
       type: 'DELETE'
     }).done( function (res) {
+      if (res.error) 
+        return errors.add('error', calendar.error, $('.cal-delete'));
       console.log(res.success);
       temp.parents()[2].remove();
     });
@@ -36,6 +38,8 @@
     $.ajax('/user/displayName', {
       type: 'PUT', data: {disName: $('#display_name').val()}
     }).done( function (res) {
+      if (res.error) 
+        return errors.add('error', calendar.error, $('#change_name'));
       console.log(res.success);
       $('#display_name').parents().children('#displayname').
         children('#profile_value').text($('#display_name').val());
@@ -50,8 +54,10 @@
     $.ajax('calendar/'+$(this).parents('.cal-func').children()[0].id+'/name',{
       type: 'PUT', data: {name:$(this).siblings('.cal-name-input').val()}
     }).done( function (res) {
-       console.log(res.success);
-          temp.parents('.cal-block').children('li.cal-name').
+      if (res.error) 
+        return errors.add('error', calendar.error, $('.cal-change-name'));
+      console.log(res.success);
+      temp.parents('.cal-block').children('li.cal-name').
             text(temp.siblings('.cal-name-input').val());
     });
   });
@@ -66,6 +72,8 @@
     $.ajax('calendar/'+$(this).parents('.cal-func').children()[0].id+'/privacy',{
       type: 'PUT', data: {privacy: temp}
     }).done( function (res) {
+      if (res.error) 
+        return errors.add('error', calendar.error, $('.cal-privacy'));
       console.log(res.success);
     });
   });
@@ -77,6 +85,8 @@
     $.ajax('/group/'+$(this).siblings()[1].id+'/member/', {
       type: 'DELETE', data: {user:$('#user').val()}
     }).done( function (res) {
+      if (res.error) 
+        return errors.add('error', calendar.error, $('.group-leave'));
       console.log(res.success);
     });
   });
