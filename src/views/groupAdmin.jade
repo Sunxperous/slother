@@ -19,7 +19,7 @@ block content
               span.calendar-name(style='background-color: ' + member.color + ';')= member.display_name
               span.small-text= member.username
             div.control
-              if (!member.isAdmin)
+              if (member.isAdmin)
                 span.small-text.admin admin
               else
                 form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
