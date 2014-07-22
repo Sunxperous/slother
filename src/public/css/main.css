@@ -687,3 +687,16 @@ input.text-input, input.text-input:hover, input.text-input:active {
   top: -1px;
 }
 /*^ groupAdmin.jade ^*/
+
+
+/*v footer.jade v*/
+footer {
+  margin: 64px auto 0 auto;
+  display: block;
+  text-align: center;
+  font-size: 12px;
+}
+footer > * {
+  margin: 0 16px;
+}
+/*^ footer.jade ^*/

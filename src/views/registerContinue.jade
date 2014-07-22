@@ -1,10 +1,13 @@
+block vars
+  - var title = 'Continue registration'
+
 extends layout
 include mixins/errors.jade
 
 block headScript
 
 block content
-  h2.empty-space Continue registration
+  h2.empty-space= title
 
   +errors(messages)
 

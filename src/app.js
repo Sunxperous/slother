@@ -92,6 +92,8 @@ var server = app.listen(app.get('port'), function() {
 
 function applyLocals() {
   return function(req, res, next) {
+    app.locals.title = "Slother";
+
     var flashMessages = {};
     flashMessages.alerts = req.flash('alert');
     flashMessages.errors = req.flash('error');

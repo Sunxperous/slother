@@ -1,4 +1,7 @@
-extends layout
+block vars
+  - var title = group.groupName + ' Calendar'
+
+ extends layout
 include mixins/errors.jade
 
 block headScript

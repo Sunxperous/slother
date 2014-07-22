@@ -1,10 +1,13 @@
-extends layout
+block vars
+  - var title = 'Groups'
+
+ extends layout
 include mixins/errors.jade
 
 block headScript
 
 block content
-  h2.empty-space Groups
+  h2.empty-space= title
 
   +errors(messages)
 

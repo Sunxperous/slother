@@ -1,9 +1,9 @@
 doctype html
+block vars
 
 html(lang='en')
   head
-    - var title = title || "Slother"
-    title= title
+    title= title + " - Slother"
     meta(name='viewport' content='width=device-width, initial-scale=0.8, maximum-scale=0.8')
     script(src='/vendor/jquery-2.1.1.min.js')
     script(src='/vendor/moment.min.js')
@@ -39,4 +39,7 @@ html(lang='en')
             
     div#content
       block content
+
+    include footer
+
     block footScripts
