@@ -59,7 +59,7 @@ router.get('/group/:hash/:name',
                 user.calendars.forEach(function(calendar) {
                   if(calendar.hidden) {
                     calendar.events.forEach(function (event) {
-                      event.summary = "";
+                      event.summary = members[index].display_name;
                       event.description = "";
                       event.location = "";
                     });

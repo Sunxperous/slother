@@ -14,7 +14,7 @@ var timetable = (function() {
 
   var calendars = {};
   var now = moment();
-  now = moment("2014-08-11").add(2, 'weeks'); // For testing purposes, set to 3rd week.
+  //now = moment("2014-08-11").add(2, 'weeks'); // For testing purposes, set to 3rd week.
 
   var sunOfWeek = now.startOf('week');
   var satOfWeek = moment(sunOfWeek).add(7, 'days'); // Next Sunday 00:00.
@@ -568,7 +568,7 @@ var timetable = (function() {
         .css('background-color', calendar.color)
         .css('left', dateStartMinutes / 60 * CELL_WIDTH)
         .addClass('item')
-        .text(item.summary)
+        .text(item.summary || " ")
         .data({
           calendar_id: calendar._id,
           item: item,
