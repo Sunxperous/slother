@@ -20,17 +20,18 @@ html(lang='en')
           #brand
             h1 - Slother -
         
+        div#links
           if (user)
-            span Hi, 
-            span#username= user.display_name
-            div#links
-              a#groups(href='/group') Groups
-              a#profile_link(href='/user') Profile
+            span#user
+              | Hi, 
+              a#username(href='/user') Sun Wang Jun
+            a#groups(href='/group') Groups
+            a#profile_link(href='/user') Profile
             #notification
               if (user.requests.length > 0)
-                a#number.has-notifications(href='#')= user.requests.length
+                a#number.has-notifications(href='/user')= user.requests.length
               else
-                a#number.no-notifications(href='#')= user.requests.length
+                a#number.no-notifications(href='/user')= user.requests.length
               
           else
             a(href='/login') Login
