@@ -90,6 +90,9 @@ nav {
   height: 24px;
   white-space: nowrap;
 }
+.clickable {
+  cursor: pointer;
+}
 #brand { /* Hide text if screen is damn small. */
   display: inline-block;
   padding: 0 8px;
@@ -120,13 +123,11 @@ nav {
   position: relative;
   z-index: 0;
 }
-
 #username {
   text-align: left;
   position: relative;
   left:1px;
 }
-
 #profile_link {
   position: relative;
   left:3px;
@@ -140,7 +141,6 @@ a.has-notifications {
   color: #fff;
   background-color: #f66;
 }
-
 a.no-notifications {
   color: #333;
   background-color: #ccc;
@@ -306,8 +306,6 @@ div.tableWrapper {
   min-width: 75px;
   max-width: 75px;
   height: 30px;
-}
-#calendar td {
   vertical-align: top;
   padding-bottom: 12px;
 }
@@ -487,17 +485,17 @@ h3.info-block-title {
 .small-text {
   color: #666;
   font-size: 10px;
-  cursor: pointer;
-  margin-left: 8px;
 }
 #calendars li {
   margin-top: 5px;
+}
+#calendars li > *, #group_calendar li > * {
+  margin-right: 8px;
 }
 #group_calendar {
   margin-bottom: 8px;
 }
 .calendar-name {
-  cursor: pointer;
   padding: 0 8px;
   border-radius: 2px;
 }
@@ -574,7 +572,6 @@ h3.info-block-title {
 /*^ #colorpicker ^*/
 
 /*v user.jade v*/
-
 .user-block {
   margin: 10px auto auto auto;
   width: 95%;
@@ -671,3 +668,30 @@ h4 {
   margin: auto auto;
   max-width: 500px;
 }
+
+/*v groupAdmin.jade v*/
+#members form {
+  display: inline-block;
+}
+#members li {
+  margin-bottom: 4px;
+}
+#members li > * {
+  margin-right: 16px;
+  display: inline-block;
+}
+#members li > div > * {
+  margin-right: 8px;
+}
+#members .admin {
+  color: #c66;
+}
+input.text-input, input.text-input:hover, input.text-input:active {
+  border: 0;
+  border-radius: 2px;
+  padding: 2px 8px;
+  text-transform: lowercase;
+  position: relative;
+  top: -1px;
+}
+/*^ groupAdmin.jade ^*/

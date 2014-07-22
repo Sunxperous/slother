@@ -16,8 +16,8 @@ block content
       +errors
       ul#calendars
         li.hidden
-          span.calendar-name
-          span.toggle-view.small-text hide
+          span.calendar-name.clickable
+          span.toggle-view.small-text.clickable hide
     .info-block
       form#add_friend(action='/group/' + group.getHash() + '/invite')
         h3.info-block-title Invite a friend

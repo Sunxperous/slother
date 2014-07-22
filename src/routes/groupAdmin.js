@@ -25,6 +25,7 @@ router.get('/', function(req, res, next) {
         username: user.username,
         display_name: user.display_name,
         isAdmin: group.hasUser(user, 'admins'),
+        color: member.color,
       });
       callback();
     });

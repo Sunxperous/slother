@@ -12,24 +12,19 @@ block content
     .info-block
       h3.info-block-title Members
       +errors
-      table#members
-        thead
-          tr
-            td Display name
-            td Username
-            td Admin?
-            td Remove
-        tbody
-          for member in members
-            tr
-              td= member.display_name
-              td= member.username
-              td= member.isAdmin
-              td
-                if (!member.isAdmin)
-                  form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
-                    input(type='hidden' name='_method' value='delete')
-                    input(type='submit' value='Remove')
+      ol#members
+        for member in members
+          li
+            div.name
+              span.calendar-name(style='background-color: ' + member.color + ';')= member.display_name
+              span.small-text= member.username
+            div.control
+              if (!member.isAdmin)
+                span.small-text.admin admin
+              else
+                form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
+                  input(type='hidden' name='_method' value='delete')
+                  input.text-input.small-text.red.clickable(type='submit' value='remove')
     .info-block
       form#delete_group(action='' method='post')
         h3.info-block-title Delete this group
