@@ -167,34 +167,6 @@ router.post('/:hash/reject',
   }
 );
    
-// Delete request to remove user in a group.
-//  params
-//    hash: Group.ObjectId.hashed
-//    username: String
-router.delete('/:hash/member/:username',
-  User.ensureExistsByUsername(true, ['params', 'username'], 'There is no such user.'), // Attaches target.
-  Group.userInGroup('target', true, 'members', 'User does not belong to the group.'),
-  Group.userInGroup('user', true, 'admins', 'Admins cannot be removed from the group.'),
-  function(req, res, next) {
-    var group = req.attach.group;
-    var target = req.attach.target;
-
-    group.members.pull({ _id: target._id });
-    target.groups.pull(group._id);
-
-    group.save(function(err) {
-      if (err) { return next(err); }
-      else {
-        target.save(function(err) {
-          if (err) { return next(err); }
-          else { // Success.
-            return res.send({ success: 'User ' + target.username + ' is removed from the group.' })
-          }
-        });
-      }
-    });
-});
-   
 // Put request to change color of a group member.
 //  params
 //    hash: Group.ObjectId.hashed
@@ -232,9 +204,14 @@ router.post('/:hash/leave',
       }
     });
 
+    user.groups.pull(group._id);
+
     group.save(function(err) {
       if (err) { return next(err); }
-      return res.redirect('/group');
+      user.save(function(err) {
+        if (err) { return next(err); }
+        return res.redirect('/group');
+      })
     })
   }
 );

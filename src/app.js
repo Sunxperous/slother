@@ -38,13 +38,20 @@ passport.deserializeUser(function(obj, done) {
 });
 
 // Middleware.
-app.use(methodOverride('_method'));
+app.use(bodyParser());
 app.use(cookieParser());
 app.use(session({ secret: config.app.sessionSecret }));
+app.use(methodOverride(function(req, res) {
+  if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+    // look in urlencoded POST bodies and delete it
+    var method = req.body._method;
+    delete req.body._method;
+    return method;
+  }
+}));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(bodyParser());
 app.use(express.static(__dirname + '/public'));
 app.use(applyLocals()); // Locals for jade templates, attaches for user-defined functions.
 app.use('/', login);

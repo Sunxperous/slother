@@ -1,0 +1,40 @@
+extends layout
+include mixins/errors.jade
+
+block headScript
+
+block content
+  h2.empty-space= group.groupName + ' Settings'
+
+  +errors(messages)
+
+  #info_controls
+    .info-block
+      h3.info-block-title Members
+      +errors
+      table#members
+        thead
+          tr
+            td Display name
+            td Username
+            td Admin?
+            td Remove
+        tbody
+          for member in members
+            tr
+              td= member.display_name
+              td= member.username
+              td= member.isAdmin
+              td
+                if (!member.isAdmin)
+                  form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
+                    input(type='hidden' name='_method' value='delete')
+                    input(type='submit' value='Remove')
+    .info-block
+      form#delete_group(action='' method='post')
+        h3.info-block-title Delete this group
+        +errors
+        div
+          input#create.red(type='submit' value='Delete group')
+
+block footScripts
