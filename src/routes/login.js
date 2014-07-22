@@ -30,7 +30,7 @@ function redirectUnlessPending(req, res, next) {
 // Login page.
 router.get('/login', redirectIfAuthenticated,
   function(req, res, next) {
-    res.render('login');
+    res.render('login', req.flash('login')[0]);
   }
 );
 
@@ -59,6 +59,13 @@ passport.use(new LocalStrategy(
 
 // Default login request.
 router.post('/login/default',
+  function(req, res, next) {
+    res.error.redirect = '/login';
+    req.flash('login', {
+      username: req.body.username,
+    });
+    next();
+  },
   passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/login',
@@ -155,13 +162,17 @@ router.post('/register/complete', redirectUnlessPending,
 // Default registration.
 router.get('/register', redirectIfAuthenticated,
   function(req, res, next) {
-    res.render('register');
+    res.render('register', req.flash('register')[0]);
   }
 );
 
 router.post('/register',
   function(req, res, next) {
     res.error.redirect = '/register';
+    req.flash('register', {
+      username: req.body.username,
+      display_name: req.body.display_name,
+    });
     next();
   },
   redirectIfAuthenticated,

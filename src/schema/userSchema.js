@@ -6,10 +6,25 @@ var calendarSchema = require('../schema/calendarSchema');
 var requestSchema = require('../schema/requestSchema');
 var UserError = require('../userError.js');
 
+var usernameValidate = [
+  { validator: usernameLength, msg: 'Username must be 3 to 20 characters long.' },
+  { validator: usernameAlphanumeric, msg: 'Username must contain only alphanumeric characters.'},
+  { validator: usernameStartWithLetter, msg: 'Username must begin with a letter.' },
+];
+function usernameLength(value) {
+  return /^.{3,20}$/g.test(value)
+}
+function usernameAlphanumeric(value) {
+  return /^\w*$/g.test(value)
+}
+function usernameStartWithLetter(value) {
+  return /^[a-zA-Z].*$/g.test(value)
+}
+
 var userSchema = Schema({
-  username: { type: String, unique: true, lowercase: true },
+  username: { type: String, unique: true, lowercase: true, validate: usernameValidate },
   email: String,
-  display_name: String,
+  display_name: { type: String, required: 'Display name cannot be blank.', trim: true },
   password: String,
   nusId: String,
   calendars: [{ type: Schema.Types.ObjectId, ref: 'Calendar' }],
@@ -22,10 +37,6 @@ userSchema.statics.statusTypes = {
   PENDING: 1,
   COMPLETE: 2,
 };
-
-userSchema.path('username').validate(function(value) {
-  return /^[a-zA-Z]\w{2,19}$/g.test(value)
-}, 'Invalid username.');
 
 userSchema.methods.authPassword = function(password, callback) {
   bcrypt.compare(password, this.password, function(err, res) {

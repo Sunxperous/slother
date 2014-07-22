@@ -12,13 +12,13 @@ block content
     form#register_default(method='post' action='/register')
       div
         label(for='username') Username
-          input#username(type='text' placeholder='username' name='username' autofocus)
+          input#username(type='text' placeholder='username' name='username' autofocus value=username)
       div
         label(for='password') Password
           input#password(type='password' placeholder='password' name='password')
       div
         label(for='display_name') Display name
-          input#display_name(type='text' placeholder='display name' name='display_name')
+          input#display_name(type='text' placeholder='display name' name='display_name' value=display_name)
       div
         input.green(type='submit' value='Register')
     div
