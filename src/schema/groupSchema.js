@@ -13,13 +13,12 @@ function randomColor() {
 var groupSchema = new Schema({
   groupName: { type: String, required: 'Group name cannot be blank.', trim: true },
   members: [{
-    _id: {
-      type: Schema.Types.ObjectId, ref: 'User',
-    },
+    _id: { type: Schema.Types.ObjectId, ref: 'User', },
     color: {
       type: String,
       default: randomColor
-    }
+    },
+    role: { type: Number }
   }],
   requested: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   admins: [{ type: Schema.Types.ObjectId, ref: 'User' }],
@@ -27,27 +26,61 @@ var groupSchema = new Schema({
   calendar: {type: Schema.Types.ObjectId, ref:'Calendar'}
 });
 
-// Specify type for array to search in, defaults to 'members'.
-groupSchema.methods.hasUser = function(user, type) {
-  type = type || 'members';
-  return this[type].some(function(member) { // .some returns true prematurely.
-    if (type === 'members') {
-      return (member._id.toString() === user._id.toString());
+groupSchema.statics.roles = {
+  REQUESTED : 0,
+  MEMBER    : 1,
+  ADMIN     : 2,
+  OWNER     : 3,
+};
+
+groupSchema.methods.switchRoleById = function(id, role) {
+  for (var i = 0; i < this.members.length; i++) {
+    if (id.toString() === this.members[i]._id.toString()) {
+      var member = this.members[i];
+      member.role = role;
+      this.members.set(i, member);
+      return member;
     }
-    else {
-      return (member.toString() === user._id.toString());
+  }
+};
+groupSchema.methods.removeMemberById = function(id) {
+  var i;
+  for (i = 0; i < this.members.length; i++) {
+    if (id.toString() === this.members[i]._id.toString()) { break; }
+  }
+  return this.members.splice(i, 1)[0];
+};
+groupSchema.methods.changeColorById = function(id, color) {
+  for (var i = 0; i < this.members.length; i++) {
+    if (id.toString() === this.members[i]._id.toString()) {
+      var member = this.members[i];
+      member.color = color;
+      this.members.set(i, member);
+      return member;
     }
+  }  
+};
+
+// Checks if user is of role in group.
+groupSchema.methods.hasUser = function(user, role) {
+  return this.members.some(function(member) { // .some returns true prematurely.
+    return (member._id.toString() === user._id.toString()
+      && member.role >= role);
   });
 };
 
-groupSchema.statics.userInGroup = function(_user, positive, type, message) {
+groupSchema.statics.userIsType = function(_user, positive, role, message) {
+  var _this = this;
   return function(req, res, next) {
     var group = req.attach.group;
     var user = req.attach[_user];
     if (group && user) { // Compulsory to have.
       var hasUser;
-      if (type === 'requested') { hasUser = group.hasUser(user, type); }
-      else { hasUser = group.hasUser(user, type) && user.hasGroup(group) }
+
+      // Check only role if requested, else also check if user has group.
+      if (role === _this.roles.REQUESTED) { hasUser = group.hasUser(user, role); }
+      else { hasUser = group.hasUser(user, role) && user.hasGroup(group) }
+
       if (positive) { // We want user in group list...
         if (hasUser) { return next(); } // ...yay!
         else { // ...nope, user is not in group list.

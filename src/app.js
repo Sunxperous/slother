@@ -104,7 +104,9 @@ function applyLocals() {
     res.error = {};
 
     if (req.isAuthenticated()) {
-      User.findOne({ username: req.user.username }, function(err, user) {
+      User.findOne({ username: req.user.username })
+      .select('-password -updated_at -created_at')
+      .exec(function(err, user) {
         if (err) { return next(err); }
         else {
           res.locals.user = user;

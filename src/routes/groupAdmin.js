@@ -7,12 +7,10 @@ var async = require('async');
 var UserError = require('../userError.js');
 
 router.use(function isAdminInGroup(req, res, next) { // req.attach.user and req.attach.group exists.
-  var isAdmin = req.attach.group.admins.indexOf(req.attach.user._id);
-  if (isAdmin !== -1) {
-    return next();
-  }
+  var isAdmin = req.attach.group.hasUser(req.attach.user, Group.roles.ADMIN);
   res.error.redirect = req.attach.group.getUrl();
-  return next(new UserError('You are not authorized to administrate this group'));
+  if (isAdmin) { return next(); }
+  return next(new UserError('You are not authorized to manage this group'));
 })
 
 router.get('/', function(req, res, next) {
@@ -24,7 +22,7 @@ router.get('/', function(req, res, next) {
       members.push({
         username: user.username,
         display_name: user.display_name,
-        isAdmin: group.hasUser(user, 'admins'),
+        isAdmin: group.hasUser(user, Group.roles.ADMIN),
         color: member.color,
       });
       callback();
@@ -37,12 +35,11 @@ router.get('/', function(req, res, next) {
    
 // Delete request to remove user in a group.
 //  params
-//    hash: Group.ObjectId.hashed
 //    username: String
 router.delete('/member/:username',
   User.ensureExistsByUsername(true, ['params', 'username'], 'There is no such user.'), // Attaches target.
-  Group.userInGroup('target', true, 'members', 'User does not belong to the group.'),
-  Group.userInGroup('user', true, 'admins', 'Admins cannot be removed from the group.'),
+  Group.userIsType('user', true, Group.roles.ADMIN, 'Admins cannot be removed from the group.'),
+  Group.userIsType('target', true, Group.roles.MEMBER, 'User does not belong to the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
@@ -62,6 +59,11 @@ router.delete('/member/:username',
         });
       }
     });
+});
+
+// Delete request to remove group.
+router.delete('/', function(req, res, next) {
+  var group = req.attach.group;
 });
 
 module.exports = router;

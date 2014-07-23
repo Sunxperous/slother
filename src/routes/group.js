@@ -16,10 +16,7 @@ router.all('/:hash', function(req, res, next) {
   next();
 });
 
-router.use('/:hash/admin',
-  groupAdmin,
-  function(req, res, next) { console.log('hi'); next(); }
-);
+router.use('/:hash/admin', groupAdmin);
 
 // Post request to create new Group.
 //  body
@@ -30,10 +27,7 @@ router.post('/',
     var user = req.attach.user;
     Group.create({
       groupName: req.body.group_name,
-      members: [{ _id: user._id }],
-      admins: [user._id],
-      requested: [],
-      created_by: user._id
+      members: [{ _id: user._id, role: Group.roles.OWNER }],
     }, function(err, group) {
       if (err) { return next(err); }
       if (group) {
@@ -60,14 +54,17 @@ router.post('/',
 //    username: String
 router.post('/:hash/invite',
   User.ensureExistsByUsername(true, ['body', 'username'], 'There is no such user.'), // Attaches target.
-  Group.userInGroup('user', true, 'admins', 'Only admins can invite other users.'),
-  Group.userInGroup('target', false, 'members', 'User is already in the group.'),
-  Group.userInGroup('target', false, 'requested', 'User is already invited to the group.'),
+  Group.userIsType('user', true, Group.roles.ADMIN, 'Only admins can invite other users.'),
+  Group.userIsType('target', false, Group.roles.MEMBER, 'User is already in the group.'),
+  Group.userIsType('target', false, Group.roles.REQUESTED, 'User is already invited to the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
 
-    group.requested.push(target._id);
+    group.members.push({
+      _id: target._id,
+      role: Group.roles.REQUESTED
+    });
     target.requests.push({
       type: Request.types.GROUP,
       requester: req.attach.user,
@@ -95,15 +92,13 @@ router.post('/:hash/invite',
 //  body
 //    username: String
 router.post('/:hash/accept',
-  Group.userInGroup('user', true, 'requested', 'You have not been invited to the group.'),
-  Group.userInGroup('user', false, 'members', 'You are already in the group.'),
+  Group.userIsType('user', false, Group.roles.MEMBER, 'You are already in the group.'),
+  Group.userIsType('user', true, Group.roles.REQUESTED, 'You have not been invited to the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var user = req.attach.user;
 
-    var requestedIndex = group.requested.indexOf(user._id);
-    group.requested.splice(requestedIndex, 1);
-    group.members.push({ _id: user._id });
+    var member = group.switchRoleById(user._id, Group.roles.MEMBER);
 
     var requestIndex;
     user.requests.forEach(function(request, index) {
@@ -138,14 +133,13 @@ router.post('/:hash/accept',
 //  body
 //    username: String
 router.post('/:hash/reject',
-  Group.userInGroup('user', true, 'requested', 'You have not been invited to the group.'),
-  Group.userInGroup('user', false, 'members', 'You are already in the group.'),
+  Group.userIsType('user', false, Group.roles.MEMBER, 'You are already in the group.'),
+  Group.userIsType('user', true, Group.roles.REQUESTED, 'You have not been invited to the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var user = req.attach.user;
 
-    var requestedIndex = group.requested.indexOf(user._id);
-    group.requested.splice(requestedIndex, 1);
+    var removedMember = group.removeMemberById(user._id);
 
     var requestIndex;
     user.requests.forEach(function(request, index) {
@@ -173,15 +167,12 @@ router.post('/:hash/reject',
 //    username: String
 router.put('/:hash/member/:username/color',
   User.ensureExistsByUsername(true, ['params', 'username'], 'There is no such user.'), // Attaches target.
-  Group.userInGroup('target', true, 'members', 'User does not belong in the group.'),
+  Group.userIsType('target', true, Group.roles.MEMBER, 'User does not belong in the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
-    group.members.forEach(function(member, index, members) {
-      if (member._id.toString() === target._id.toString()) {
-        group.members[index].color = req.body.color;
-      }
-    });
+    
+    group.changeColorById(target._id, req.body.color);
     group.save(function(err) {
       if (err) { return next(err); }
       else {
@@ -192,17 +183,13 @@ router.put('/:hash/member/:username/color',
 
 // Post request to leave group.
 router.post('/:hash/leave',
-  Group.userInGroup('user', true, 'members', 'You are not a member of the group.'),
-  Group.userInGroup('user', false, 'admins', 'Admins cannot leave the group.'), // Administrators cannot leave group at the moment.
+  Group.userIsType('user', false, Group.roles.ADMIN, 'Admins cannot leave the group.'), // Administrators cannot leave group at the moment.
+  Group.userIsType('user', true, Group.roles.MEMBER, 'You are not a member of the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var user = req.attach.user;
 
-    group.members.forEach(function(member, index, members) {
-      if (member._id.toString() === user._id.toString()) {
-        group.members.pull(member);
-      }
-    });
+    var removedMember = group.removeMemberById(user._id);
 
     user.groups.pull(group._id);
 

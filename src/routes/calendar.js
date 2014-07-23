@@ -34,7 +34,7 @@ function ownership (message) {
 
 router.get('/group/:hash/:name',
   function(req, res, next) { res.error.redirect = '/group'; next(); },
-  Group.userInGroup('user', true, 'members', 'You are not a member of this group.'),
+  Group.userIsType('user', true, Group.roles.MEMBER, 'You are not a member of this group.'),
   function(req, res, next) {
   res.format({
     'text/html': function() { // If html page is requested...
@@ -45,7 +45,7 @@ router.get('/group/:hash/:name',
           return next(new UserError('There is no such group.'));
         }
         else { // Group found!
-          var isAdmin = group.hasUser(req.attach.user, 'admins');
+          var isAdmin = group.hasUser(req.attach.user, Group.roles.ADMIN);
           return res.render('groupCalendar', { group: group, isAdmin: isAdmin });
         }
       });
