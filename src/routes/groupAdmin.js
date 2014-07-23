@@ -39,13 +39,18 @@ router.get('/', function(req, res, next) {
 router.delete('/member/:username',
   User.ensureExistsByUsername(true, ['params', 'username'], 'There is no such user.'), // Attaches target.
   Group.userIsType('user', true, Group.roles.ADMIN, 'Admins cannot be removed from the group.'),
-  Group.userIsType('target', true, Group.roles.MEMBER, 'User does not belong to the group.'),
+  Group.userIsType('target', true, Group.roles.REQUESTED, 'User does not belong to the group.'),
   function(req, res, next) {
     var group = req.attach.group;
     var target = req.attach.target;
 
-    group.members.pull({ _id: target._id });
-    target.groups.pull(group._id);
+    var member = group.members.pull({ _id: target._id });
+    if (member.role > Group.roles.REQUESTED) {
+      target.groups.pull(group._id);
+    }
+    else {
+      target.removeRequestBySubjectId(group._id);
+    }
 
     group.save(function(err) {
       if (err) { return next(err); }
@@ -54,16 +59,26 @@ router.delete('/member/:username',
           if (err) { return next(err); }
           else { // Success.
             //return res.send({ success: 'User ' + target.username + ' is removed from the group.' })
+            req.flash('success', target.username + ' has been removed from the group.');
             return res.redirect('/group/' + group.getHash() + '/admin');
           }
         });
       }
     });
-});
+  }
+);
 
 // Delete request to remove group.
-router.delete('/', function(req, res, next) {
-  var group = req.attach.group;
-});
+router.delete('/',
+  Group.userIsType('user', true, Group.roles.OWNER, 'Only the owner can delete the group.'),
+  function(req, res, next) {
+    var group = req.attach.group;
+    group.remove(function(err, group) {
+      if (err) { return next(err); }
+      req.flash('success', group.groupName + ' has been deleted.');
+      return res.redirect('/group');
+    });
+  }
+);
 
 module.exports = router;

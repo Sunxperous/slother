@@ -2,6 +2,9 @@ mixin errors(messages)
   .error_box.hidden
     ul.errors
       if (messages)
+        if (messages.success.length > 0)
+          each message in messages.success
+            li.success= message
         if (messages.errors.length > 0)
           each message in messages.errors
             li.error= message

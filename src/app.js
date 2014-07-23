@@ -24,11 +24,11 @@ app.set('port', config.app.port);
 
 // Routing.
 var routes = require('./routes/index');
+var group = require('./routes/group');
+var user = require('./routes/user');
 var login = require('./routes/login');
 var extractMod = require('./routes/extractMod');
 var calendar = require('./routes/calendar');
-var group = require('./routes/group');
-var user = require('./routes/user');
 
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -56,10 +56,10 @@ app.use(express.static(__dirname + '/public'));
 app.use(applyLocals()); // Locals for jade templates, attaches for user-defined functions.
 app.use('/', login);
 app.use('/', routes);
-app.use('/calendar', calendar);
-app.use('/extract', extractMod);
 app.use('/group', group);
 app.use('/user', user);
+app.use('/calendar', calendar);
+app.use('/extract', extractMod);
 
 // Errors final middleware.
 // Maybe can render a Sloth sleeping.
@@ -98,6 +98,7 @@ function applyLocals() {
     flashMessages.alerts = req.flash('alert');
     flashMessages.errors = req.flash('error');
     flashMessages.requests = req.flash('requests');
+    flashMessages.success = req.flash('success');
     res.locals.messages = flashMessages;
 
     req.attach = {};

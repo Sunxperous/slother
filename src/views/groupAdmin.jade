@@ -30,6 +30,7 @@ block content
                   input.text-input.small-text.red.clickable(type='submit' value='remove')
     .info-block
       form#delete_group(action='' method='post')
+        input(type='hidden' name='_method' value='DELETE')
         h3.info-block-title Delete this group
         +errors
         div

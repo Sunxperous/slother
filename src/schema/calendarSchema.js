@@ -3,7 +3,7 @@ var timestamps = require('mongoose-timestamp');
 var Schema = mongoose.Schema;
 var config = require('../config');
 var eventSchema = require('./eventSchema');
-var User = require('./userSchema');
+var UserError = require('../userError.js');
 
 function randomColor() {
   return config.colors[Math.floor(Math.random() * config.colors.length)];

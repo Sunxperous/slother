@@ -4,7 +4,10 @@ var Schema = mongoose.Schema;
 var config = require('../config');
 var Hashids = require('hashids');
   var hashids = new Hashids(config.hashid.salt);
+var async = require('async');
 var UserError = require('../userError.js');
+var Calendar = require('./calendarSchema');
+var User = require('./userSchema');
 
 function randomColor() {
   return config.colors[Math.floor(Math.random() * config.colors.length)];
@@ -127,6 +130,34 @@ groupSchema.methods.getHash = function() {
 groupSchema.statics.decryptHash = function(hash) {
   return hashids.decryptHex(hash);
 };
+
+groupSchema.pre('remove', function removeCalendar(next, done) {
+  Calendar.findOneAndRemove({ group: this._id }, function(err, calendar) {
+    if (err) { return next(err); }
+    return next();
+  });
+});
+groupSchema.pre('remove', function removeMemberGroups(next, done) {
+  var _this = this;
+  async.each(this.members, function(member, callback) {
+    User.findById(member._id, function(err, user) {
+      if (err) { return callback(err); }
+      if (member.role > groupSchema.statics.roles.REQUESTED) {
+        user.groups.pull(_this._id);
+      }
+      else {
+        user.removeRequestBySubjectId(_this._id);
+      }
+      user.save(function(err) {
+        if (err) { return callback(err); }
+        return callback();
+      });
+    });
+  }, function(err) {
+    if (err) { return next(err); }
+    return next();
+  });
+});
 
 groupSchema.plugin(timestamps);
 

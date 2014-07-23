@@ -2,8 +2,7 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
 var timestamps = require('mongoose-timestamp');
 var Schema = mongoose.Schema;
-var calendarSchema = require('../schema/calendarSchema');
-var requestSchema = require('../schema/requestSchema');
+var requestSchema = require('./requestSchema');
 var UserError = require('../userError.js');
 
 var usernameValidate = [
@@ -51,7 +50,7 @@ userSchema.methods.hasGroup = function(group) {
 };
 
 function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
+  if (req.isAuthenticated() && req.attach.user) {
     if (req.attach.user.status === userSchema.statics.statusTypes.PENDING) {
       return res.redirect('/register/continue');
     }
@@ -96,6 +95,14 @@ userSchema.statics.ensureExistsByUsername = function(positive, source, message) 
       }
     });
   };
+};
+
+userSchema.methods.removeRequestBySubjectId = function(id) {
+  var i;
+  for (i = 0; i < this.requests.length; i++) {
+    if (id.toString() === this.requests[i].subject_id.toString()) { break; }
+  }
+  return this.requests.splice(i, 1)[0];
 };
 
 userSchema.plugin(timestamps);

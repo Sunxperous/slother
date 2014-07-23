@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var timestamps = require('mongoose-timestamp');
-var Group = require('../schema/groupSchema');
+var config = require('../config');
+var Hashids = require('hashids');
+  var hashids = new Hashids(config.hashid.salt);
 var Schema = mongoose.Schema;
 
 var requestSchema = Schema({
@@ -22,7 +24,7 @@ requestSchema.methods.getUrl = function(action) {
     case requestSchema.types.USER:
       break;
     case requestSchema.types.GROUP:
-      return '/group/' + Group.getHashOfId(this.subject_id) + '/' + action;
+      return '/group/' + hashids.encryptHex(this.subject_id) + '/' + action;
       break;
     default:
       break;
