@@ -23,7 +23,8 @@ var groupSchema = new Schema({
   }],
   requested: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   admins: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  created_by: { type: Schema.Types.ObjectId, ref: 'User' }
+  created_by: { type: Schema.Types.ObjectId, ref: 'User' },
+  calendar: {type: Schema.Types.ObjectId, ref:'Calendar'}
 });
 
 // Specify type for array to search in, defaults to 'members'.

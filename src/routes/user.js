@@ -8,43 +8,29 @@ router.use(User.ensureAuthenticated());
 
 
 router.get('/request', function (req, res, next) {
-  User.findOne({username:req.user.username}, 
-    function (err, user) {
-      if (err) { return next(err); }
-      else 
-        return res.send(user.requests);
-  });
+  return res.send(req.attach.user.requests);
 });
 
 router.put('/displayName', function (req, res, next) {
-  User.findOne({username:req.user.username},
-    function (err, user) {
+  req.attach.user.display_name = req.body.disName;
+  req.attach.user.save( function (err, user) {
     if (err) { return next(err); }
-    user.display_name = req.body.disName;
-    user.save( function (err, user) {
-      if (err) { return next(err); }
-      else
-        return res.send({ success: "Username Changed."});
-    });
-   });
-})
+    return res.send({ success: "Username Changed."});
+  });
+});
 
-router.post('/createCalendar', function (req, res, next) {
+router.post('/', function (req, res, next) {
   Calendar.create({
     name: req.body.name,
-    events:[]
+    events:[],
+    user: req.attach.user._id
   }, function (err, calendar) {
     if (err) { return next(err); }
-    User.findOneAndUpdate({username:req.user.username},
-      {$push:{calendar:calendar._id}}, function (err, user) {
-        if (err) { return next(err); }
-        calendar.user = user._id;
-        calendar.save( function (err, calendar) {
-          if (err) { return next(err); }
-          else 
-            return res.send({success:"New calendar is created."});
-        });
-      });
+    req.attach.user.calendars.push(calendar._id)
+    req.attach.user.save( function (err, user) {
+      if (err) { return next(err); }
+      return res.send({success:"New calendar is created."});
+    });
   });
 });
 

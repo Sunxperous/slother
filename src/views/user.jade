@@ -44,9 +44,9 @@ block content
         for item in calendar
           div.cal-block
             li.cal-name
-              span=item.name 
+              span.cal-each-name=item.name 
               if(item.hidden)
-                span#hidden Private
+                span#privacy_state Private
             div.cal-func
               input(id=item.id value=item.name type='hidden')
               

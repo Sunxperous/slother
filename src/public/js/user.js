@@ -39,7 +39,7 @@
       type: 'DELETE'
     }).done( function (res) {
       if (res.error) 
-        return errors.add('error', calendar.error, $('.cal-delete'));
+        return errors.add('error', res.error, $('.cal-delete'));
       console.log(res.success);
       temp.parents()[2].remove();
     });
@@ -50,7 +50,7 @@
       type: 'PUT', data: {disName: $('#display_name').val()}
     }).done( function (res) {
       if (res.error) 
-        return errors.add('error', calendar.error, $('#change_name'));
+        return errors.add('error', res.error, $('#change_name'));
       console.log(res.success);
       $('#display_name').parents().children('#displayname').
         children('#profile_value').text($('#display_name').val());
@@ -60,21 +60,19 @@
 
   $('.cal-change-name').click(function (event) {
     var temp=$(this);
-    console.log(temp.parents('.cal-block').children('li.cal-name'));
-    // console.log($(this).siblings('.cal-name-input').val());
     $.ajax('calendar/'+$(this).parents('.cal-func').children()[0].id+'/name',{
       type: 'PUT', data: {name:$(this).siblings('.cal-name-input').val()}
     }).done( function (res) {
       if (res.error) 
-        return errors.add('error', calendar.error, $('.cal-change-name'));
+        return errors.add('error', res.error, $('.cal-change-name'));
       console.log(res.success);
-      temp.parents('.cal-block').children('li.cal-name').
+      console.log(temp.siblings('.cal-name-input'));
+      temp.parents('.cal-block').children('li.cal-name').children('.cal-each-name').
             text(temp.siblings('.cal-name-input').val());
     });
   });
   
   $('.cal-privacy').click(function (event) {
-    console.log($(this).siblings('.cal-privacy-type').val());
     if($(this).siblings('.cal-privacy-type').val() == 'Open')
       var temp = false;
     else
@@ -84,20 +82,19 @@
       type: 'PUT', data: {privacy: temp}
     }).done( function (res) {
       if (res.error) 
-        return errors.add('error', calendar.error, $('.cal-privacy'));
+        return errors.add('error', res.error, $('.cal-privacy'));
       console.log(res.success);
+      $('#privacy_state').text((temp)?("Private"):(""));
     });
   });
 
   $('.group-leave').click(function (event) {
-    console.log('/group/'+$(this).siblings()[1].id+'/member/');
-    console.log($(this).siblings()[1].id);
-
+    
     $.ajax('/group/'+$(this).siblings()[1].id+'/member/', {
       type: 'DELETE', data: {user:$('#user').val()}
     }).done( function (res) {
       if (res.error) 
-        return errors.add('error', calendar.error, $('.group-leave'));
+        return errors.add('error', res.error, $('.group-leave'));
       console.log(res.success);
     });
   });
