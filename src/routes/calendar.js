@@ -17,8 +17,11 @@ function ownership (message) {
         if (err) { return next(err); }
         else if(group == null) 
           return next(new UserError("No such group."));
-        else 
-          return next();
+        else
+          if (group.hasUser(req.attach.user, Group.roles.ADMIN)) {
+            return next();
+          }
+          return next(new UserError('Not authorized to modify group calendar.'));
       });
     }
     else{
@@ -155,7 +158,7 @@ router.post('/', function (req, res, next) {
   Calendar.create({ name: req.body.name, events:[],user: req.attach.user._id }, 
     function (err, calendar) {
     if (err) { return next(err); }
-    req.attach.user.calendar.push(calendar._id);
+    req.attach.user.calendars.push(calendar._id);
     req.attach.user.save( function (err, user) {
       if(err) { return next(err); }
       return res.send(calendar);

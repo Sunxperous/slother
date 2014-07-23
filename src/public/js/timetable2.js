@@ -267,77 +267,82 @@ var timetable = (function() {
     });
 
     // Popup for new event when empty areas of calendar are clicked.
-    $('#calendar').click(function createNewEvent(event) {
-      if (popup.status !== popup.statusTypes.HIDDEN) { return; }
-      if (!$(event.target).hasClass('slot')) { return; }
+    if ($('#new').length != 0) { // Only if #new div is available. (Admin.)
+      $('#calendar').click(function createNewEvent(event) {
+        if (popup.status !== popup.statusTypes.HIDDEN) { return; }
+        if (!$(event.target).hasClass('slot')) { return; }
 
-      var td = $(event.target);
-      var hour, day;
-      for (var i = 0; i < 24; i++) {
-        if (td.hasClass(i)) { hour = i; }
-      }
-      var tr = td.parent();
-      for (var i = 0; i < 7; i++) {
-        if (tr.hasClass(days[i])) { day = i; }
-      }
+        var td = $(event.target);
+        var hour, day;
+        for (var i = 0; i < 24; i++) {
+          if (td.hasClass(i)) { hour = i; }
+        }
+        var tr = td.parent();
+        for (var i = 0; i < 7; i++) {
+          if (tr.hasClass(days[i])) { day = i; }
+        }
 
-      var date = moment(now).clone().add(day, 'days');
-      date.hours(hour);
+        var date = moment(now).clone().add(day, 'days');
+        date.hours(hour);
 
-      popup.displayItem({
-        submit: 'Add event',
-        popup_title: 'Add event',
-        event_id: '',
-        summary: '',
-        description: '',
-        location: '',
-        date_start: date.format(MOMENT_DATE_FORMAT),
-        date_end: date.format(MOMENT_DATE_FORMAT),
-        time_start: date.format(MOMENT_TIME_FORMAT),
-        time_end: date.add(1, 'hour').format(MOMENT_TIME_FORMAT),
-        rrule_freq: 'ONCE',
-        rrule_count: 1,
-        exclude: [],
-      }).show('new');
-    });
-
-    // Sending event to server.
-    $('#event_details').submit(function(event) {
-      event.preventDefault();
-      var dateStart = moment(
-        $('#date_start').val() + $('#time_start').val(),
-        MOMENT_DATE_FORMAT + MOMENT_TIME_FORMAT);
-      var dateEnd = moment(
-        $('#date_end').val() + $('#time_end').val(),
-        MOMENT_DATE_FORMAT + MOMENT_TIME_FORMAT);
-      var sending = {};
-      var directCopies = ['summary', 'description', 'location', 'rrule_freq', 'rrule_count'];
-      directCopies.forEach(function(field) {
-        var element = $('#' + field);
-        sending[field] = element.val();
-      });
-      sending['date_start'] = dateStart.format();
-      sending['date_end'] = dateEnd.format();
-      var checkedExcludes = $('input[name="exclude"]:checked');
-      sending['exclude'] = [];
-      checkedExcludes.each(function(index) {
-        sending['exclude'].push(checkedExcludes.eq(index).val());
+        popup.displayItem({
+          submit: 'Add event',
+          popup_title: 'Add event',
+          event_id: '',
+          summary: '',
+          description: '',
+          location: '',
+          date_start: date.format(MOMENT_DATE_FORMAT),
+          date_end: date.format(MOMENT_DATE_FORMAT),
+          time_start: date.format(MOMENT_TIME_FORMAT),
+          time_end: date.add(1, 'hour').format(MOMENT_TIME_FORMAT),
+          rrule_freq: 'ONCE',
+          rrule_count: 1,
+          exclude: [],
+        }).show('new');
       });
 
-      var requestType = $('#popup_title').text() === 'Add event' ? 'POST' : 'PUT';
-
-      $('#submit').prop('disabled', true);
-      $.ajax('/calendar/' + $('#calendar_id').val() + '/event/' + $('#event_id').val(),
-        { data: sending, type: requestType })
-        .done(function(response) {
-          if (response.error) {
-            return errors.add('error', response.error, $('#event_details'));
-          }
-          calendars[response.calendar_id].addOrReplaceItem(response.eventInfo); // Replace or add.
-          popup.close();
-          $('#submit').removeAttr('disabled');
+      // Sending event to server.
+      $('#event_details').submit(function(event) {
+        event.preventDefault();
+        var dateStart = moment(
+          $('#date_start').val() + $('#time_start').val(),
+          MOMENT_DATE_FORMAT + MOMENT_TIME_FORMAT);
+        var dateEnd = moment(
+          $('#date_end').val() + $('#time_end').val(),
+          MOMENT_DATE_FORMAT + MOMENT_TIME_FORMAT);
+        var sending = {};
+        var directCopies = ['summary', 'description', 'location', 'rrule_freq', 'rrule_count'];
+        directCopies.forEach(function(field) {
+          var element = $('#' + field);
+          sending[field] = element.val();
         });
-    });
+        sending['date_start'] = dateStart.format();
+        sending['date_end'] = dateEnd.format();
+        var checkedExcludes = $('input[name="exclude"]:checked');
+        sending['exclude'] = [];
+        checkedExcludes.each(function(index) {
+          sending['exclude'].push(checkedExcludes.eq(index).val());
+        });
+
+        var requestType = $('#popup_title').text() === 'Add event' ? 'POST' : 'PUT';
+
+        $('#submit').prop('disabled', true);
+        $.ajax('/calendar/' + $('#calendar_id').val() + '/event/' + $('#event_id').val(),
+          { data: sending, type: requestType })
+          .done(function(response) {
+            if (response.error) {
+              return errors.add('error', response.error, $('#event_details'));
+            }
+            calendars[response.calendar_id].addOrReplaceItem(response.eventInfo); // Replace or add.
+            popup.close();
+            $('#submit').removeAttr('disabled');
+          });
+      });
+    }
+    else { // #new div is not available. (Not admin.)
+      $('#calendar .slot').removeClass('clickable');
+    }
 
     return popup;
   })();

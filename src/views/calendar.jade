@@ -1,5 +1,7 @@
 include mixins/errors.jade
 - var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+- if (typeof isAdmin === 'undefined') isAdmin = true
+
 .tableWrapper
   table#calendar
     thead
@@ -19,7 +21,7 @@ include mixins/errors.jade
               span.dayDate
               span.dayDay= days[daysI]
           - for (var i = 0; i < 24; i++)
-            td.slot(class= i)
+            td.slot.clickable(class= i)
     tfoot
       tr
         th.time
@@ -59,53 +61,55 @@ include mixins/errors.jade
       div
         span.label Exclude
         ul.exclude
-      div
+      if (!!isAdmin)
         div
-          button#edit_event.orange Edit event
-          button#end_early.yellow End early
-        div
-          button#delete_this.pink Remove this
-          button#delete_all.grey Remove all
-    #new.hidden
-      form#event_details(method='post')
-        input#event_id(type='hidden' name='event_id')
-        div
-          label(for='calendar_id') Calendar
-          select#calendar_id(name='calendar_id' required)
-        div
-          label(for='summary') Summary
-          input#summary.fullLength(name='summary' required)
-        div
-          label(for='description') Description
-          textarea#description(rows='2' name='description')
-        div
-          label(for='location') Location
-          input#location.fullLength(name='location')
-        div
-          label(for='date_start') From (DD/MM/YYYY HH:mm)
-          input#date_start.shortLength(type='text' name='dateStart' required)
-          input#time_start.shortLength(type='text' name='timeStart' required)
-          label(for='date_end') to (DD/MM/YYYY HH:mm)
-          input#date_end.shortLength(type='text' name='dateEnd' required)
-          input#time_end.shortLength(type='text' name='timeEnd' required)
-        div
-          label(for='rrule_freq') Repeat
-          select#rrule_freq(name='rrule_freq')
-            option(value='ONCE' selected) No repeat
-            option(value='DAILY') Daily
-            option(value='WEEKLY') Weekly
-            option(value='MONTHLY') Monthly
-            option(value='YEARLY') Yearly
-          span.rruleInfo
-            |  for 
-            input#rrule_count(type='number' value='1' min='1' max='1024' name='rrule_count' required)
-            |  times
-        div#exclude
-          label Exclude
-        div
-          input#submit.green(type='submit')
-          input#cancel.red(type='button' value='Cancel')
-          input#modify_type(type='hidden')
+          div
+            button#edit_event.orange Edit event
+            button#end_early.yellow End early
+          div
+            button#delete_this.pink Remove this
+            button#delete_all.grey Remove all
+    if (!!isAdmin)
+      #new.hidden
+        form#event_details(method='post')
+          input#event_id(type='hidden' name='event_id')
+          div
+            label(for='calendar_id') Calendar
+            select#calendar_id(name='calendar_id' required)
+          div
+            label(for='summary') Summary
+            input#summary.fullLength(name='summary' required)
+          div
+            label(for='description') Description
+            textarea#description(rows='2' name='description')
+          div
+            label(for='location') Location
+            input#location.fullLength(name='location')
+          div
+            label(for='date_start') From (DD/MM/YYYY HH:mm)
+            input#date_start.shortLength(type='text' name='dateStart' required)
+            input#time_start.shortLength(type='text' name='timeStart' required)
+            label(for='date_end') to (DD/MM/YYYY HH:mm)
+            input#date_end.shortLength(type='text' name='dateEnd' required)
+            input#time_end.shortLength(type='text' name='timeEnd' required)
+          div
+            label(for='rrule_freq') Repeat
+            select#rrule_freq(name='rrule_freq')
+              option(value='ONCE' selected) No repeat
+              option(value='DAILY') Daily
+              option(value='WEEKLY') Weekly
+              option(value='MONTHLY') Monthly
+              option(value='YEARLY') Yearly
+            span.rruleInfo
+              |  for 
+              input#rrule_count(type='number' value='1' min='1' max='1024' name='rrule_count' required)
+              |  times
+          div#exclude
+            label Exclude
+          div
+            input#submit.green(type='submit')
+            input#cancel.red(type='button' value='Cancel')
+            input#modify_type(type='hidden')
 
 div#calendar_controls_wrapper
   div#calendar_controls

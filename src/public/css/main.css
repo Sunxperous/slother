@@ -303,7 +303,6 @@ div.tableWrapper {
 }
 #calendar .slot {
   position: relative;
-  cursor: pointer;
 }
 #calendar th div {
   text-align: left;
