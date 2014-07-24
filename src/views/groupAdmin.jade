@@ -28,8 +28,20 @@ block content
                 form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
                   input(type='hidden' name='_method' value='delete')
                   input.text-input.small-text.red.clickable(type='submit' value='remove')
+    
     .info-block
-      form#delete_group(action='' method='post')
+      form#delete_group(action='admin/groupName' method='post')
+        input(type='hidden' name='_method' value='PUT')
+        h3.info-block-title Change Group Name
+        +errors
+        div
+          label(for='group_name') Group name
+          input#group_name(name='groupName' type='text')
+        div.center-button
+          input#create.green(type='submit' value='Change')
+
+    .info-block
+      form#delete_group(action='admin' method='post')
         input(type='hidden' name='_method' value='DELETE')
         h3.info-block-title Delete this Group
         +errors

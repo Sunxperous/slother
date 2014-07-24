@@ -68,6 +68,17 @@ router.delete('/member/:username',
   }
 );
 
+// Put request to change group name.
+router.put('/groupName', function(req, res, next) {
+  var group = req.attach.group;
+  group.groupName = req.body.groupName;
+  group.save(function(err) {
+    if (err) { return next(err); }
+    req.flash('success', 'Group name changed to ' + group.groupName + '.');
+    return res.redirect('/group/' + group.getHash() + '/admin');
+  });
+});
+
 // Delete request to remove group.
 router.delete('/',
   Group.userIsType('user', true, Group.roles.OWNER, 'Only the owner can delete the group.'),
