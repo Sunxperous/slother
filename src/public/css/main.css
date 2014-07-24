@@ -65,6 +65,7 @@ input, select, textarea, button {
   margin-left: 0;
   margin-bottom: 2px;
   color: #333;
+  font-size: 13px;
 }
 h1 {
   font-size: 18px;
@@ -77,6 +78,11 @@ h2 {
   font-size: 24px;
   padding: 0 0 16px 0;
   font-weight: 600;
+}
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 4px 0 8px -2%;
 }
 header {
   margin: 4px auto;
@@ -92,6 +98,9 @@ nav {
 }
 .clickable {
   cursor: pointer;
+}
+.small-text-spacing > * {
+  margin-right: 8px;
 }
 #brand { /* Hide text if screen is damn small. */
   display: inline-block;
@@ -445,10 +454,8 @@ label.exclude {
 /*^ #popup ^*/
 
 /*v #info_controls v*/
-h3.info-block-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 4px 0;
+#info_controls h2 {
+  margin-left: -2%;
 }
 #info_controls {
   margin: auto auto;
@@ -463,13 +470,16 @@ h3.info-block-title {
   width: 100%;
 }
 .info-block input[type='submit'] {
-  display: block;
   margin: auto auto;
 }
+.info-block .center-button {
+  text-align: center;
+}
 .info-block {
+  position: relative;
   text-align: left;
   margin: 4px 0;
-  padding: 5%;
+  padding: 5% 5% 5% 6%;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -479,9 +489,6 @@ h3.info-block-title {
 }
 #calendars li {
   margin-top: 5px;
-}
-#calendars li > *, #group_calendar li > * {
-  margin-right: 8px;
 }
 #group_calendar {
   margin-bottom: 8px;
@@ -563,81 +570,41 @@ h3.info-block-title {
 /*^ #colorpicker ^*/
 
 /*v user.jade v*/
-.user-block {
-  margin: 10px auto auto auto;
-  width: 95%;
-  min-width: 480px;
-  max-width: 480px;
-  position: relative;
-  min-height: 100px;
-  height: auto;
-  border-radius: 4px;
-  text-align: left;
-  position: relative;
-  display:inline-block;
-}
-h4 {
-  text-align: center;
-  margin: 10px 0px 5px;
-  font-size: 20px;
-  font-style: bold;
-  font-weight: 500;
-}
-#profile, #calendar_info {
-  border: 2px solid #ccc;
-}
-#request, #group_info {
-  border: 2px solid;
-}
 .cal-func {
-  display:inline-block;
-  width: 270px;
-  float:right;
   padding:0px;
   margin: 5px;
-  height:140px;
   display: none;
-  border: 2px solid #FFF2FF;
 }
-.cal-change {
-  width: 250px;
-  margin:5px;
-  height:40px;
+.cal-func input {
+  display: inline-block;
 }
 .cal-name {
-  margin: 5px;
-  display:inline-block;
-  cursor: pointer;
+  margin-bottom: 4px;
 }
-.cal-privacy-type {
-  margin: 0px 20px;
+.cal-change {
+  margin-bottom: 8px;
 }
 .cal-change-name, .cal-delete, .cal-privacy  {
-  float:right;
+  display: inline-block;
+}
+.cal-change input[type=text], .cal-change select {
+  width: 150px;
+  margin-right: 32px;
 }
 .group-data {
-  min-width: 130px;
-  height: 30px;
-  display:inline-block;
-}
-.group-leave {
-  margin: 0px 0px 0px 20px; 
+  margin-bottom: 4px;
 }
 #user_name, #displayname {
-  margin: 10px;
-  height:20px;
+  height: 20px;
+  line-height: 20px;
 }
-#displayname {
-  cursor: pointer;
-}
-#profile_header {
+.profile_header {
   margin-bottom: 20px;
-  padding-bottom: 20px;
 }
-#profile_value {
+.profile_value {
   position: absolute;
   right: 20px;
-  margin: 5px;
+  margin: 0;
 }
 #change_display_name {
   display: none;
@@ -645,10 +612,7 @@ h4 {
   text-align: center;
 }
 .nothing-display {
-  margin: 20px;
-  font-size: 18px;
-  text-align: center;
-  color: red;
+  color: #999;
 }
 .picture {
    width: 5%; 
@@ -656,11 +620,6 @@ h4 {
 }
 #privacy_state {
   color: red;
-  margin: 3px;
-}
-#user_panel {
-  margin: auto auto;
-  max-width: 500px;
 }
 /*^ user.jade ^*/
 

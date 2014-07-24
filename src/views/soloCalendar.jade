@@ -13,15 +13,16 @@ block content
   
   #info_controls
     .info-block
-      h3.info-block-title Your calendars
+      h3.info-block-title Calendars
       +errors
       ul#calendars
-        li.hidden
+        li.hidden.small-text-spacing
           span.calendar-name.clickable
+          span.small-text.clickable color
           span.toggle-view.small-text.clickable hide
     .info-block
       form#add_calendar
-        h3.info-block-title Add a calendar
+        h3.info-block-title Add a Calendar
         +errors
         div
           label(for='type') Type
@@ -34,7 +35,7 @@ block content
         div#generic.hidden
           label(for='generic_string') Name
           input#generic_string(name='string' type='text')
-        div
+        div.center-button
           input#add.green(type='submit' value='Add calendar')
 
 block footScripts

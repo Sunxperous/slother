@@ -31,9 +31,9 @@ block content
     .info-block
       form#delete_group(action='' method='post')
         input(type='hidden' name='_method' value='DELETE')
-        h3.info-block-title Delete this group
+        h3.info-block-title Delete this Group
         +errors
-        div
+        div.center-button
           input#create.red(type='submit' value='Delete group')
 
 block footScripts

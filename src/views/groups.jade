@@ -13,20 +13,23 @@ block content
 
   #info_controls
     .info-block
-      h3.info-block-title Your groups
+      h3.info-block-title Groups
       +errors
-      ul#groups
-        for group in groups
-          li
-            a(href=group.getUrl())= group.groupName
+      if (groups.length !== 0)
+        ul#groups
+          for group in groups
+            li
+              a(href=group.getUrl())= group.groupName
+      else
+        div.nothing-display You do not belong to any groups yet.
     .info-block
       form#create_group(action='/group' method='post')
-        h3.info-block-title Create a group
+        h3.info-block-title Create a Group
         +errors
         div
           label(for='group_name') Name
           input#group_name(name='group_name' type='text')
-        div
+        div.center-button
           input#create.green(type='submit' value='Create group')
 
 block footScripts
