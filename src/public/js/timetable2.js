@@ -368,13 +368,13 @@ var timetable = (function() {
         $('#calendar_id').append(this.option);
       }
 
-      this.li = $('#calendars .hidden').clone();
+      this.li = $('#calendars li.hidden').clone();
       this.li.removeClass('hidden')
         .children('.calendar-name')
           .text(this.name)
           .css('background-color', this.color);
       this.li.children('.toggle-view').click(this, toggleView);
-      this.li.children('.calendar-name').click(this, colorPicker);
+      this.li.children('.color-pick').click(this, colorPicker);
       //$('#calendars').append(this.li);
       liForAppend(this.li);
     };
