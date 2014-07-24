@@ -278,6 +278,9 @@ form > div {
   width: 100%;
   max-width: 188px;
 }
+.confirm-block > input {
+  margin: 0 4px;
+}
 /*^ login.jade ^*/
 
 /*v calendar.jade v*/

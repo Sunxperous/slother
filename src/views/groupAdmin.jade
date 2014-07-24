@@ -38,7 +38,7 @@ block content
           label(for='group_name') Group name
           input#group_name(name='groupName' type='text')
         div.center-button
-          input#create.green(type='submit' value='Change')
+          input#change.green(type='submit' value='Change')
 
     .info-block
       form#delete_group(action='admin' method='post')
@@ -46,6 +46,6 @@ block content
         h3.info-block-title Delete this Group
         +errors
         div.center-button
-          input#create.red(type='submit' value='Delete group')
+          input#create.red.confirm(type='submit' value='Delete group')
 
 block footScripts

@@ -1,6 +1,6 @@
-var errors = (function() {
-  'use strict';
+'use strict';
 
+var errors = (function() {
   var errorBoxes = [];
   var error = {
     parse: function() {
@@ -88,3 +88,30 @@ var errors = (function() {
 
   return error;
 })();
+
+var alerts = errors, success = errors, requests = errors;
+
+$(document).ready(function() {
+  $('.confirm').each(function(index, element) {
+    var value = $(element).val();
+    var id = $(element).attr('id');
+
+    var replacement = '<input type="button" value="' + value + '" class="red replaced">';
+    $(element).wrap('<div class="confirm-block hidden"></div>');
+    var cancel = '<input type="button" value="Cancel" class="grey cancel">';
+    $(element).after(cancel);
+    $(element).parent().before(replacement);
+
+    $(element).val('Confirm');
+
+    var replacementElement = $(element).parent().siblings('.replaced').eq(0);
+    replacementElement.click(function() {
+      $(element).parent().toggleClass('hidden');
+      $(this).attr('disabled', true);
+    });
+    $(element).siblings('.cancel').click(function() {
+      $(element).parent().addClass('hidden');
+      replacementElement.removeAttr('disabled');
+    })
+  });
+});
