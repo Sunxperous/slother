@@ -15,7 +15,11 @@ block content
     .info-block
       h2#group_name= group.groupName
       ul#group_calendar
-      h3.info-block-title Members
+        li.hidden.small-text-spacing
+          span.calendar-name.color-pick.clickable
+          span.color-pick.small-text.clickable color
+          span.toggle-view.small-text.clickable hide
+      h3.info-block-title.empty-space Members
       +errors
       ul#calendars
         li.hidden.small-text-spacing

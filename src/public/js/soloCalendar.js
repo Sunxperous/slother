@@ -3,10 +3,9 @@
 
     $.getJSON('/calendar/user', function(calendars) {
       calendars.forEach(function (calendar) {
+        var appendTarget = calendar.user ? '#calendars' : '#group_calendars';
         calendar = timetable.replaceOrAddCalendar(calendar, true);
-        calendar.appendToLists(function liForAppend(li) {
-          $('#calendars').append(li);
-        });
+        calendar.appendToLists($(appendTarget));
       });
     });
 
@@ -28,9 +27,7 @@
                 return errors.add('error', calendar.error, $('#add_calendar'));
               }
               newCalendar = timetable.replaceOrAddCalendar(calendar, true);
-              newCalendar.appendToLists(function liForAppend(li) {
-                $('#calendars').append(li);
-              });
+              newCalendar.appendToLists($('#calendars'));
               timetable.update();
             }
           );
@@ -47,14 +44,11 @@
               return errors.add('error', calendar.error, $('#add_calendar'));
             }
             newCalendar = timetable.replaceOrAddCalendar(calendar, true);
-            newCalendar.appendToLists(function liForAppend(li) {
-              $('#calendars').append(li);
-            });
+            newCalendar.appendToLists($('#calendars'));
             timetable.update();
           }
         );
       }
-
       return false;
     });
 

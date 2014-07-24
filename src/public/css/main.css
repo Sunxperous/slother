@@ -157,7 +157,7 @@ a.no-notifications {
   opacity: 0.2;
 }
 .empty-space {
-  margin: 16px;
+  margin-top: 16px;
 }
 label, span.label {
   display: block;

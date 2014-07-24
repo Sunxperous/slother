@@ -13,14 +13,10 @@
           colorUrl: window.location.pathname.match(/\/group\/.+\//g) + 'member/' + member.username + '/color',
         };
         calendar = timetable.replaceOrAddCalendar(genericCalendar, false); // Member calendar.
-        calendar.appendToLists(function liForAppend(li) {
-          $('#calendars').append(li);
-        });
+        calendar.appendToLists($('#calendars'));
       });
       calendar = timetable.replaceOrAddCalendar(response.calendar, true); // Group calendar.
-      calendar.appendToLists(function liForAppend(li) {
-        $('#group_calendar').append(li);
-      });
+      calendar.appendToLists($('#group_calendar'));
     }
   );
 

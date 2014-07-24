@@ -20,6 +20,12 @@ block content
           span.calendar-name.color-pick.clickable
           span.small-text.color-pick.clickable color
           span.toggle-view.small-text.clickable hide
+      h3.info-block-title.empty-space Group Calendars
+      +errors
+      ul#group_calendars
+        li.hidden.small-text-spacing
+          span.calendar-name
+          span.toggle-view.small-text.clickable hide
     .info-block
       form#add_calendar
         h3.info-block-title Add a Calendar

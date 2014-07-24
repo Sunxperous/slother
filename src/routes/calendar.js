@@ -4,6 +4,7 @@ var User = require('../schema/userSchema');
 var Group = require('../schema/groupSchema');
 var Calendar = require('../schema/calendarSchema');
 var UserError = require('../userError.js');
+var async = require('async');
 
 router.use(User.ensureAuthenticated());
 
@@ -119,16 +120,11 @@ router.get('/user', function(req, res, next) {
     'text/html': function() { // If html page is requested...
       User
       .findOne({ username: req.user.username })
-      .populate('groups')
-      .populate('requests')
       .populate('calendars')
       .exec(function(err, user) {
         if (err) { return next(err); }
         if (user) {
-          return res.render('soloCalendar', {
-            groups: user.groups,
-            requests: user.requests
-          });
+          return res.render('soloCalendar');
         }
         else { return next(new UserError('?')); }
       });
@@ -141,10 +137,20 @@ router.get('/user', function(req, res, next) {
       .exec(function(err, user) {
         if (err) { return next(err); }
         if (user) {
-          if (user.calendars.length > 0) {
-            return res.send(user.calendars);
-          }
-          else { return res.send([]); }
+          var calendars = [];
+          user.calendars.forEach(function(calendar) {
+            calendars.push(calendar);
+          });
+          async.each(user.groups, function(group_id, callback) {
+            Calendar.findOne({ group: group_id }, function(err, calendar) {
+              if (err) { return callback(err); }
+              calendars.push(calendar);
+              return callback();
+            });
+          }, function(err) {
+            if (err) { return next(err); }
+            return res.send(calendars);
+          });
         }
         else { return next(new UserError('?')); }
       });

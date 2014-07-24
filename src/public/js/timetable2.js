@@ -360,7 +360,7 @@ var timetable = (function() {
       this.display();
     }
 
-    Calendar.prototype.appendToLists = function(liForAppend) {
+    Calendar.prototype.appendToLists = function(appendTarget) {
       if (this.editable) {
         // Append to popup select#calendar.
         this.option = $('<option>');
@@ -368,15 +368,14 @@ var timetable = (function() {
         $('#calendar_id').append(this.option);
       }
 
-      this.li = $('#calendars li.hidden').clone();
+      this.li = appendTarget.children('li.hidden').clone();
       this.li.removeClass('hidden')
         .children('.calendar-name')
           .text(this.name)
           .css('background-color', this.color);
       this.li.children('.toggle-view').click(this, toggleView);
       this.li.children('.color-pick').click(this, colorPicker);
-      //$('#calendars').append(this.li);
-      liForAppend(this.li);
+      appendTarget.append(this.li);
     };
 
     Calendar.prototype.changeColor = function(color) {
