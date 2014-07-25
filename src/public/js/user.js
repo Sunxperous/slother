@@ -18,17 +18,42 @@
   });
 
   $('.req-reject').click(function(event) {
+    var _this = this;
     $.post($(this).siblings('.req-url').val() + 'reject', [], 
       function(response) {
-        console.log(response);
+        if (response.error) {
+          return errors.add('error', response.error, $(_this));
+        }
+        $(_this).parent().remove();
       }
     );
   });
 
   $('.req-accept').click(function(event) {
+    var _this = this;
     $.post($(this).siblings('.req-url').val() + 'accept', [],
       function(response) {
-        console.log(response);
+        if (response.error) {
+          return errors.add('error', response.error, $(_this));
+        }
+
+        // Clones the first .hidden li.
+        var li = $('#group_info li.hidden').first().clone();
+
+        // Replaces the values.
+        li.children('a').text(response.data.groupName).attr('href', response.data.groupUrl);
+        li.children('.group-hash').val(response.data.groupHash);
+
+        // Appends to ul.
+        li.removeClass('hidden').appendTo($('#group_info ul'));
+
+        // Flashes alert.
+        success.add('success', 'You have joined the group.', $(_this));
+
+        // Needs a click event for leave.
+
+        // Remove buttons.
+        $(_this).parent().remove();
       }
     );
   });
@@ -51,7 +76,6 @@
     }).done( function (res) {
       if (res.error) 
         return errors.add('error', res.error, $('#change_name'));
-      console.log(res.success);
       $('#display_name').parents().children('#displayname').
         children('#profile_value').text($('#display_name').val());
       $('#change_display_name').hide(function(){});  
@@ -65,8 +89,6 @@
     }).done( function (res) {
       if (res.error) 
         return errors.add('error', res.error, $('.cal-change-name'));
-      console.log(res.success);
-      console.log(temp.siblings('.cal-name-input'));
       temp.parents('.cal-block').children('li.cal-name').children('.cal-each-name').
             text(temp.siblings('.cal-name-input').val());
     });
@@ -77,25 +99,24 @@
       var temp = false;
     else
       var temp = true;
-    console.log(temp);
     $.ajax('calendar/'+$(this).parents('.cal-func').children()[0].id+'/privacy',{
       type: 'PUT', data: {privacy: temp}
     }).done( function (res) {
       if (res.error) 
         return errors.add('error', res.error, $('.cal-privacy'));
-      console.log(res.success);
       $('#privacy_state').text((temp)?("Private"):(""));
     });
   });
 
   $('.group-leave').click(function (event) {
-    
-    $.ajax('/group/'+$(this).siblings()[1].id+'/member/', {
-      type: 'DELETE', data: {user:$('#user').val()}
+    var clicked = $(this);
+    $.ajax('/group/'+$(this).siblings('.group-hash').val()+'/leave/', {
+      type: 'POST', data: {user:$('#user').val()}
     }).done( function (res) {
       if (res.error) 
-        return errors.add('error', res.error, $('.group-leave'));
-      console.log(res.success);
+        return errors.add('error', res.error, clicked);
+      success.add('success', 'You have left the group.', clicked);
+      clicked.parent().remove();
     });
   });
 

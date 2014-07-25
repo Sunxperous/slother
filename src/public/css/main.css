@@ -233,6 +233,9 @@ form > div {
 /*^ layout.jade ^*/
 
 /*v errors.jade v*/
+.errors {
+  margin-bottom: 0;
+}
 .error_box {
   margin: 2px auto;
   padding: 0;
@@ -274,7 +277,6 @@ form > div {
   font-size: 12px;
   display: inline-block;
   padding: 2px 16px;
-  margin-top: 2px;
 }
 /*^ errors.jade ^*/
 
@@ -509,6 +511,7 @@ label.exclude {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.5);
+  word-wrap: break-word;
 }
 .small-text {
   color: #666;
@@ -675,6 +678,9 @@ label.exclude {
 }
 #privacy_state {
   color: red;
+}
+.requests > input[type='submit'] {
+  margin-left: 8px;
 }
 /*^ user.jade ^*/
 

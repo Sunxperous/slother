@@ -10,7 +10,13 @@ var errors = (function() {
       });
     },
     add: function(type, message, source) {
-      while (source.find('.error_box').first().length === 0 || $('body').is(source)) {
+      var stop = 10;
+      while (source.find('.error_box').first().length === 0
+        && !$('body').is(source)
+        && typeof source !== 'undefined'
+        && stop > 0
+      ) {
+        stop--;
         source = source.parent();
       }
       var errorBox = source.find('.error_box').first();

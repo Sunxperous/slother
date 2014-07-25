@@ -118,6 +118,7 @@ router.post('/:hash/accept',
               data: {
                 groupName: group.groupName,
                 groupUrl: group.getUrl(),
+                groupHash: group.getHash(),
               }
             })
           }

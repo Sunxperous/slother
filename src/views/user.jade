@@ -7,6 +7,7 @@ block headScript
 
 
 block content
+  h2= title
   +errors(messages)
 
   input#user(value=user.id name=user.username type='hidden')
@@ -17,11 +18,11 @@ block content
       div#user_name
         span.profile_header Username
         span.profile_value=username
-      div#displayname.small-text-spacing
+      div#displayname.clickable.small-text-spacing
         span.profile_header Display Name
         span.small-text edit
         span.profile_value=displays
-      div#change_display_name.clickable.center-button
+      div#change_display_name.center-button
         input#display_name(type='text' placeholder='Display name')
         input#change_name.green(type='button' value='Change display name')
        
@@ -30,18 +31,19 @@ block content
       +errors
       div
         if(requests.length > 0)
-          for request in requests
-            span.req-name=request.description
-            input.req-url(value=request.getUrl() type='hidden')
-            input.req-accept(value='Accept' type='submit')
-            input.req-reject(value='Reject' type='submit')
+          ul
+            for request in requests
+              li.requests
+                span.req-name=request.description
+                input.req-url(value=request.getUrl() type='hidden')
+                input.req-accept.green(value='Accept' type='submit')
+                input.req-reject.red(value='Reject' type='submit')
         else
-          div.nothing-display No requests.
+          div.nothing-display No requests yet.
     .info-block#calendar_info
       h3 Calendars
       +errors
-      if(calendar.length > 0)      
-          
+      if (calendar.length > 0)          
         for item in calendar
           ul.cal-block
             li.cal-name.clickable.small-text-spacing
@@ -62,19 +64,25 @@ block content
                 input.cal-privacy.green(value='Change privacy' type='submit')
               div.cal-change.center-button
                 input.cal-delete.red.confirm(value='Delete calendar' type='submit') 
-        else
-          div.nothing-display No Calendars Yet
+      else
+        div.nothing-display No calendars yet.
+
     .info-block#group_info
       h3 Groups
       +errors
-      if(groups.length > 0 )
-        ul
+      ul
+        if (groups.length > 0 )
+          //- Dummy li.
+          li.group-data.small-text-spacing.hidden
+            a
+            input.group-hash(value='' type='hidden')
+            input.text-input.small-text.red.clickable.group-leave(value='Leave' type='submit')
           for group in groups
             li.group-data.small-text-spacing
               a(href=group.getUrl())= group.groupName
-              input(id=group._id value=group.groupName type='hidden')
+              input.group-hash(value=group.getHash() type='hidden')
               input.text-input.small-text.red.clickable.group-leave(value='Leave' type='submit')
-      else
-        div.nothing-display You do not belong to any groups yet.
+        else
+          li.nothing-display No groups yet.
 block footScripts
   script(src='/js/user.js')
