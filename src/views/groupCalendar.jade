@@ -1,7 +1,7 @@
 block vars
   - var title = group.groupName + ' Calendar'
 
- extends layout
+extends layout
 include mixins/errors.jade
 
 block headScript
@@ -26,15 +26,16 @@ block content
           span.calendar-name.color-pick.clickable
           span.color-pick.small-text.clickable color
           span.toggle-view.small-text.clickable hide
-    .info-block
-      form#add_friend(action='/group/' + group.getHash() + '/invite')
-        h3.info-block-title Invite a Friend
-        +errors
-        div
-          label(for='friend_name') Username
-          input#friend_name(name='url' type='text')
-        div.center-button
-          input#add.green(type='submit' value='Invite')
+    if (isAdmin)
+      .info-block
+        form#add_friend(action='/group/' + group.getHash() + '/invite')
+          h3.info-block-title Invite a Friend
+          +errors
+          div
+            label(for='friend_name') Username
+            input#friend_name(name='url' type='text')
+          div.center-button
+            input#add.green(type='submit' value='Invite')
     .info-block
       if (isAdmin)
         div
