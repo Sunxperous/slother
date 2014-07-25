@@ -114,12 +114,25 @@ include mixins/errors.jade
 div#calendar_controls_wrapper
   div#calendar_controls
     button#before &#9664;
-    div#date_info
-      p
-        span#sun_day
-        span  - 
-        span#sat_day
-      p#year_display
+    #date_info
+      #default_date_info
+        p
+          span#sun_day
+          span  - 
+          span#sat_day
+        p#year_display
+      #nus_date_info.hidden
+        p#week_no
+        p#academic_year
+    #view_controls
+      div#view_details.clickable
+        span.label View
+        button.link#view_details_summary.clickable(disabled) Summary
+        button.link#view_details_location.fade.clickable Location
+      div#date_style.clickable
+        span.label Date Style
+        button.link#date_style_default.clickable(disabled) Default
+        button.link#date_style_nus.fade.clickable NUS
     button#after &#9654;
 
 div#colorpicker.hidden

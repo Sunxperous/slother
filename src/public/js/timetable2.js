@@ -10,6 +10,18 @@ var timetable = (function() {
   var START_VIEWING_AT       = 7; // Scrolls to hour on page load.
   var OVER_HOUR_END_EARLY    = 30; // Minutes to end early for duration over an hour.
   var UNDER_HOUR_END_EARLY   = 15; // Minutes to end early for duration under an hour.
+  var NUS_SEMESTER_START_DATES = [ // Dates to be Saturday before actual start date.
+    [2014, 7, 9],
+    [2015, 0, 10],
+    [2015, 4, 9],
+    [2015, 5, 20]
+  ];
+  var NUS_CURRENT_SEMESTER = 'AY2014/2015 Sem 1'; // Temporary.
+  var NUS_WEEKS = [
+    'Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6',
+    'Recess Week', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11',
+    'Week 12', 'Week 13', 'Reading Week', 'Exam Week', 'Exam Week'
+  ];
   var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
   var calendars = {};
@@ -378,6 +390,12 @@ var timetable = (function() {
       appendTarget.append(this.li);
     };
 
+    Calendar.prototype.switchDetails = function() {
+      this.onDisplay.forEach(function(item, indeX) {
+        item.text(item.data('item')[viewDetails] || " ");
+      });
+    };
+
     Calendar.prototype.changeColor = function(color) {
       this.color = color;
       this.onDisplay.forEach(function(item) {
@@ -572,7 +590,7 @@ var timetable = (function() {
         .css('background-color', calendar.color)
         .css('left', dateStartMinutes / 60 * CELL_WIDTH)
         .addClass('item')
-        .text(item.summary || " ")
+        .text(item[viewDetails] || " ")
         .data({
           calendar_id: calendar._id,
           item: item,
@@ -672,8 +690,33 @@ var timetable = (function() {
     });
 
     satOfWeek = date.add(1, 'day'); // Technically Sunday 00:00am.
+
+    // Default date info.
     $('#sun_day').text(sunOfWeek.format("DD MMM"));
     $('#sat_day').text(satOfWeek.format("DD MMM"));
+
+    // Nus date info.
+    var startDate;
+    for (var i = 0; i < NUS_SEMESTER_START_DATES.length; i++) {
+      if (sunOfWeek.isAfter(NUS_SEMESTER_START_DATES[i])) {
+        startDate = moment(NUS_SEMESTER_START_DATES[i]).subtract(1, 'day');
+      }
+    }
+    if (startDate) {
+      var weekNo = sunOfWeek.diff(startDate, 'weeks');
+      if (weekNo >= 0 && weekNo < NUS_WEEKS.length) {
+        $('#week_no').text(NUS_WEEKS[weekNo]);
+        $('#academic_year').text(NUS_CURRENT_SEMESTER);
+      }
+      else {
+        $('#week_no').text('');
+        $('#academic_year').text('');
+      }
+    }
+    else {
+      $('#week_no').text('');
+      $('#academic_year').text('');
+    }
 
     // Reset <td> rows.
     var tds = $('td.slot');
@@ -683,7 +726,6 @@ var timetable = (function() {
     Object.keys(calendars).forEach(function(_id) { calendars[_id].clear(); });
     Object.keys(calendars).forEach(function(_id) { calendars[_id].display(); });
   };
-  timetable.update();
 
   // Switch weeks.
   $('#before').click(function(event) { timetable.update(-1, 'weeks'); });
@@ -692,5 +734,49 @@ var timetable = (function() {
   // Scrolls immediately to 7:00am. To limit the scrolling for screens with large width.
   $('.tableWrapper').scrollLeft(START_VIEWING_AT * CELL_WIDTH + 1);
 
+  // View details controls.
+  var viewDetails = $('#view_details button:disabled').text().toLowerCase();
+  $('#view_details').click(function(event) {
+    if (viewDetails === 'summary') {
+      $('#view_details_summary').removeAttr('disabled');
+      $('#view_details_location').attr('disabled', true);
+      $('#view_details_summary').addClass('fade');
+      $('#view_details_location').removeClass('fade');
+      viewDetails = 'location';
+    }
+    else {
+      $('#view_details_location').removeAttr('disabled');
+      $('#view_details_summary').attr('disabled', true);
+      $('#view_details_location').addClass('fade');
+      $('#view_details_summary').removeClass('fade');
+      viewDetails = 'summary';
+    }
+    Object.keys(calendars).forEach(function(_id) { calendars[_id].switchDetails(); });
+  });
+
+  // Date style controls.
+  var dateStyle = $('#date_style button:disabled').text().toLowerCase();
+  $('#date_style').click(function(event) {
+    if (dateStyle  === 'default') {
+      $('#date_style_default').removeAttr('disabled');
+      $('#date_style_nus').attr('disabled', true);
+      $('#date_style_default').addClass('fade');
+      $('#date_style_nus').removeClass('fade');
+      $('#default_date_info').addClass('hidden');
+      $('#nus_date_info').removeClass('hidden');
+      dateStyle = 'nus';
+    }
+    else {
+      $('#date_style_nus').removeAttr('disabled');
+      $('#date_style_default').attr('disabled', true);
+      $('#date_style_nus').addClass('fade');
+      $('#date_style_default').removeClass('fade');
+      $('#default_date_info').removeClass('hidden');
+      $('#nus_date_info').addClass('hidden');
+      dateStyle = 'default';
+    }
+  });
+
+  timetable.update();
   return timetable;
 })();
