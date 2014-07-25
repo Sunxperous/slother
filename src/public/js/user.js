@@ -6,15 +6,8 @@
   });
 
   $('.cal-name').click(function (event) {
-    $(this).siblings('.cal-func').toggle(function(){}, function () {
-      $(this).css('background-color','#FFF7FF');
-      if($(this).is(":hidden"))
-        $(this).parents().children('.cal-name').css('background-color','');   
-    });
+    $(this).siblings('.cal-func').toggle();
     $('.cal-func').not($(this).siblings('.cal-func')).hide();
-      $('.cal-name').not($(this)).css('background-color','');
-    $(this).css('background-color','#FFFF00');
-
   });
 
   $('.req-reject').click(function(event) {
