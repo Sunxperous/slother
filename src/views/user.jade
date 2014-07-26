@@ -48,9 +48,8 @@ block content
           ul.cal-block
             li.cal-name.clickable.small-text-spacing
               span.cal-each-name=item.name 
-              if(item.hidden)
-                span#privacy_state.small-text Private
-              span#edit.small-text edit
+              span.privacy_state.small-text.hidden Private
+              span.edit.small-text edit
             div.cal-func
               input(id=item.id value=item.name type='hidden')
               

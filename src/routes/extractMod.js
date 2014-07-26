@@ -8,6 +8,7 @@ var User = require('../schema/userSchema');
 var Calendar = require('../schema/calendarSchema');
 var moment = require('moment');
 var async = require('async');
+var UserError = require('../userError.js');
 //  extract module info from nusmods address.
 //  Input         : address of nusmods 
 //  Output        : Array Events info by callback

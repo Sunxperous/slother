@@ -676,7 +676,7 @@ label.exclude {
    width: 5%; 
    height: 5%;
 }
-#privacy_state {
+.privacy_state {
   color: red;
 }
 .requests > input[type='submit'] {

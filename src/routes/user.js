@@ -3,6 +3,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('../schema/userSchema');
 var Calendar = require('../schema/calendarSchema');
+var Group = require('../schema/groupSchema');
 // /user/calendar
 router.use(User.ensureAuthenticated());
 
@@ -43,6 +44,7 @@ router.get('/', function (req, res, next) {
       .populate('requests','groupName _id')
       .populate('calendars','name hidden _id')
       .exec(function(err, user) {
+
         res.render('user', {
           username: user.username,
           groups: user.groups,

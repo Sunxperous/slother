@@ -2,7 +2,7 @@
   'use strict';
 
   $('#displayname').click(function (event) {
-    $('#change_display_name').toggle(function(){}); 
+    $('#change_display_name').toggle(); 
   });
 
   $('.cal-name').click(function (event) {
@@ -69,9 +69,9 @@
     }).done( function (res) {
       if (res.error) 
         return errors.add('error', res.error, $('#change_name'));
-      $('#display_name').parents().children('#displayname').
-        children('#profile_value').text($('#display_name').val());
-      $('#change_display_name').hide(function(){});  
+      console.log(res.success);
+      $('#displayname').children('.profile_value').text($('#display_name').val());
+      $('#change_display_name').hide();  
     });
   });
 
@@ -88,6 +88,8 @@
   });
   
   $('.cal-privacy').click(function (event) {
+    var _this = this;
+    console.log();
     if($(this).siblings('.cal-privacy-type').val() == 'Open')
       var temp = false;
     else
@@ -97,7 +99,12 @@
     }).done( function (res) {
       if (res.error) 
         return errors.add('error', res.error, $('.cal-privacy'));
-      $('#privacy_state').text((temp)?("Private"):(""));
+      console.log(res.success);
+      var link = $(_this).parents('.cal-func').siblings('.cal-name').children('.privacy_state');
+      if(temp)
+        link.removeClass('hidden');
+      else
+        link.addClass('hidden');
     });
   });
 
