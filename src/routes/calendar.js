@@ -178,8 +178,7 @@ router.delete('/:calendar_id',
   Calendar.findOne({_id:req.params.calendar_id})
   .exec( function (err, calendar) {
     if (err) { return next(err); }
-    calendar.remove();
-    calendar.save( function (err, calendarD) {
+    calendar.remove( function (err, calendarD) {
       if (err) { return next(err); }
       req.attach.user.calendars.remove(req.params.calendar_id);
       req.attach.user.save( function (err, user) {
