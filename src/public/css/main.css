@@ -104,6 +104,10 @@ nav {
   height: 24px;
   white-space: nowrap;
 }
+.ignition {
+  width: 100%;
+  max-width: 500px;
+}
 .clickable {
   cursor: pointer;
 }
@@ -229,6 +233,13 @@ input.text-input, input.text-input:hover, input.text-input:active {
 }
 form > div {
   margin-bottom: 8px;
+}
+#try_it {
+  text-align: center;
+}
+#try_it > form {
+  display: inline-block;
+  margin-right: 8px;
 }
 /*^ layout.jade ^*/
 

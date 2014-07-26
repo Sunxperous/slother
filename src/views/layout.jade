@@ -24,7 +24,7 @@ html(lang='en')
           if (user)
             span#user
               | Hi, 
-              a#username(href='/user')= user.display_name
+              a#username(href='/calendar/user')= user.display_name
             a#groups(href='/group') Groups
             a#profile_link(href='/user') Profile
             #notification

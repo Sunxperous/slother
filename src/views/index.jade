@@ -3,5 +3,32 @@ extends layout
 block headScript
 
 block content
-  h2.empty-space Slother
-  a(href='/login') Login
+  h2 Slother
+
+  #info_controls
+    .info-block
+      h3 What is this
+      p.
+        An avenue for groups of users to
+        determine suitable event timings and locations quickly
+        by overlapping their calendars on a single display 
+        for easy viewing.
+    if (!user)
+      .info-block
+        h3 Try it
+        div#try_it
+          form(action='/register')
+            input.green(type='submit' value='Register')
+          form(action='/register/nus')
+              input.orange(type='submit' value='Use NUS OpenID')
+          form(action='/login')
+              input.yellow(type='submit' value='Login')
+    .info-block
+      h3 Ignition slide
+      img.ignition(src='/images/ignition.jpg')
+    .info-block
+      h3 Why is this
+      p This is an application made during NUS School of Computing's Orbital Programme, CP3108B, in 2014.
+    .info-block
+      h3 Who we are
+      p Sun Wang Jun, Tan Mun Aw
