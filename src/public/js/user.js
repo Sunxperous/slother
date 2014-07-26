@@ -53,14 +53,14 @@
 
   $('.cal-delete').click(function (event) {
     var temp = $(this);
-    console.log($(this).parents());
-    $.ajax('/calendar/'+$(this).parents('.cal-func').children()[0].id, {
+    console.log($(this).parents('.cal-func').children('.key').val());
+    $.ajax('/calendar/'+$(this).parents('.cal-func').children('.key').val(), {
       type: 'DELETE'
     }).done( function (res) {
       if (res.error) 
         return errors.add('error', res.error, $('.cal-delete'));
       console.log(res.success);
-      temp.parents()[3].remove();
+      temp.parents('.cal-block').remove();
     });
   });
   
@@ -78,24 +78,24 @@
 
   $('.cal-change-name').click(function (event) {
     var temp=$(this);
-    $.ajax('calendar/'+$(this).parents('.cal-func').children()[0].id+'/name',{
+    $.ajax('calendar/'+$(this).parents('.cal-func').children('.key').val()+'/name',{
       type: 'PUT', data: {name:$(this).siblings('.cal-name-input').val()}
     }).done( function (res) {
       if (res.error) 
         return errors.add('error', res.error, $('.cal-change-name'));
       temp.parents('.cal-block').children('li.cal-name').children('.cal-each-name').
             text(temp.siblings('.cal-name-input').val());
+      temp.parents('.cal-func').hide();
     });
   });
   
   $('.cal-privacy').click(function (event) {
-    var _this = this;
-    console.log();
+    var _this = $(this);
     if($(this).siblings('.cal-privacy-type').val() == 'Open')
       var temp = false;
     else
       var temp = true;
-    $.ajax('calendar/'+$(this).parents('.cal-func').children()[0].id+'/privacy',{
+    $.ajax('calendar/'+$(this).parents('.cal-func').children('.key').val()+'/privacy',{
       type: 'PUT', data: {privacy: temp}
     }).done( function (res) {
       if (res.error) 
@@ -106,6 +106,7 @@
         link.removeClass('hidden');
       else
         link.addClass('hidden');
+      _this.parents('.cal-func').hide();
     });
   });
 

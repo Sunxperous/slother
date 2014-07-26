@@ -48,18 +48,21 @@ block content
           ul.cal-block
             li.cal-name.clickable.small-text-spacing
               span.cal-each-name=item.name 
-              span.privacy_state.small-text.hidden Private
+              if(item.hidden)
+                span.privacy_state.small-text Private
+              else  
+                span.privacy_state.small-text.hidden Private
               span.edit.small-text edit
             div.cal-func
-              input(id=item.id value=item.name type='hidden')
+              input.key(value=item.id type='hidden')
               
               div.cal-change.center-button
                 input.cal-name-input(val="" placeholder='Calendar name' type='text')
                 input.cal-change-name.green(value='Change name' type='submit') 
               div.cal-change.center-button
                 select.cal-privacy-type(type='select')
-                  option(value='Open' selected) Public
-                  option(value='Hidden') Hidden
+                  option(value='Open' selected=(!item.hidden)) Public
+                  option(value='Hidden' selected=(item.hidden)) Private
                 input.cal-privacy.green(value='Change privacy' type='submit')
               div.cal-change.center-button
                 input.cal-delete.red.confirm(value='Delete calendar' type='submit') 
