@@ -53,13 +53,14 @@
 
   $('.cal-delete').click(function (event) {
     var temp = $(this);
+    console.log($(this).parents());
     $.ajax('/calendar/'+$(this).parents('.cal-func').children()[0].id, {
       type: 'DELETE'
     }).done( function (res) {
       if (res.error) 
         return errors.add('error', res.error, $('.cal-delete'));
       console.log(res.success);
-      temp.parents()[2].remove();
+      temp.parents()[3].remove();
     });
   });
   
