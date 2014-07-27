@@ -314,6 +314,14 @@ form > div {
 .confirm-block > input {
   margin: 0 4px;
 }
+#remember_me_wrapper > * {
+  display: inline-block;
+  width: auto;
+}
+#remember_me {
+  position: relative;
+  top: 2px;
+}
 /*^ login.jade ^*/
 
 /*v calendar.jade v*/

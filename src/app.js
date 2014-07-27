@@ -2,12 +2,15 @@
 var express = require('express');
 var methodOverride = require('method-override');
   var session = require('express-session');
+    var RememberMeStrategy = require('passport-remember-me').Strategy;
   var cookieParser = require('cookie-parser');
   var flash = require('connect-flash');
   var passport = require('passport');
     var bodyParser = require('body-parser');
   var mongoose = require('mongoose');
     var User = require('./schema/userSchema');
+    var Token = require('./schema/tokenSchema');
+      var randtoken = require('rand-token');
 var path = require('path');
 var http = require('http');
 var config = require('./config');
@@ -36,6 +39,27 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
+passport.use(new RememberMeStrategy(
+  function consumeToken(token, done) {
+    Token.findOneAndRemove({ token: token }, function(err, token) {
+      if (err) { return done(err, null); }
+      if (!token) { return done(null, false); }
+      User.findOne({ username: token.username }, function(err, user) {
+        if (err) { return done(err, null); }
+        if (!user) { return done(null, false); }
+        return done(null, user);
+      });
+    });
+  },
+  function issueToken(user, done) {
+    // Got to ensure unique token next time, and modularize app.js.
+    var newToken = new Token({ username: user.username, token: randtoken.generate(16) });
+    newToken.save(function(err, token) {
+      if (err) { return done(err, null); }
+      return done(null, token.token);
+    });
+  }
+));
 
 // Middleware.
 app.use(bodyParser());
@@ -52,6 +76,7 @@ app.use(methodOverride(function(req, res) {
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(passport.authenticate('remember-me'));
 app.use(express.static(__dirname + '/public'));
 app.use(applyLocals()); // Locals for jade templates, attaches for user-defined functions.
 app.use('/', login);

@@ -86,5 +86,12 @@ block content
               input.text-input.small-text.red.clickable.group-leave(value='Leave' type='submit')
         else
           li.nothing-display No groups yet.
+
+    .info-block
+      h3 Logout
+      +errors
+      div.center-button
+        form(action='/logout' method='POST')
+          input.red(value='Logout' type='submit')
 block footScripts
   script(src='/js/user.js')

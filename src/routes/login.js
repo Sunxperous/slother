@@ -8,6 +8,8 @@ var router = express.Router();
 var config = require('../config');
 var bcrypt = require('bcrypt-nodejs');
 var User = require('../schema/userSchema');
+var Token = require('../schema/tokenSchema');
+  var randtoken = require('rand-token');
 var UserError = require('../userError.js');
 
 function redirectIfAuthenticated(req, res, next) {
@@ -67,10 +69,18 @@ router.post('/login/default',
     next();
   },
   passport.authenticate('local', {
-    successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true
-  })
+  }),
+  function(req, res, next) {
+    if (!req.body.remember_me) { return res.redirect('/calendar/user'); }
+    var newToken = new Token({ username: req.user.username, token: randtoken.generate(16) });
+    newToken.save(function(err, token) {
+      if (err) { return next(err); }
+      res.cookie('remember_me', token.token, { path: '/', httpOnly: true, maxAge: 604800000 });
+      return res.redirect('/calendar/user');
+    });
+  }
 );
 
 
@@ -130,7 +140,15 @@ router.get('/login/nus/callback', function(req, res, next) {
         if (info.flash) { req.flash('error', info.flash); }
         return res.redirect('/register/continue');
       }
-      return res.redirect('/calendar/user');
+
+      // Remember me token (automatic).
+      var newToken = new Token({ username: user.username, token: randtoken.generate(16) });
+      newToken.save(function(err, token) {
+        if (err) { return next(err); }
+        res.cookie('remember_me', token.token, { path: '/', httpOnly: true, maxAge: 604800000 });
+        return res.redirect('/calendar/user');
+      });
+
     });
   })(req, res, next);
 });
@@ -153,7 +171,14 @@ router.post('/register/complete', redirectUnlessPending,
       req.logout();
       req.login(user, function(err) {
         if (err) { return next(err); }
-        return res.redirect('/calendar/user');
+
+        // Remember me token (automatic).
+        var newToken = new Token({ username: user.username, token: randtoken.generate(16) });
+        newToken.save(function(err, token) {
+          if (err) { return next(err); }
+          res.cookie('remember_me', token.token, { path: '/', httpOnly: true, maxAge: 604800000 });
+          return res.redirect('/calendar/user');
+        });
       });
     });
   }
@@ -206,9 +231,18 @@ router.post('/register',
 
 
 // Logout
-router.get('/logout', function(req, res, next) {
-  req.logout();
-  res.redirect('/');
+router.post('/logout', function(req, res, next) {
+  if (req.user) {
+    Token.remove({ username: req.attach.user.username }, function(err) {
+      if (err) { return next(err); }
+      res.clearCookie('remember_me');
+      req.logout();
+      return res.redirect('/');
+    });
+  }
+  else {
+    return res.redirect('/');
+  }
 });
 
 module.exports = router;
