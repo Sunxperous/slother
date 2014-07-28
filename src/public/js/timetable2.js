@@ -242,6 +242,7 @@ var timetable = (function() {
             }
             if (response.success) {
               calendars[calendar_id].deleteItem(item._id);
+              //errors.add('success',response.success,$('#event_details'));
               popup.close();
               $('#delete_all').removeAttr('disabled');
             }
@@ -346,6 +347,7 @@ var timetable = (function() {
             if (response.error) {
               return errors.add('error', response.error, $('#event_details'));
             }
+            //errors.add('success',response.success,$('#event_details'));
             calendars[response.calendar_id].addOrReplaceItem(response.eventInfo); // Replace or add.
             popup.close();
             $('#submit').removeAttr('disabled');

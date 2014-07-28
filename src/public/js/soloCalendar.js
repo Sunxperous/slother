@@ -22,13 +22,14 @@
         if (validateNUSModsLink($('#nusmods_string').val())) {
           $.post('/extract',
             { addr: encodeURIComponent($('#nusmods_string').val()) },
-            function(calendar) {
-              if (calendar.error) {
-                return errors.add('error', calendar.error, $('#add_calendar'));
+            function (response) {
+              if (response.error) {
+                return errors.add('error', response.error, $('#add_calendar'));
               }
-              newCalendar = timetable.replaceOrAddCalendar(calendar, true);
+              newCalendar = timetable.replaceOrAddCalendar(response.calendar, true);
               newCalendar.appendToLists($('#calendars'));
               timetable.update();
+              errors.add('success', response.success, $('#add_calendar'));
             }
           );
         }
@@ -39,11 +40,12 @@
       else if ($('#type').val() === 'generic') {
         $.post('/calendar',
           { name: $('#generic_string').val() },
-          function(calendar) {
-            if (calendar.error) {
-              return errors.add('error', calendar.error, $('#add_calendar'));
+          function(response) {
+            if (response.error) {
+              return errors.add('error', response.error, $('#add_calendar'));
             }
-            newCalendar = timetable.replaceOrAddCalendar(calendar, true);
+            errors.add('success', response.success, $('#add_calendar'));
+            newCalendar = timetable.replaceOrAddCalendar(response.calendar, true);
             newCalendar.appendToLists($('#calendars'));
             timetable.update();
           }

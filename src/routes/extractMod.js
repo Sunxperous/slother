@@ -263,7 +263,9 @@ router.post('/', function (req, res, next) {
             calendar.save(function (err,calendar) {
               if(err) { return next(err); }
               else {
-                return res.send(calendar);
+                return res.send({calendar:calendar,
+                                 success: "NUS calendar is created."
+                                });
               }
             });
           }

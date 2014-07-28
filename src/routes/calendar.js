@@ -167,7 +167,9 @@ router.post('/', function (req, res, next) {
     req.attach.user.calendars.push(calendar._id);
     req.attach.user.save( function (err, user) {
       if(err) { return next(err); }
-      return res.send(calendar);
+      return res.send({calendar:calendar,
+                      success:"A generic calendar is created."
+                      });
     });
   });
 });
