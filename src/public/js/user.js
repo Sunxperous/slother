@@ -26,6 +26,7 @@
 
   $('.req-accept').click(function(event) {
     var _this = this;
+    
     $.post($(this).siblings('.req-url').val() + 'accept', [],
       function(response) {
         if (response.error) {
@@ -41,16 +42,15 @@
 
         // Appends to ul.
         li.removeClass('hidden').appendTo($('#group_info ul'));
-
+        if($('li.nothing-display'))
+          $('li.nothing-display').hide();
         // Flashes alert.
         success.add('success', 'You have joined the group.', $(_this));
 
         // Needs a click event for leave.
-
         // Remove buttons.
         $(_this).parent().remove();
-      }
-    );
+    });
   });
 
   $('.cal-delete').click(function (event) {
