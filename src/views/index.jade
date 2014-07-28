@@ -17,12 +17,13 @@ block content
       .info-block
         h3 Try it
         div#try_it
-          form(action='/register')
-            input.green(type='submit' value='Register')
-          form(action='/register/nus')
-              input.orange(type='submit' value='Use NUS OpenID')
-          form(action='/login')
-              input.yellow(type='submit' value='Login')
+          a(href='/register')
+            button.green Register
+          form#register_nus(method='get' action='/login/nus')
+            input(type='hidden' name='openid_identifier' value='https://openid.nus.edu.sg')
+            input.orange(type='submit' value='Use NUS OpenID')
+          a(href='/login')
+            button.yellow Login
     .info-block
       h3 Ignition slide
       img.ignition(src='/images/ignition.jpg')

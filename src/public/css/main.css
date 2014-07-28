@@ -237,7 +237,7 @@ form > div {
 #try_it {
   text-align: center;
 }
-#try_it > form {
+#try_it > * {
   display: inline-block;
   margin-right: 8px;
 }
