@@ -138,6 +138,8 @@ function buildNUSEvent(data, semStart, classNo) {
         },
         exclude: []
   };
+  if(semStart.get('month').toString()=='5'||semStart.get('month').toString()=='6')
+    temp.rrule.count = 6;
   switch(data.Timetable[classNo].LessonType) {
     case "Laboratory": temp.summary = temp.summary +  " (LAB)"; break;
     case "Sectional Teaching": temp.summary = temp.summary +  " (SEC)"; break;
@@ -194,6 +196,10 @@ function buildNUSEvent(data, semStart, classNo) {
       if(data.Timetable[classNo].WeekText !== "Odd Week")
         temp.exclude.push(tempTime.clone().add('week',1).toDate());
     }
+  if(semStart.get('month')>=4&&semStart.get('month')<=6) {
+    temp.rrule.count = 6;
+    temp.exclude = [];
+  }
   temp.dateStart = tempTime.clone().toDate();
   tempTime.hour(parseInt(data.Timetable[classNo].EndTime.substring(0,2))-8);
   temp.dateEnd = tempTime.clone().toDate();
@@ -236,13 +242,25 @@ function semesterStart(year,sem) {
   switch(year) {
     case "2014-2015": {
       //11-8-2014 & 12-1-2015
-      (sem=="1")?test = moment("11082014","DDMMYYYY"): 
-                 test = moment("12012015","DDMMYYYY");
+      if(sem=="1")
+        test = moment("11082014","DDMMYYYY");
+      else if(sem=="2")
+        test = moment("12012015","DDMMYYYY");
+      else if(sem=="3")
+        test = moment("11052015","DDMMYYYY");
+      else 
+        test = moment("22062015","DDMMYYYY");
     } break; 
     case "2013-2014": {
       //13-01-2014 & 12-08-2013
-      (sem=="1")?test = moment("12082013","DDMMYYYY"): 
-                 test = moment("13012014","DDMMYYYY");
+      if(sem=="1")
+        test = moment("12082013","DDMMYYYY");
+      else if(sem=="2")
+        test = moment("11012014","DDMMYYYY");
+      else if(sem=="3")
+        test = moment("12052014","DDMMYYYY");
+      else
+        test = moment("23062014","DDMMYYYY");
     } break; 
   }
   return test.toDate();
