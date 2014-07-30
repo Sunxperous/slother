@@ -197,7 +197,7 @@ function buildNUSEvent(data, semStart, classNo) {
         temp.exclude.push(tempTime.clone().add('week',1).toDate());
     }
   if(semStart.get('month')>=4&&semStart.get('month')<=6) {
-    temp.rrule.count = 6;
+    temp.rrule.count = 5;
     temp.exclude = [];
   }
   temp.dateStart = tempTime.clone().toDate();
