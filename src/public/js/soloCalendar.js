@@ -10,7 +10,7 @@
     });
 
     function validateNUSModsLink(url) {
-      var regexp = /http\:\/\/nusmods\.com\/timetable\/20[\d]{2}-20[\d]{2}\/sem(1|2)\?(.{6,8}?\[.{3,4}\]=.{2,5}?)+/g;
+      var regexp = /http\:\/\/nusmods\.com\/timetable\/20[\d]{2}-20[\d]{2}\/sem(1|2|3|4)\?(.{6,8}?\[.{3,4}\]=.{2,5}?)+/g;
       return url.match(regexp);
     }
 
