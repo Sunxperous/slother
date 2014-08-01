@@ -138,8 +138,6 @@ function buildNUSEvent(data, semStart, classNo) {
         },
         exclude: []
   };
-  if(semStart.get('month').toString()=='5'||semStart.get('month').toString()=='6')
-    temp.rrule.count = 6;
   switch(data.Timetable[classNo].LessonType) {
     case "Laboratory": temp.summary = temp.summary +  " (LAB)"; break;
     case "Sectional Teaching": temp.summary = temp.summary +  " (SEC)"; break;
