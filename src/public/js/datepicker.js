@@ -51,6 +51,7 @@ datepicker = (function() {
 
   function replaceDates(dateValue) {
     if (typeof dateValue === 'undefined') { dateValue = moment(); }
+    if (!dateValue.isValid()) { dateValue = moment(); }
 
     var firstDayOfMonth = dateValue.date(1); // Set to first date.
     $('#datepicker_month').text(firstDayOfMonth.format("MMMM"));

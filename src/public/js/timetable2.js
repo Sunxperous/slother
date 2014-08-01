@@ -343,6 +343,7 @@ var timetable = (function() {
           { data: sending, type: requestType })
           .done(function(response) {
             if (response.error) {
+              $('#submit').removeAttr('disabled');
               return errors.add('error', response.error, $('#event_details'));
             }
             //errors.add('success',response.success,$('#event_details'));
@@ -678,7 +679,7 @@ var timetable = (function() {
   timetable.update = function(num, type) {
     // Change the dates and update date displays.
     if (num && type) { now.add(num, type); }
-    now.hour(0).minute(0);
+    now.startOf('day');
     sunOfWeek = now.subtract(now.day(), 'days');
 
     var date = moment(sunOfWeek);

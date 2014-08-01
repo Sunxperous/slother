@@ -4,11 +4,30 @@ var User = require('../schema/userSchema');
 var Group = require('../schema/groupSchema');
 var Calendar = require('../schema/calendarSchema');
 var UserError = require('../userError.js');
+var moment = require('moment');
 var async = require('async');
 
 router.use(User.ensureAuthenticated());
 
 router.param('hash', Group.ensureExistsByHash());
+
+function validateDates(startDate, endDate) {
+  var dateStart = moment(startDate);
+  var dateEnd = moment(endDate);
+  if (!dateStart.isValid()) {
+    return new UserError('Start date is invalid.');
+  }
+  if (!dateEnd.isValid()) {
+    return new UserError('End date is invalid.');
+  }
+  if (dateStart.isAfter(dateEnd)) {
+    return new UserError('Start date should not be after end date.');
+  }
+  if (dateStart.day() !== dateEnd.day()) {
+    return new UserError('Overnight events not supported yet.');
+  }
+  return null;
+}
 
 function ownership (message) {
   return function (req, res, next) {
@@ -249,6 +268,9 @@ router.put('/:calendar_id/event/:event_id',
     'events._id':req.params.event_id})
   .exec(function (err, calendar) {
     if (err) { return next(err); }
+    var dateValidation = validateDates(req.body.date_start, req.body.date_end);
+    if (dateValidation) { return next(dateValidation); }
+    
     var myEvent = calendar.events.id(req.params.event_id);
     myEvent.summary = req.body.summary;
     myEvent.description = req.body.description;
@@ -276,6 +298,9 @@ router.post('/:calendar_id/event/',
   Calendar.findOne({_id:req.params.calendar_id})
   .exec(function (err, calendar) {
     if (err) { return next(err); }
+    var dateValidation = validateDates(req.body.date_start, req.body.date_end);
+    if (dateValidation) { return next(dateValidation); }
+
     calendar.events.push({
       summary: req.body.summary,
       description: req.body.description,
