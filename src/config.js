@@ -3,11 +3,11 @@
 var config = {};
 
 config.hashid = {};
-config.hashid.salt = 'this is my salt';
+config.hashid.salt = process.env.SALT || 'this is my salt';
 
 config.app = {};
 config.app.port = process.env.PORT || 8000;
-config.app.sessionSecret = 'keyboard cat';
+config.app.sessionSecret = process.env.SECRET || 'keyboard cat';
 
 config.db = {};
 config.db.uri = process.env.MONGOLAB_URI || 'mongodb://localhost/test';
