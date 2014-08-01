@@ -1,0 +1,30 @@
+- var dayKey = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+
+#datepicker_wrapper.hidden
+  #datepicker_top.control
+    button(type='button')#datepicker_year_before.before &#9664;
+    span#datepicker_year
+    button(type='button')#datepicker_year_after.after &#9654;
+  table#datepicker
+    thead
+      tr
+        th S
+        th M
+        th T
+        th W
+        th T
+        th F
+        th S
+    tbody
+      - for (var i = 0; i < 6; i++)
+        tr(class='week' + i)
+          - for (var j = 0; j < 7; j++)
+            td.datepicker-day(class=dayKey[j])
+  #datepicker_bottom.control
+    button(type='button')#datepicker_month_before.before &#9664;
+    span#datepicker_month
+    button(type='button')#datepicker_month_after.after &#9654;
+
+    
+block footScripts
+  script(src='/js/datepicker.js')

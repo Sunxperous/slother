@@ -324,6 +324,71 @@ form > div {
 }
 /*^ login.jade ^*/
 
+/*v datepicker.jade v*/
+#datepicker_wrapper {
+  z-index: 40;
+  background-color: rgb(255, 255, 255);
+  text-align: center;
+  position: absolute;
+  width: 182px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 12px;
+}
+#datepicker {
+  margin: 4px;
+  border-collapse: collapse;
+  border-spacing: 0;
+  box-sizing: border-box;
+  table-layout: fixed;
+}
+#datepicker thead th {
+  border: 0;
+}
+#datepicker td {
+  border: 1px solid #ccc;
+  height: 14px;
+  width: 24px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+#datepicker_wrapper .control {
+  padding: 2px 0;
+  width: 100%;
+  position: relative;
+  line-height: 16px;
+  height: 16px;
+  background-color: #ffefc0;
+}
+#datepicker_wrapper button {
+  padding: 0px 4px;
+  border: 0;
+  background-color: #b86;
+  color: #fff;
+  cursor: pointer;
+}
+#datepicker_wrapper button.before {
+  position: absolute;
+  left: 8px;
+  margin: 0;
+}
+#datepicker_wrapper button.after {
+  position: absolute;
+  right: 8px;
+  margin: 0;
+}
+td.datepicker-selected {
+  background-color: #fedacc;
+}
+td.datepicker-fade {
+  color: #ccc;
+  background-color: #eee;
+}
+.relative {
+  position: relative;
+}
+/*^ datepicker.jade ^*/
+
 /*v calendar.jade v*/
 div.tableWrapper {
   margin: 0 12px;
@@ -597,6 +662,7 @@ label.exclude {
   left: 54px;
   font-size: 12px;
   line-height: 16px;
+  cursor: pointer;
 }
 #view_controls {
   position: absolute;

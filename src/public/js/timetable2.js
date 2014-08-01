@@ -10,13 +10,12 @@ var timetable = (function() {
   var START_VIEWING_AT       = 7; // Scrolls to hour on page load.
   var OVER_HOUR_END_EARLY    = 30; // Minutes to end early for duration over an hour.
   var UNDER_HOUR_END_EARLY   = 15; // Minutes to end early for duration under an hour.
-  var NUS_SEMESTER_START_DATES = [ // Dates to be Saturday before actual start date.
-    [2014, 7, 9],
-    [2015, 0, 10],
-    [2015, 4, 9],
-    [2015, 5, 20]
-  ];
-  var NUS_CURRENT_SEMESTER = 'AY2014/2015 Sem 1'; // Temporary.
+  var NUS_SEMESTER_NAMES     = ['Sem 1', 'Sem 2', 'Sp.T 1', 'Sp.T 2']
+  var NUS_START_YEAR         = 14;
+
+  var NUS_SEMESTER_START_DATES = { // Dates to be Saturday before actual start date.
+    14: [[2014, 7, 9], [2015, 0, 10], [2015, 4, 9], [2015, 5, 20]],
+  };
   var NUS_WEEKS = [
     'Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6',
     'Recess Week', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11',
@@ -26,7 +25,6 @@ var timetable = (function() {
 
   var calendars = {};
   var now = moment();
-  //now = moment("2014-08-11").add(2, 'weeks'); // For testing purposes, set to 3rd week.
 
   var sunOfWeek = now.startOf('week');
   var satOfWeek = moment(sunOfWeek).add(7, 'days'); // Next Sunday 00:00.
@@ -680,6 +678,7 @@ var timetable = (function() {
   timetable.update = function(num, type) {
     // Change the dates and update date displays.
     if (num && type) { now.add(num, type); }
+    now.hour(0).minute(0);
     sunOfWeek = now.subtract(now.day(), 'days');
 
     var date = moment(sunOfWeek);
@@ -698,17 +697,23 @@ var timetable = (function() {
     $('#sat_day').text(satOfWeek.format("DD MMM"));
 
     // Nus date info.
-    var startDate;
-    for (var i = 0; i < NUS_SEMESTER_START_DATES.length; i++) {
-      if (sunOfWeek.isAfter(NUS_SEMESTER_START_DATES[i])) {
-        startDate = moment(NUS_SEMESTER_START_DATES[i]).subtract(1, 'day');
+    var startDate, index;
+    var check = NUS_START_YEAR;
+    while (!startDate && typeof NUS_SEMESTER_START_DATES[check] !== 'undefined') {
+      for (var i = 0; i < NUS_SEMESTER_START_DATES[check].length; i++) {
+        if (sunOfWeek.isAfter(NUS_SEMESTER_START_DATES[check][i])) {
+          startDate = moment(NUS_SEMESTER_START_DATES[check][i]).subtract(1, 'day');
+          index = i;
+        }
       }
+      check++;
     }
     if (startDate) {
       var weekNo = sunOfWeek.diff(startDate, 'weeks');
       if (weekNo >= 0 && weekNo < NUS_WEEKS.length) {
         $('#week_no').text(NUS_WEEKS[weekNo]);
-        $('#academic_year').text(NUS_CURRENT_SEMESTER);
+        $('#academic_year').text('AY20' + (check - 1) + '/20' + check
+          + ' ' + NUS_SEMESTER_NAMES[index]);
       }
       else {
         $('#week_no').text('');
@@ -740,17 +745,13 @@ var timetable = (function() {
   var viewDetails = $('#view_details button:disabled').text().toLowerCase();
   $('#view_details').click(function(event) {
     if (viewDetails === 'summary') {
-      $('#view_details_summary').removeAttr('disabled');
-      $('#view_details_location').attr('disabled', true);
-      $('#view_details_summary').addClass('fade');
-      $('#view_details_location').removeClass('fade');
+      $('#view_details_summary').removeAttr('disabled').addClass('fade');
+      $('#view_details_location').attr('disabled', true).removeClass('fade');
       viewDetails = 'location';
     }
     else {
-      $('#view_details_location').removeAttr('disabled');
-      $('#view_details_summary').attr('disabled', true);
-      $('#view_details_location').addClass('fade');
-      $('#view_details_summary').removeClass('fade');
+      $('#view_details_location').removeAttr('disabled').addClass('fade');
+      $('#view_details_summary').attr('disabled', true).removeClass('fade');
       viewDetails = 'summary';
     }
     Object.keys(calendars).forEach(function(_id) { calendars[_id].switchDetails(); });
@@ -760,23 +761,43 @@ var timetable = (function() {
   var dateStyle = $('#date_style button:disabled').text().toLowerCase();
   $('#date_style').click(function(event) {
     if (dateStyle  === 'default') {
-      $('#date_style_default').removeAttr('disabled');
-      $('#date_style_nus').attr('disabled', true);
-      $('#date_style_default').addClass('fade');
-      $('#date_style_nus').removeClass('fade');
+      $('#date_style_default').removeAttr('disabled').addClass('fade');
+      $('#date_style_nus').attr('disabled', true).removeClass('fade');
       $('#default_date_info').addClass('hidden');
       $('#nus_date_info').removeClass('hidden');
       dateStyle = 'nus';
     }
     else {
-      $('#date_style_nus').removeAttr('disabled');
-      $('#date_style_default').attr('disabled', true);
-      $('#date_style_nus').addClass('fade');
-      $('#date_style_default').removeClass('fade');
+      $('#date_style_nus').removeAttr('disabled').addClass('fade');
+      $('#date_style_default').attr('disabled', true).removeClass('fade');
       $('#default_date_info').removeClass('hidden');
       $('#nus_date_info').addClass('hidden');
       dateStyle = 'default';
     }
+  });
+
+  datepicker.register($('#date_info'), $('#date_info'), function() {
+    return now;
+  }, function(date) {
+    now = date.clone();
+    timetable.update();
+    datepicker.hide();
+  });
+
+  datepicker.register($('#date_start'), $('#date_start').parent(), function() {
+    return moment($('#date_start').val(), MOMENT_DATE_FORMAT);
+  }, function(date) {
+    $('#date_start').val(date.format(MOMENT_DATE_FORMAT));
+    $('#date_start').focus();
+    datepicker.hide();
+  });
+
+  datepicker.register($('#date_end'), $('#date_end').parent(), function() {
+    return moment($('#date_end').val(), MOMENT_DATE_FORMAT);
+  }, function(date) {
+    $('#date_end').val(date.format(MOMENT_DATE_FORMAT));
+    $('#date_end').focus();
+    datepicker.hide();
   });
 
   timetable.update();

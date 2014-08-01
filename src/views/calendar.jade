@@ -2,6 +2,8 @@ include mixins/errors.jade
 - var days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 - if (typeof isAdmin === 'undefined') isAdmin = true
 
+include datepicker
+
 .tableWrapper
   table#calendar
     thead
@@ -86,12 +88,14 @@ include mixins/errors.jade
             label(for='location') Location
             input#location.fullLength(name='location')
           div
-            label(for='date_start') From (DD/MM/YYYY HH:mm)
-            input#date_start.shortLength(type='text' name='dateStart' required)
-            input#time_start.shortLength(type='text' name='timeStart' required)
-            label(for='date_end') to (DD/MM/YYYY HH:mm)
-            input#date_end.shortLength(type='text' name='dateEnd' required)
-            input#time_end.shortLength(type='text' name='timeEnd' required)
+            div.relative
+              label(for='date_start') From (DD/MM/YYYY HH:mm)
+              input#date_start.shortLength(type='text' name='dateStart' required)
+              input#time_start.shortLength(type='text' name='timeStart' required)
+            div.relative
+              label(for='date_end') to (DD/MM/YYYY HH:mm)
+              input#date_end.shortLength(type='text' name='dateEnd' required)
+              input#time_end.shortLength(type='text' name='timeEnd' required)
           div
             label(for='rrule_freq') Repeat
             select#rrule_freq(name='rrule_freq')
