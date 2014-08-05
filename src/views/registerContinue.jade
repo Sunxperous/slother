@@ -21,9 +21,5 @@ block content
           input#display_name(type='text' placeholder='display name' name='display_name' value=user.display_name)
       div
         input.green(type='submit' value='Complete registration')
-    div
-      form#register_nus(method='get' action='/login/nus')
-        input(type='hidden' name='openid_identifier' value='https://openid.nus.edu.sg')
-        input(type='submit' value='Use NUS OpenID')
 
 block footScripts

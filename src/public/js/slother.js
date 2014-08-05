@@ -25,7 +25,26 @@ var errors = (function() {
           savedBox.add(type, message);
         }
       });
+      return this;
     },
+    clear: function(source) {
+      var stop = 10;
+      while (source.find('.error_box').first().length === 0
+        && !$('body').is(source)
+        && typeof source !== 'undefined'
+        && stop > 0
+      ) {
+        stop--;
+        source = source.parent();
+      }
+      var errorBox = source.find('.error_box').first();
+      errorBoxes.forEach(function(savedBox) {
+        if (errorBox.is(savedBox.errorBox)) {
+          savedBox.dismissAll().hide();
+        }
+      });
+      return this;
+    }
   };
 
   var ErrorMessage = (function() {
@@ -52,14 +71,17 @@ var errors = (function() {
 
     ErrorBox.prototype.show = function() {
       this.errorBox.removeClass('hidden');
+      return this;
     };
     ErrorBox.prototype.hide = function() {
       this.errorBox.addClass('hidden');
+      return this;
     };
     ErrorBox.prototype.dismissAll = function() {
       this.errorBox.find('.errors li').remove();
       this.errorMessages = [];
       this.hide();
+      return this;
     };
     ErrorBox.prototype.parse = function() {
       var _this = this;
@@ -83,6 +105,7 @@ var errors = (function() {
       var li = '<li class="' + type + '">' + message + '</li>';
       this.errorBox.children('.errors').append(li);
       if (this.errorMessages.length > 0) { this.show(); }
+      return this;
     };
 
     return ErrorBox;

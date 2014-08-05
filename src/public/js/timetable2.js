@@ -42,6 +42,7 @@ var timetable = (function() {
       close: function() {
         $('#popup_wrapper').addClass('hidden');
         this.status = this.statusTypes.HIDDEN;
+        errors.clear($('#popup'));
         return this;
       },
       show: function(type) {
@@ -182,9 +183,11 @@ var timetable = (function() {
           var newDateEnd;
           if(dateEnd - dateStart > 3600000) {
             newDateEnd = dateEnd.clone().subtract(OVER_HOUR_END_EARLY, 'minutes');
+            success.clear($(this)).add('success', 'End time is now ' + OVER_HOUR_END_EARLY + ' minutes earlier.', $(this));
           }
           else {
             newDateEnd = dateEnd.clone().subtract(UNDER_HOUR_END_EARLY, 'minutes');  
+            success.clear($(this)).add('success', 'End time is now ' + UNDER_HOUR_END_EARLY + ' minutes earlier.', $(this));
           }
           popup.displayItem({
             submit: 'Edit event',
@@ -209,6 +212,7 @@ var timetable = (function() {
         $('#delete_this').click(function(event) {
           var excludes = item.exclude.map(function(exclude) { return exclude; }); // Cloning.
           excludes.push(exactDateStart);
+          success.clear($(this)).add('success', 'Date added to list of excluded dates.', $(this));
           popup.displayItem({
             submit: 'Edit event',
             popup_title: 'Edit event',
