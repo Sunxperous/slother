@@ -714,20 +714,21 @@ var timetable = (function() {
       check++;
     }
     if (startDate) {
+      var validTerm = false;
       var weekNo = sunOfWeek.diff(startDate, 'weeks');
       if (weekNo >= 0 && weekNo < NUS_WEEKS.length) {
-        $('#week_no').text(NUS_WEEKS[weekNo]);
-        $('#academic_year').text('AY20' + (check - 1) + '/20' + check
-          + ' ' + NUS_SEMESTER_NAMES[index]);
+        validTerm = (index === 0 || index === 1) || // Semesters 1 and 2.
+          ((index === 2 || index === 3) && weekNo < 6); // Special terms.
+        if (validTerm) {
+          $('#week_no').text(NUS_WEEKS[weekNo]);
+          $('#academic_year').text('AY20' + (check - 1) + '/20' + check
+            + ' ' + NUS_SEMESTER_NAMES[index]);
+        }
       }
-      else {
+      if (!validTerm) {
         $('#week_no').text('');
         $('#academic_year').text('');
       }
-    }
-    else {
-      $('#week_no').text('');
-      $('#academic_year').text('');
     }
 
     // Reset <td> rows.
