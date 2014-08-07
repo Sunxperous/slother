@@ -713,8 +713,8 @@ var timetable = (function() {
       }
       check++;
     }
+    var validTerm = false;
     if (startDate) {
-      var validTerm = false;
       var weekNo = sunOfWeek.diff(startDate, 'weeks');
       if (weekNo >= 0 && weekNo < NUS_WEEKS.length) {
         validTerm = (index === 0 || index === 1) || // Semesters 1 and 2.
@@ -725,11 +725,12 @@ var timetable = (function() {
             + ' ' + NUS_SEMESTER_NAMES[index]);
         }
       }
-      if (!validTerm) {
-        $('#week_no').text('');
-        $('#academic_year').text('');
-      }
     }
+    if (!validTerm) {
+      $('#week_no').text('');
+      $('#academic_year').text('');
+    }
+
 
     // Reset <td> rows.
     var tds = $('td.slot');
