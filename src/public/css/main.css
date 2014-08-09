@@ -140,7 +140,7 @@ ol, ul {
   z-index: 0;
 }
 #links > * {
-  margin-left: 16px;
+  margin-left: 12px;
   display: inline-block;
   vertical-align: bottom;
 }
@@ -154,18 +154,16 @@ ol, ul {
   text-overflow: ellipsis;
   z-index: 0;
 }
-#number {
-  font-size: 14px;
-  padding: 2px 8px;
-  border-radius: 8px;  
-}
-a.has-notifications {
+#has-notifications {
+  vertical-align: super;
   color: #fff;
-  background-color: #f66;
-}
-a.no-notifications {
-  color: #333;
-  background-color: #ccc;
+  background-color: #f99;
+  padding: 0 2px;
+  font-size: 10px;
+  border-radius: 2px;
+  position: relative;
+  top: -2px;
+  left: 2px;
 }
 #content {
   margin: auto auto;
