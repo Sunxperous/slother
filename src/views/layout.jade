@@ -27,11 +27,10 @@ html(lang='en')
               a#username(href='/calendar/user')= user.display_name
             a#groups(href='/group') Groups
             a#profile_link(href='/user') Profile
-            #notification
               if (user.requests.length > 0)
-                a#number.has-notifications(href='/user')= user.requests.length
-              else
-                a#number.no-notifications(href='/user')= user.requests.length
+                sup#has-notifications(href='/user')= user.requests.length
+            form#logout_post(action='/logout' method='POST')
+              a#logout_link(href='/logout') Logout
               
           else
             a(href='/login') Login
