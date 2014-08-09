@@ -13,7 +13,9 @@ block content
   
   #info_controls
     .info-block
-      h3.info-block-title Calendars
+      h3.info-block-title
+        | Calendars
+        a(href='/user').header-control edit
       +errors
       ul#calendars
         li.hidden.small-text-spacing
