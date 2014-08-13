@@ -41,12 +41,17 @@ passport.deserializeUser(function(obj, done) {
 });
 passport.use(new RememberMeStrategy(
   function consumeToken(token, done) {
-    Token.findOneAndRemove({ token: token }, function(err, token) {
+    //console.log('removing token %s', token);
+    Token.findOneAndRemove({ token: token }, function(err, _token) {
       if (err) { return done(err, null); }
-      if (!token) { return done(null, false); }
-      User.findOne({ username: token.username }, function(err, user) {
+      if (!_token) {
+        //console.log('token %s not found', token);
+        return done(null, false);
+      }
+      User.findOne({ username: _token.username }, function(err, user) {
         if (err) { return done(err, null); }
         if (!user) { return done(null, false); }
+        //console.log('owner of token %s', _token.username);
         return done(null, user);
       });
     });
@@ -56,6 +61,7 @@ passport.use(new RememberMeStrategy(
     var newToken = new Token({ username: user.username, token: randtoken.generate(16) });
     newToken.save(function(err, token) {
       if (err) { return done(err, null); }
+      //console.log('saved token for %s, as %s', user.username, token.token);
       return done(null, token.token);
     });
   }
