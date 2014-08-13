@@ -392,6 +392,12 @@ var timetable = (function() {
           .css('background-color', this.color);
       this.li.children('.toggle-view').click(this, toggleView);
       this.li.children('.color-pick').click(this, colorPicker);
+
+      // If this.colorUrl exists, calendar belongs to a member in a group view. 
+      if (!this.editable && !this.colorUrl) { // Is a group calendar in solo, so link.
+        this.li.children('.calendar-name').wrap('<a href="/calendar/' + this._id + '"></a>');
+      }
+
       appendTarget.append(this.li);
     };
 

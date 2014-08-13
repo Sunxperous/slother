@@ -4,7 +4,7 @@
     $.getJSON('/calendar/user', function(calendars) {
       calendars.forEach(function (calendar) {
         var appendTarget = calendar.user ? '#calendars' : '#group_calendars';
-        calendar = timetable.replaceOrAddCalendar(calendar, true);
+        calendar = timetable.replaceOrAddCalendar(calendar, calendar.user ? true : false);
         calendar.appendToLists($(appendTarget));
       });
     });

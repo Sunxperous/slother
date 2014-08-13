@@ -339,6 +339,22 @@ router.delete('/:calendar_id/event/:event_id',
   });
 });
 
+router.get('/:calendar_id',
+  Calendar.ensureExist(true, 'There is no such calendar.'),
+  function (req, res, next) {
+    var calendar = req.attach.calendar;
+    if (calendar.group) {
+      Group.findById(calendar.group, function(err, group) {
+        if (err) { return next(err); }
+        return res.redirect(group.getUrl());
+      });
+    }    
+    else {
+      return res.redirect('/calendar/user');
+    }
+  }
+);
+
 router.get('/', function (req, res, next) {
   res.redirect('/calendar/user');
 });
