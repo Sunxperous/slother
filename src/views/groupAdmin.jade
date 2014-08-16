@@ -22,9 +22,20 @@ block content
               span.calendar-name(style='background-color: ' + member.color + ';')= member.display_name
               span.small-text= member.username
             div.control
-              if (member.isAdmin)
+              if (member.isOwner)
+                span.small-text.admin owner
+              else if (member.isAdmin)
                 span.small-text.admin admin
+                if (owner_controls)
+                  form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
+                    input(type='hidden' name='_method' value='put')
+                    input(type='hidden' name='role' value='1')
+                    input.text-input.small-text.red.clickable(type='submit' value='remove admin')
               else
+                form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
+                  input(type='hidden' name='_method' value='put')
+                  input(type='hidden' name='role' value='2')
+                  input.text-input.small-text.green.clickable(type='submit' value='make admin')
                 form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
                   input(type='hidden' name='_method' value='delete')
                   input.text-input.small-text.red.clickable(type='submit' value='remove')
@@ -40,12 +51,13 @@ block content
         div.center-button
           input#change.green(type='submit' value='Change')
 
-    .info-block
-      form#delete_group(action='admin' method='post')
-        input(type='hidden' name='_method' value='DELETE')
-        h3.info-block-title Delete this Group
-        +errors
-        div.center-button
-          input#create.red.confirm(type='submit' value='Delete group')
+    if (owner_controls)
+      .info-block
+        form#delete_group(action='admin' method='post')
+          input(type='hidden' name='_method' value='DELETE')
+          h3.info-block-title Delete this Group
+          +errors
+          div.center-button
+            input#create.red.confirm(type='submit' value='Delete group')
 
 block footScripts

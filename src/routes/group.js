@@ -184,7 +184,7 @@ router.put('/:hash/member/:username/color',
 
 // Post request to leave group.
 router.post('/:hash/leave',
-  Group.userIsType('user', false, Group.roles.ADMIN, 'Admins cannot leave the group.'), // Administrators cannot leave group at the moment.
+  Group.userIsType('user', false, Group.roles.OWNER, 'Owners cannot leave the group.'), // Administrators cannot leave group at the moment.
   Group.userIsType('user', true, Group.roles.MEMBER, 'You are not a member of the group.'),
   function(req, res, next) {
     var group = req.attach.group;

@@ -23,13 +23,18 @@ router.get('/', function(req, res, next) {
         username: user.username,
         display_name: user.display_name,
         isAdmin: group.hasUser(user, Group.roles.ADMIN),
+        isOwner: group.hasUser(user, Group.roles.OWNER), 
         color: member.color,
       });
       callback();
     });
   }, function(err) {
     if (err) { return next(err); }
-    return res.render('groupAdmin', { group: group, members: members });
+    return res.render('groupAdmin', {
+      owner_controls: group.hasUser(req.attach.user, Group.roles.OWNER),
+      group: group,
+      members: members
+    });
   });
 });
    
@@ -64,6 +69,21 @@ router.delete('/member/:username',
           }
         });
       }
+    });
+  }
+);
+
+// Put request to change member role.
+router.put('/member/:username',
+  User.ensureExistsByUsername(true, ['params', 'username'], 'There is no such user.'),
+  function(req, res, next) {
+    var group = req.attach.group;
+    var target = req.attach.target;
+    group.switchRoleById(target._id, req.body.role);
+    group.save(function(err) {
+      if (err) { return next(err); }
+      req.flash('success', 'Role of ' + target.username + ' modified.');
+      return res.redirect('/group/' + group.getHash() + '/admin');
     });
   }
 );

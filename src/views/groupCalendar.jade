@@ -36,12 +36,13 @@ block content
             input#friend_name(name='url' type='text')
           div.center-button
             input#add.green(type='submit' value='Invite')
-    .info-block
-      if (isAdmin)
+    if (isAdmin)
+      .info-block
         div
           a(href='/group/' + group.getHash() + '/admin')
             h3.info-block-title Group Settings
-      else
+    if (!isOwner)
+      .info-block
         form#leave_group(action='/group/' + group.getHash() + '/leave' method='POST')
           h3.info-block-title Leave Group
           +errors

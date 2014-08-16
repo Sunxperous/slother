@@ -69,7 +69,8 @@ router.get('/group/:hash/:name',
         }
         else { // Group found!
           var isAdmin = group.hasUser(req.attach.user, Group.roles.ADMIN);
-          return res.render('groupCalendar', { group: group, isAdmin: isAdmin });
+          var isOwner = group.hasUser(req.attach.user, Group.roles.OWNER);
+          return res.render('groupCalendar', { group: group, isAdmin: isAdmin, isOwner: isOwner });
         }
       });
     },
