@@ -6,6 +6,7 @@ config.hashid = {};
 config.hashid.salt = process.env.SALT || 'this is my salt';
 
 config.app = {};
+config.app.env = process.env.NODE_ENV || 'development';
 config.app.port = process.env.PORT || 8000;
 config.app.sessionSecret = process.env.SECRET || 'keyboard cat';
 

@@ -21,8 +21,10 @@ var Hashids = require('hashids');
 mongoose.connect(config.db.uri);
 var app = express();
 
-app.set('views', __dirname + '/views');
+app.set('env', config.app.env);
+app.set('view cache', false);
 app.set('view engine', 'jade');
+app.set('views', __dirname + '/views');
 app.set('port', config.app.port);
 
 // Routing.
