@@ -94,8 +94,15 @@ router.put('/groupName', function(req, res, next) {
   group.groupName = req.body.groupName;
   group.save(function(err) {
     if (err) { return next(err); }
-    req.flash('success', 'Group name changed to ' + group.groupName + '.');
-    return res.redirect('/group/' + group.getHash() + '/admin');
+    Calendar.update(
+      { group: group._id },
+      { name: req.body.groupName },
+      function(err, numAffected, rawResponse) {
+        if (err) { return next(err); }
+        req.flash('success', 'Group name changed to ' + group.groupName + '.');
+        return res.redirect('/group/' + group.getHash() + '/admin');
+      }
+    );
   });
 });
 
