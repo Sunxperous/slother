@@ -145,7 +145,7 @@ router.get('/login/nus/callback', function(req, res, next) {
       var newToken = new Token({ username: user.username, token: randtoken.generate(16) });
       newToken.save(function(err, token) {
         if (err) { return next(err); }
-        res.cookie('remember_me', token.token, { path: '/', httpOnly: true, maxAge: 604800000 });
+        res.cookie('remember_me', token.token, { path: '/', httpOnly: true, maxAge: config.cookies.duration });
         return res.redirect('/calendar/user');
       });
 
