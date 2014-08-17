@@ -15,30 +15,31 @@ block content
     .info-block
       h3.info-block-title Members
       +errors
-      ol#members
+      ul#members
         for member in members
           li
-            div.name
-              span.calendar-name(style='background-color: ' + member.color + ';')= member.display_name
-              span.small-text= member.username
-            div.control
-              if (member.isOwner)
-                span.small-text.admin owner
-              else if (member.isAdmin)
-                span.small-text.admin admin
-                if (owner_controls)
-                  form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
-                    input(type='hidden' name='_method' value='put')
-                    input(type='hidden' name='role' value='1')
-                    input.text-input.small-text.red.clickable(type='submit' value='remove admin')
-              else
+            span.calendar-name(style='background-color: ' + member.color + ';')= member.display_name
+            span.small-text= member.username
+            span.empty 
+            if (member.role === roles.REQUESTED)
+              span.small-text invited
+            else if (member.role === roles.OWNER)
+              span.small-text.admin owner
+            else if (member.role === roles.ADMIN)
+              span.small-text.admin admin
+              if (owner_controls)
                 form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
                   input(type='hidden' name='_method' value='put')
-                  input(type='hidden' name='role' value='2')
-                  input.text-input.small-text.green.clickable(type='submit' value='make admin')
-                form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
-                  input(type='hidden' name='_method' value='delete')
-                  input.text-input.small-text.red.clickable(type='submit' value='remove')
+                  input(type='hidden' name='role' value='1')
+                  input.text-input.small-text.red.clickable(type='submit' value='remove admin')
+            else if (member.role === roles.MEMBER)
+              form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
+                input(type='hidden' name='_method' value='put')
+                input(type='hidden' name='role' value='2')
+                input.text-input.small-text.green.clickable(type='submit' value='make admin')
+              form.remove(action='/group/' + group.getHash() + '/admin/member/' + member.username method='POST')
+                input(type='hidden' name='_method' value='delete')
+                input.text-input.small-text.red.clickable(type='submit' value='remove')
     
     .info-block
       form#delete_group(action='admin/groupName' method='post')

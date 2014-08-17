@@ -22,8 +22,7 @@ router.get('/', function(req, res, next) {
       members.push({
         username: user.username,
         display_name: user.display_name,
-        isAdmin: group.hasUser(user, Group.roles.ADMIN),
-        isOwner: group.hasUser(user, Group.roles.OWNER), 
+        role: member.role,
         color: member.color,
       });
       callback();
@@ -33,7 +32,8 @@ router.get('/', function(req, res, next) {
     return res.render('groupAdmin', {
       owner_controls: group.hasUser(req.attach.user, Group.roles.OWNER),
       group: group,
-      members: members
+      roles: Group.roles,
+      members: members,
     });
   });
 });
