@@ -479,6 +479,15 @@ div.tableWrapper {
   box-sizing: border-box;
   cursor: pointer;
 }
+
+/* Because Firefox displays extra 1px on top and left. */
+@-moz-document url-prefix() {
+  .item {
+    margin-top: -1px;
+    margin-left: -1px;
+    padding: 1px 2px 3px 2px;
+  }
+}
 /*^ calendar.jade ^*/
 
 /*v #popup v*/
